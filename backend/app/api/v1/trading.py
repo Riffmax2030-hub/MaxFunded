@@ -13,6 +13,7 @@ from app.models.challenge import Challenge, ChallengeRule, ChallengePurchase, Pu
 from app.models.trading import Trade, DailySnapshot, BreachLog
 from app.models.user import User
 from app.services.risk_engine import risk_engine
+from app.services.copy_engine import copy_engine
 from app.schemas.trading import (
     AccountMetricsSchema,
     TradeSchema,
@@ -287,6 +288,12 @@ async def simulate_trade(
         rules=purchase.challenge.rules,
         db=db,
     )
+
+    # Update company-capital signal profile (non-blocking; isolated from retail evaluation)
+    try:
+        await copy_engine.evaluate_and_score_trader(purchase_id=purchase.id, db=db)
+    except Exception:
+        pass  # Signal scoring is best-effort; never block a trade
 
     await db.commit()
     await db.refresh(purchase)

@@ -4,6 +4,15 @@ from app.models.challenge import Challenge, ChallengeRule, ChallengePurchase, Pu
 from app.models.audit import AuditLog
 from app.models.payment import Payment, PaymentProvider, PaymentStatus
 from app.models.trading import Trade, DailySnapshot, BreachLog
+from app.models.company_capital import (
+    CompanyBrokerAccount,
+    TraderSignalProfile,
+    CompanyAllocationStrategy,
+    CompanyOrderExecution,
+    BrokerType,
+    BrokerConnectionStatus,
+    AllocationStatus,
+)
 
 __all__ = [
     "BaseModel",
@@ -19,4 +28,11 @@ __all__ = [
     "Trade",
     "DailySnapshot",
     "BreachLog",
+    "CompanyBrokerAccount",
+    "TraderSignalProfile",
+    "CompanyAllocationStrategy",
+    "CompanyOrderExecution",
+    "BrokerType",
+    "BrokerConnectionStatus",
+    "AllocationStatus",
 ]
