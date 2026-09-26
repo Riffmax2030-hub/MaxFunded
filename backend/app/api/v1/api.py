@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1 import auth, users, challenges, admin, payments, trading, company_capital, kyc
+from app.api.v1 import auth, users, challenges, admin, payments, trading, company_capital, kyc, payouts
 
 api_router = APIRouter()
 
@@ -19,4 +19,10 @@ api_router.include_router(
     prefix="/kyc",
     tags=["KYC & AML Compliance"],
 )
+api_router.include_router(
+    payouts.router,
+    prefix="/payouts",
+    tags=["Trader Profit Payouts"],
+)
+
 

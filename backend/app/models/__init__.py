@@ -21,6 +21,11 @@ from app.models.kyc import (
     DocumentType,
     AMLStatus,
 )
+from app.models.payout import (
+    PayoutRequest,
+    PayoutMethod,
+    PayoutStatus,
+)
 
 __all__ = [
     "BaseModel",
@@ -49,5 +54,9 @@ __all__ = [
     "KYCVendor",
     "DocumentType",
     "AMLStatus",
+    "PayoutRequest",
+    "PayoutMethod",
+    "PayoutStatus",
 ]
+
 

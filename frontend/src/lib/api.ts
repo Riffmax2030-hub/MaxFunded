@@ -496,5 +496,149 @@ export async function rescreenKYCAML(
   return res.json();
 }
 
+// ─── Payout & Profit Withdrawal Types & API Methods ───────────────────────────
+
+export interface PayoutEligibilityData {
+  purchase_id: string;
+  challenge_name: string;
+  starting_balance: number;
+  current_balance: number;
+  current_equity: number;
+  gross_profit: number;
+  profit_split_percentage: number;
+  eligible_trader_amount: number;
+  company_fee_amount: number;
+  kyc_approved: boolean;
+  is_eligible: boolean;
+  ineligibility_reasons: string[];
+}
+
+export interface PayoutResponseData {
+  id: string;
+  user_id: string;
+  purchase_id: string;
+  amount: number;
+  trader_amount: number;
+  company_fee_amount: number;
+  profit_split_percentage: number;
+  currency: string;
+  method: "CRYPTO_USDT_TRC20" | "CRYPTO_USDT_ERC20" | "BANK_WIRE_SWIFT" | "LOCAL_BANK_NGN" | "PAYPAL";
+  payout_details: Record<string, any>;
+  status: "REQUESTED" | "UNDER_REVIEW" | "APPROVED" | "PROCESSING" | "PAID" | "REJECTED" | "CANCELLED";
+  tx_hash_or_reference?: string;
+  rejection_reason?: string;
+  admin_notes?: string;
+  reviewer_id?: string;
+  requested_at: string;
+  reviewed_at?: string;
+  processed_at?: string;
+  created_at: string;
+}
+
+export interface PayoutRequestPayload {
+  purchase_id: string;
+  amount?: number;
+  method: string;
+  payout_details: Record<string, any>;
+}
+
+export interface AdminPayoutReviewPayload {
+  status: string;
+  tx_hash_or_reference?: string;
+  admin_notes?: string;
+  rejection_reason?: string;
+}
+
+export async function fetchPayoutEligibility(
+  purchaseId: string,
+  token: string
+): Promise<PayoutEligibilityData> {
+  const res = await fetch(`${API_BASE}/payouts/eligibility/${purchaseId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error("Failed to load payout eligibility");
+  return res.json();
+}
+
+export async function requestTraderPayout(
+  payload: PayoutRequestPayload,
+  token: string
+): Promise<PayoutResponseData> {
+  const res = await fetch(`${API_BASE}/payouts/request`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Payout request failed" }));
+    throw new Error(err.detail || "Payout request failed");
+  }
+  return res.json();
+}
+
+export async function fetchMyPayouts(token: string): Promise<PayoutResponseData[]> {
+  const res = await fetch(`${API_BASE}/payouts/my-payouts`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error("Failed to load payout history");
+  return res.json();
+}
+
+export async function cancelTraderPayout(
+  payoutId: string,
+  token: string
+): Promise<PayoutResponseData> {
+  const res = await fetch(`${API_BASE}/payouts/${payoutId}/cancel`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Cancellation failed" }));
+    throw new Error(err.detail || "Cancellation failed");
+  }
+  return res.json();
+}
+
+export async function fetchAdminPayoutQueue(
+  token: string,
+  statusFilter?: string
+): Promise<PayoutResponseData[]> {
+  const url = statusFilter
+    ? `${API_BASE}/payouts/admin/queue?status_filter=${statusFilter}`
+    : `${API_BASE}/payouts/admin/queue`;
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error("Failed to load admin payout queue");
+  return res.json();
+}
+
+export async function reviewAdminPayout(
+  payoutId: string,
+  payload: AdminPayoutReviewPayload,
+  token: string
+): Promise<PayoutResponseData> {
+  const res = await fetch(`${API_BASE}/payouts/admin/${payoutId}/review`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Payout review failed" }));
+    throw new Error(err.detail || "Payout review failed");
+  }
+  return res.json();
+}
+
+
 
 
