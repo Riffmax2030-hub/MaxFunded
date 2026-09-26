@@ -26,6 +26,10 @@ from app.models.payout import (
     PayoutMethod,
     PayoutStatus,
 )
+from app.models.certificate import (
+    Certificate,
+    CertificateType,
+)
 
 __all__ = [
     "BaseModel",
@@ -57,6 +61,8 @@ __all__ = [
     "PayoutRequest",
     "PayoutMethod",
     "PayoutStatus",
+    "Certificate",
+    "CertificateType",
 ]
 
 

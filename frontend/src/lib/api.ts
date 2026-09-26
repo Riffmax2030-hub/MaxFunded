@@ -739,3 +739,59 @@ export async function fetchPerformanceReport(token: string): Promise<Performance
   }
   return res.json();
 }
+
+// ============================================================
+// Phase 9 — Cryptographic Certificates & Public Verification
+// ============================================================
+
+export interface CertificateItem {
+  id: string;
+  certificate_code: string;
+  user_id: string;
+  purchase_id: string;
+  certificate_type: "PHASE_1_PASSED" | "PHASE_2_PASSED" | "FUNDED_TRADER" | "PAYOUT_ACHIEVER";
+  trader_name: string;
+  challenge_name: string;
+  account_size: string;
+  payout_amount: string | null;
+  sha256_signature: string;
+  is_revoked: boolean;
+  revocation_reason: string | null;
+  created_at: string;
+}
+
+export interface PublicCertificateData {
+  is_valid: boolean;
+  certificate_code: string;
+  certificate_type: "PHASE_1_PASSED" | "PHASE_2_PASSED" | "FUNDED_TRADER" | "PAYOUT_ACHIEVER";
+  trader_name: string;
+  challenge_name: string;
+  account_size: string;
+  payout_amount: string | null;
+  issued_at: string;
+  sha256_signature: string;
+  is_revoked: boolean;
+  revocation_reason: string | null;
+  issuer: string;
+  verification_url: string;
+}
+
+export async function fetchMyCertificates(token: string): Promise<CertificateItem[]> {
+  const res = await fetch(`${API_BASE}/certificates/my`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Failed to fetch certificates" }));
+    throw new Error(err.detail || "Failed to fetch certificates");
+  }
+  return res.json();
+}
+
+export async function verifyCertificatePublic(code: string): Promise<PublicCertificateData> {
+  const res = await fetch(`${API_BASE}/certificates/verify/${encodeURIComponent(code)}`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Certificate not found or invalid" }));
+    throw new Error(err.detail || "Certificate not found or invalid");
+  }
+  return res.json();
+}
