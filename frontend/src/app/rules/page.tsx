@@ -1,7 +1,6 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import Link from "next/link";
 
 const rules = [
   {
@@ -136,8 +135,7 @@ const rules = [
 
 export default function RulesPage() {
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <Navbar />
+    <div className="min-h-screen bg-slate-950 text-white">
 
       {/* Hero */}
       <section className="pt-24 pb-12 px-4 text-center bg-gradient-to-b from-gray-900 to-gray-950">
@@ -205,8 +203,6 @@ export default function RulesPage() {
           </p>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }

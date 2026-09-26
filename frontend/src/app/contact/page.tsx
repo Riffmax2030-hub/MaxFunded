@@ -1,18 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-
-const SUPPORT_EMAIL = "support@riffmaxfunding.com";
+import { BRAND } from "@/lib/branding";
+import { Mail, Clock, ShieldCheck, CheckCircle2 } from "lucide-react";
 
 const topics = [
-  "Account Provisioning Issue",
-  "Payment / Billing Question",
-  "Payout Request Help",
-  "Rule Clarification",
-  "Technical / MT5 Issue",
-  "KYC / Compliance",
+  "Account Provisioning & Credentials",
+  "Payment & Billing Assistance",
+  "Payout Request Inquiries",
+  "Risk Rule Clarifications",
+  "Technical Platform Support",
+  "KYC & Compliance Verification",
+  "Affiliate & Partnership Inquiries",
   "Other",
 ];
 
@@ -30,143 +29,147 @@ export default function ContactPage() {
       setError("Please fill in all required fields.");
       return;
     }
-    // In production this will POST to /api/v1/support/ticket
-    // For now, simulate success
+    // Simulate support ticket submission
     await new Promise((r) => setTimeout(r, 800));
     setSubmitted(true);
     setError("");
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <Navbar />
-
+    <div className="min-h-screen bg-slate-950 text-white">
       {/* Hero */}
-      <section className="pt-24 pb-12 px-4 text-center bg-gradient-to-b from-gray-900 to-gray-950">
-        <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
-          Contact <span className="text-emerald-400">Support</span>
+      <section className="pt-20 pb-12 px-4 text-center bg-gradient-to-b from-slate-900 to-slate-950">
+        <h1 className="text-4xl md:text-5xl font-extrabold mb-4 tracking-tight">
+          Contact <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">Support</span>
         </h1>
-        <p className="text-gray-400 text-lg max-w-xl mx-auto">
-          Our team responds within 1 business day. For urgent issues, include
-          your account email and purchase ID in your message.
+        <p className="text-slate-400 text-lg max-w-xl mx-auto">
+          Our global operations desk operates 24/7. Average response time is under 2 hours.
         </p>
       </section>
 
       <section className="max-w-5xl mx-auto px-4 pb-24 grid md:grid-cols-2 gap-12">
         {/* Contact Info */}
         <div className="space-y-6">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-            <h3 className="font-bold text-emerald-400 mb-1 text-sm uppercase tracking-wider">Email Support</h3>
-            <p className="text-white font-semibold">{SUPPORT_EMAIL}</p>
-            <p className="text-gray-500 text-xs mt-1">Response time: within 1 business day</p>
-          </div>
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-            <h3 className="font-bold text-emerald-400 mb-1 text-sm uppercase tracking-wider">Support Hours</h3>
-            <p className="text-white text-sm">Monday – Friday</p>
-            <p className="text-gray-400 text-sm">09:00 – 18:00 UTC</p>
-            <p className="text-gray-500 text-xs mt-1">We do not offer live chat at this time.</p>
-          </div>
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-            <h3 className="font-bold text-emerald-400 mb-3 text-sm uppercase tracking-wider">Quick Links</h3>
-            <div className="space-y-2">
-              {[
-                { label: "Challenge Rules", href: "/rules" },
-                { label: "Trading Conditions", href: "/trading-conditions" },
-                { label: "Payout Policy", href: "/payout-policy" },
-                { label: "Refund Policy", href: "/refund-policy" },
-                { label: "FAQ", href: "/faq" },
-              ].map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="block text-sm text-gray-400 hover:text-emerald-400 transition-colors"
-                >
-                  → {link.label}
-                </a>
-              ))}
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <div className="flex items-center gap-3 mb-2">
+              <Mail className="w-5 h-5 text-brand-400" />
+              <h3 className="font-bold text-white text-sm uppercase tracking-wider">Direct Desk Email</h3>
             </div>
+            <p className="text-brand-400 font-semibold font-mono text-sm">{BRAND.supportEmail}</p>
+            <p className="text-slate-400 text-xs mt-2">
+              For security, always email us from your registered account email address.
+            </p>
+          </div>
+
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <div className="flex items-center gap-3 mb-2">
+              <Clock className="w-5 h-5 text-emerald-400" />
+              <h3 className="font-bold text-white text-sm uppercase tracking-wider">Trading Hours & Desk Operations</h3>
+            </div>
+            <p className="text-slate-300 text-sm">
+              Server Time: <span className="text-white font-mono font-semibold">UTC+2 / UTC+3 (EET/EEST)</span>
+            </p>
+            <p className="text-slate-400 text-xs mt-2">
+              Automated risk checks and breach evaluations operate continuously without pause.
+            </p>
+          </div>
+
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <div className="flex items-center gap-3 mb-2">
+              <ShieldCheck className="w-5 h-5 text-indigo-400" />
+              <h3 className="font-bold text-white text-sm uppercase tracking-wider">Compliance & Legal</h3>
+            </div>
+            <p className="text-slate-300 text-xs font-mono">{BRAND.complianceEmail}</p>
+            <p className="text-slate-400 text-xs mt-2">
+              Identity verification, sanction checks, and corporate documentation.
+            </p>
           </div>
         </div>
 
-        {/* Contact Form */}
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8">
+        {/* Ticket Form */}
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8">
           {submitted ? (
-            <div className="text-center py-8">
-              <div className="text-5xl mb-4">✅</div>
-              <h3 className="text-xl font-bold text-white mb-2">Message Received</h3>
-              <p className="text-gray-400 text-sm">
-                We&apos;ve received your message and will respond to{" "}
-                <span className="text-emerald-400">{email}</span> within 1 business day.
+            <div className="text-center py-12 space-y-4">
+              <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto" />
+              <h3 className="text-2xl font-bold text-white">Ticket Created</h3>
+              <p className="text-slate-400 text-sm max-w-sm mx-auto">
+                Thank you for reaching out. A support officer will inspect your inquiry and reply to <strong className="text-white">{email}</strong> shortly.
               </p>
+              <button
+                onClick={() => { setSubmitted(false); setName(""); setEmail(""); setMessage(""); }}
+                className="mt-4 px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition"
+              >
+                Send Another Inquiry
+              </button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <h2 className="text-lg font-bold mb-2">Send a Message</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <h2 className="text-xl font-bold text-white mb-2">Create Support Ticket</h2>
+
               {error && (
-                <div className="bg-red-900/30 border border-red-700 text-red-400 text-sm px-4 py-3 rounded-lg">
+                <div className="bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs p-3 rounded-xl">
                   {error}
                 </div>
               )}
+
               <div>
-                <label className="block text-xs text-gray-400 mb-1">
-                  Full Name <span className="text-red-400">*</span>
-                </label>
+                <label className="block text-xs font-semibold text-slate-400 mb-1">Your Full Name</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-emerald-500"
-                  placeholder="Your name"
+                  className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500 transition"
+                  placeholder="e.g. John Doe"
                 />
               </div>
+
               <div>
-                <label className="block text-xs text-gray-400 mb-1">
-                  Email Address <span className="text-red-400">*</span>
-                </label>
+                <label className="block text-xs font-semibold text-slate-400 mb-1">Registered Account Email</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-emerald-500"
-                  placeholder="you@example.com"
+                  className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500 transition"
+                  placeholder="trader@domain.com"
                 />
               </div>
+
               <div>
-                <label className="block text-xs text-gray-400 mb-1">Topic</label>
+                <label className="block text-xs font-semibold text-slate-400 mb-1">Inquiry Category</label>
                 <select
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500 transition"
                 >
                   {topics.map((t) => (
-                    <option key={t} value={t}>{t}</option>
+                    <option key={t} value={t} className="bg-slate-900 text-white">
+                      {t}
+                    </option>
                   ))}
                 </select>
               </div>
+
               <div>
-                <label className="block text-xs text-gray-400 mb-1">
-                  Message <span className="text-red-400">*</span>
-                </label>
+                <label className="block text-xs font-semibold text-slate-400 mb-1">Message Details</label>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  rows={5}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-emerald-500 resize-none"
-                  placeholder="Describe your issue or question in detail..."
+                  rows={4}
+                  className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500 resize-none transition"
+                  placeholder="Provide account ID, MT5 login, or issue details..."
                 />
               </div>
+
               <button
                 type="submit"
-                className="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-3 rounded-lg transition-colors"
+                className="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs py-3.5 rounded-xl transition shadow-lg shadow-brand-600/30"
               >
-                Send Message
+                Submit Support Ticket
               </button>
             </form>
           )}
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }

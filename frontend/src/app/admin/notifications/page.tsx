@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { getSession } from "@/lib/auth";
 import {
   fetchAdminWebhooks,
@@ -100,7 +98,7 @@ export default function AdminWebhooksPage() {
         target_service: w.target_service,
         webhook_url: w.webhook_url,
         event_type: "PHASE_PASSED",
-        custom_title: "Test Alert from Riffmax Console",
+        custom_title: "Test Alert from MaxFunded Console",
         custom_message: `Verifying ${w.name} connectivity to ${w.target_service} channel.`,
       });
       setTestResult({
@@ -118,7 +116,6 @@ export default function AdminWebhooksPage() {
 
   return (
     <>
-      <Navbar />
       <main className="min-h-screen bg-slate-950 text-white pt-24 pb-20 px-4">
         <div className="max-w-6xl mx-auto space-y-8">
           {/* Header */}
@@ -350,8 +347,6 @@ export default function AdminWebhooksPage() {
           </div>
         </div>
       )}
-
-      <Footer />
     </>
   );
 }

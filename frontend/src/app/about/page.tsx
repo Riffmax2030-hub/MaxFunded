@@ -1,24 +1,22 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import { BRAND } from "@/lib/branding";
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <Navbar />
-
+    <div className="min-h-screen bg-slate-950 text-white">
       {/* Hero */}
-      <section className="pt-24 pb-20 px-4 text-center bg-gradient-to-b from-gray-900 to-gray-950">
+      <section className="pt-20 pb-16 px-4 text-center bg-gradient-to-b from-slate-900 to-slate-950">
         <div className="max-w-3xl mx-auto">
-          <div className="text-5xl mb-6">🌍</div>
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-6">
-            About <span className="text-emerald-400">RiffMax Funding</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-xs font-semibold uppercase tracking-wider mb-6">
+            Institutional Evaluation Platform
+          </div>
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">
+            About <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">{BRAND.name}</span>
           </h1>
-          <p className="text-gray-300 text-lg leading-relaxed">
+          <p className="text-slate-300 text-lg leading-relaxed">
             We believe that trading talent exists everywhere — and that access
-            to capital should not be the barrier that stands between a skilled
-            trader and a serious career.
+            to capital should not be the barrier standing between a disciplined trader and financial freedom.
           </p>
         </div>
       </section>
@@ -26,90 +24,90 @@ export default function AboutPage() {
       {/* Mission */}
       <section className="max-w-4xl mx-auto px-4 pb-20 grid md:grid-cols-2 gap-12 items-start">
         <div>
-          <h2 className="text-2xl font-bold mb-4 text-emerald-400">Our Mission</h2>
-          <p className="text-gray-400 leading-relaxed mb-4">
-            RiffMax Funding exists to identify, evaluate, and support skilled
+          <h2 className="text-2xl font-bold mb-4 text-brand-400">Our Mission</h2>
+          <p className="text-slate-400 leading-relaxed mb-4">
+            {BRAND.name} exists to identify, evaluate, and fund skilled
             independent traders globally. We provide structured evaluation
-            programmes that measure trading ability — not starting capital.
+            programmes that measure trading ability, discipline, and risk management — not your starting capital.
           </p>
-          <p className="text-gray-400 leading-relaxed">
-            Traders who prove consistent, rule-compliant performance are offered
-            funded arrangements with profit-sharing. We make no promises about
-            earnings — trading is inherently risky — but we do promise
-            transparency, fairness, and clearly defined rules.
+          <p className="text-slate-400 leading-relaxed">
+            Traders who prove consistent, rule-compliant performance are awarded
+            funded accounts with up to a 90% profit-sharing split. We make no unrealistic promises — trading requires genuine skill and patience — but we guarantee transparency, deterministic execution, and fast payouts.
           </p>
         </div>
         <div>
-          <h2 className="text-2xl font-bold mb-4 text-emerald-400">What We Are Not</h2>
-          <ul className="space-y-3 text-gray-400 text-sm leading-relaxed">
+          <h2 className="text-2xl font-bold mb-4 text-brand-400">What We Are Not</h2>
+          <ul className="space-y-3 text-slate-400 text-sm leading-relaxed">
             <li className="flex gap-3">
-              <span className="text-red-400 mt-0.5">✗</span>
-              <span>We are <strong className="text-white">not a broker</strong> — we do not execute live trades on your behalf.</span>
+              <span className="text-rose-400 mt-0.5">✗</span>
+              <span>We are <strong className="text-white">not a broker</strong> — we do not take customer deposits or execute retail brokerage orders.</span>
             </li>
             <li className="flex gap-3">
-              <span className="text-red-400 mt-0.5">✗</span>
-              <span>We are <strong className="text-white">not an investment platform</strong> — we do not manage your money or accept deposits.</span>
+              <span className="text-rose-400 mt-0.5">✗</span>
+              <span>We are <strong className="text-white">not an investment fund</strong> — we do not manage your money or solicit investment capital.</span>
             </li>
             <li className="flex gap-3">
-              <span className="text-red-400 mt-0.5">✗</span>
-              <span>We are <strong className="text-white">not a get-rich-quick scheme</strong> — passing an evaluation requires genuine skill and discipline.</span>
+              <span className="text-rose-400 mt-0.5">✗</span>
+              <span>We are <strong className="text-white">not a get-rich-quick scheme</strong> — passing an evaluation requires genuine discipline and risk control.</span>
             </li>
             <li className="flex gap-3">
-              <span className="text-red-400 mt-0.5">✗</span>
-              <span>We do <strong className="text-white">not guarantee returns</strong> — all trading involves risk.</span>
+              <span className="text-rose-400 mt-0.5">✗</span>
+              <span>We do <strong className="text-white">not guarantee returns</strong> — all market trading carries inherent financial risk.</span>
             </li>
           </ul>
         </div>
       </section>
 
-      {/* Values */}
-      <section className="bg-gray-900 border-y border-gray-800 py-20 px-4 mb-20">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-12">Our Values</h2>
-          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
+      {/* How it works summary */}
+      <section className="bg-slate-900/60 border-y border-slate-800/80 py-16 px-4">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold text-center mb-10 text-white">How the Model Works</h2>
+          <div className="grid md:grid-cols-3 gap-8">
             {[
-              { icon: "🔎", title: "Transparency", desc: "Every rule, fee, and condition is published in full before you commit." },
-              { icon: "⚖️", title: "Fairness", desc: "Consistent rule enforcement for every trader, regardless of origin or background." },
-              { icon: "🌐", title: "Accessibility", desc: "Designed for international traders — not limited by geography." },
-              { icon: "🛡️", title: "Integrity", desc: "We operate with a strict compliance framework and zero tolerance for fraud." },
-            ].map((v) => (
-              <div key={v.title} className="bg-gray-800/60 rounded-2xl p-6 text-center border border-gray-700/50">
-                <div className="text-4xl mb-4">{v.icon}</div>
-                <h3 className="font-bold text-white mb-2">{v.title}</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">{v.desc}</p>
+              {
+                step: "01",
+                title: "Evaluation Phase",
+                desc: "Choose a simulated challenge tier ($10K–$200K). Prove consistency by hitting the profit target while keeping within daily loss and total drawdown parameters.",
+              },
+              {
+                step: "02",
+                title: "Verification & Pass",
+                desc: "Complete your KYC identity verification and receive your cryptographic HMAC-SHA256 certificate of achievement.",
+              },
+              {
+                step: "03",
+                title: "Funded Trader Rewards",
+                desc: "Trade simulated institutional capital and request bi-weekly performance rewards with up to 90% profit splits.",
+              },
+            ].map((item) => (
+              <div key={item.step} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 relative">
+                <span className="text-3xl font-extrabold text-brand-500/30 font-mono mb-2 block">{item.step}</span>
+                <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
+                <p className="text-slate-400 text-xs leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Legal */}
-      <section className="max-w-3xl mx-auto px-4 pb-24">
-        <div className="bg-gray-900 border border-gray-700 rounded-2xl p-8">
-          <h2 className="text-xl font-bold mb-4 text-emerald-400">Legal & Compliance</h2>
-          <p className="text-gray-400 text-sm leading-relaxed mb-3">
-            RiffMax Funding is operated by Riffmax Technologies and related
-            entities. The company is incorporated and registered as required
-            by applicable law. Our platform is designed to operate in
-            compliance with the regulatory environments of the jurisdictions we
-            serve.
+      {/* Legal & Compliance */}
+      <section className="max-w-3xl mx-auto px-4 py-20">
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8">
+          <h2 className="text-xl font-bold mb-4 text-brand-400">Legal & Compliance</h2>
+          <p className="text-slate-400 text-sm leading-relaxed mb-3">
+            {BRAND.name} is operated by {BRAND.operatingEntity} under {BRAND.parentCompany}. Our platform operates in strict compliance with applicable global regulatory frameworks.
           </p>
-          <p className="text-gray-400 text-sm leading-relaxed mb-3">
-            We maintain an active compliance programme including KYC (Know Your
-            Customer) and AML (Anti-Money Laundering) checks for all traders
-            who reach the funded stage. Traders from restricted jurisdictions
-            are not eligible.
+          <p className="text-slate-400 text-sm leading-relaxed mb-3">
+            We maintain an institutional compliance programme including KYC (Know Your Customer) and AML (Anti-Money Laundering) checks for all traders who qualify for funded accounts. Traders from restricted jurisdictions are prohibited from purchasing evaluation challenges.
           </p>
-          <p className="text-gray-400 text-sm leading-relaxed">
+          <p className="text-slate-400 text-sm leading-relaxed">
             Use of this platform constitutes acceptance of our{" "}
-            <a href="/terms" className="text-emerald-400 underline">Terms of Service</a>,{" "}
-            <a href="/privacy" className="text-emerald-400 underline">Privacy Policy</a>, and{" "}
-            <a href="/risk-disclosure" className="text-emerald-400 underline">Risk Disclosure</a>.
+            <a href="/terms" className="text-brand-400 underline">Terms of Service</a>,{" "}
+            <a href="/privacy" className="text-brand-400 underline">Privacy Policy</a>, and{" "}
+            <a href="/risk-disclosure" className="text-brand-400 underline">Risk Disclosure</a>.
           </p>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }

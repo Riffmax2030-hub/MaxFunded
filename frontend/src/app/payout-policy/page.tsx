@@ -1,22 +1,19 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 const LAST_UPDATED = "1 September 2025";
-const EMAIL = "payouts@riffmaxfunding.com";
+const EMAIL = "payouts@maxfunded.com";
 
 export default function PayoutPolicyPage() {
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <Navbar />
+    <div className="min-h-screen bg-slate-950 text-white">
       <section className="pt-24 pb-8 px-4 text-center bg-gradient-to-b from-gray-900 to-gray-950">
         <h1 className="text-3xl md:text-4xl font-extrabold mb-2">Payout Policy</h1>
-        <p className="text-gray-500 text-sm">Last Updated: {LAST_UPDATED}</p>
+        <p className="text-slate-500 text-sm">Last Updated: {LAST_UPDATED}</p>
       </section>
 
       <article className="max-w-3xl mx-auto px-4 pb-24">
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 space-y-8 text-gray-400 text-sm leading-relaxed">
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 space-y-8 text-slate-400 text-sm leading-relaxed">
 
           <div>
             <h2 className="text-white text-lg font-bold mb-3">1. Profit Split</h2>
@@ -113,8 +110,6 @@ export default function PayoutPolicyPage() {
 
         </div>
       </article>
-
-      <Footer />
     </div>
   );
 }

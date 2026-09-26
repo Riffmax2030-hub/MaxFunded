@@ -3,8 +3,6 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { getSession } from "@/lib/auth";
 import { fetchPaymentStatus, PaymentStatusResponse } from "@/lib/api";
 import {
@@ -178,7 +176,7 @@ function SuccessContent() {
       <div className="bg-dark-950 border border-dark-800 rounded-xl p-5 text-left space-y-3">
         <div className="flex items-center justify-between text-xs border-b border-dark-800 pb-2">
           <span className="text-gray-400">Environment</span>
-          <span className="font-semibold text-emerald-400">RiffMax Simulated MT5</span>
+          <span className="font-semibold text-emerald-400">MaxFunded Simulated MT5</span>
         </div>
         <div className="flex items-center justify-between text-xs border-b border-dark-800 pb-2">
           <span className="text-gray-400">Payment Gateway</span>
@@ -206,7 +204,6 @@ function SuccessContent() {
 export default function CheckoutSuccessPage() {
   return (
     <div className="min-h-screen bg-dark-950 text-white flex flex-col justify-between">
-      <Navbar />
       <main className="max-w-2xl mx-auto px-4 py-16 flex-grow w-full flex items-center justify-center">
         <Suspense
           fallback={
@@ -219,7 +216,6 @@ export default function CheckoutSuccessPage() {
           <SuccessContent />
         </Suspense>
       </main>
-      <Footer />
     </div>
   );
 }

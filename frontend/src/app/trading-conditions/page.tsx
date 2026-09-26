@@ -1,7 +1,5 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 const instruments = [
   {
@@ -63,28 +61,27 @@ const conditions = [
 
 export default function TradingConditionsPage() {
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <Navbar />
+    <div className="min-h-screen bg-slate-950 text-white">
 
       {/* Hero */}
       <section className="pt-24 pb-12 px-4 text-center bg-gradient-to-b from-gray-900 to-gray-950">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
           Trading <span className="text-emerald-400">Conditions</span>
         </h1>
-        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+        <p className="text-slate-400 text-lg max-w-2xl mx-auto">
           Full instrument specifications, leverage limits, execution model, and
-          platform details for all RiffMax Funding evaluation accounts.
+          platform details for all MaxFunded evaluation accounts.
         </p>
       </section>
 
       {/* General Conditions Table */}
       <section className="max-w-4xl mx-auto px-4 pb-16">
         <h2 className="text-xl font-bold mb-6">General Account Conditions</h2>
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
           <div className="divide-y divide-gray-800">
             {conditions.map((row) => (
               <div key={row.label} className="flex flex-col sm:flex-row sm:items-center px-6 py-4 gap-1">
-                <div className="sm:w-1/2 text-sm text-gray-400 font-medium">{row.label}</div>
+                <div className="sm:w-1/2 text-sm text-slate-400 font-medium">{row.label}</div>
                 <div className="sm:w-1/2 text-sm text-white font-semibold">{row.value}</div>
               </div>
             ))}
@@ -95,37 +92,37 @@ export default function TradingConditionsPage() {
       {/* Instruments */}
       <section className="max-w-5xl mx-auto px-4 pb-24 space-y-8">
         <h2 className="text-xl font-bold mb-2">Available Instruments</h2>
-        <p className="text-gray-500 text-sm mb-6">
+        <p className="text-slate-500 text-sm mb-6">
           Instrument availability may vary by jurisdiction. Spreads are variable and widen during low-liquidity periods.
         </p>
         {instruments.map((inst) => (
-          <div key={inst.category} className="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-800 bg-gray-900/80">
+          <div key={inst.category} className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-800 bg-slate-900/80">
               <h3 className="font-bold text-emerald-400">{inst.category}</h3>
             </div>
             <div className="px-6 py-4">
               <div className="flex flex-wrap gap-2 mb-4">
                 {inst.pairs.map((p) => (
-                  <span key={p} className="bg-gray-800 text-gray-200 text-xs px-3 py-1 rounded-full border border-gray-700">
+                  <span key={p} className="bg-slate-800 text-gray-200 text-xs px-3 py-1 rounded-full border border-slate-700">
                     {p}
                   </span>
                 ))}
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                 <div>
-                  <div className="text-gray-500 text-xs mb-1">Max Leverage</div>
+                  <div className="text-slate-500 text-xs mb-1">Max Leverage</div>
                   <div className="text-white font-semibold">{inst.maxLeverage}</div>
                 </div>
                 <div>
-                  <div className="text-gray-500 text-xs mb-1">Typical Spread</div>
+                  <div className="text-slate-500 text-xs mb-1">Typical Spread</div>
                   <div className="text-white font-semibold">{inst.typicalSpread}</div>
                 </div>
                 <div>
-                  <div className="text-gray-500 text-xs mb-1">Commission</div>
+                  <div className="text-slate-500 text-xs mb-1">Commission</div>
                   <div className="text-white font-semibold">{inst.commission}</div>
                 </div>
                 <div>
-                  <div className="text-gray-500 text-xs mb-1">Swaps</div>
+                  <div className="text-slate-500 text-xs mb-1">Swaps</div>
                   <div className="text-white font-semibold">{inst.swaps}</div>
                 </div>
               </div>
@@ -138,17 +135,15 @@ export default function TradingConditionsPage() {
           <p className="text-blue-400 text-xs font-semibold uppercase tracking-wider mb-2">
             Disclaimer
           </p>
-          <p className="text-gray-400 text-sm leading-relaxed">
+          <p className="text-slate-400 text-sm leading-relaxed">
             All trading conditions described apply exclusively to simulated evaluation accounts.
             Conditions are subject to change. Spreads, leverage, and commissions reflect the
             simulated environment and may differ from live market conditions. Cryptocurrency
             instruments are available 24/7 but liquidity may be reduced during certain hours.
-            RiffMax Funding is not a broker and does not hold client funds.
+            MaxFunded is not a broker and does not hold client funds.
           </p>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }

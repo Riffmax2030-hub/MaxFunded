@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { getSession } from "@/lib/auth";
 import { fetchMyCertificates, CertificateItem } from "@/lib/api";
 import {
@@ -92,10 +90,8 @@ export default function TraderCertificatesPage() {
   };
 
   return (
-    <>
-      <Navbar />
-      <main className="min-h-screen bg-slate-950 text-white pt-24 pb-20 px-4">
-        <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-slate-950 text-white pt-6 pb-20 px-4">
+      <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
@@ -231,8 +227,6 @@ export default function TraderCertificatesPage() {
             </div>
           )}
         </div>
-      </main>
-      <Footer />
-    </>
+      </div>
   );
 }

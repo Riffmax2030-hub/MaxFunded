@@ -217,7 +217,7 @@ export default async function HomePage() {
           <div className="p-5 rounded-xl bg-dark-850 border border-dark-700/70">
             <h4 className="text-sm font-semibold text-white mb-2">Is this a retail investment platform?</h4>
             <p className="text-xs text-gray-400 leading-relaxed">
-              No. RiffMax Funding is a proprietary trading evaluation firm. All participant accounts operate in a simulated market environment. We do not manage customer deposits or offer retail investment products.
+              No. MaxFunded is a proprietary trading evaluation firm. All participant accounts operate in a simulated market environment with fictitious capital. We do not manage customer deposits or offer retail investment products.
             </p>
           </div>
 

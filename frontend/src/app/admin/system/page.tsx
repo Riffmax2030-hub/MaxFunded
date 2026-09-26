@@ -3,8 +3,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { getSession } from "@/lib/auth";
 import {
   fetchSystemHealth,
@@ -160,7 +158,6 @@ export default function AdminSystemPage() {
 
   return (
     <>
-      <Navbar />
       <main className="min-h-screen bg-slate-950 text-white pt-24 pb-20 px-4">
         <div className="max-w-7xl mx-auto space-y-8">
 
@@ -470,7 +467,6 @@ export default function AdminSystemPage() {
 
         </div>
       </main>
-      <Footer />
     </>
   );
 }

@@ -1,28 +1,25 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 const LAST_UPDATED = "1 September 2025";
-const EMAIL = "privacy@riffmaxfunding.com";
+const EMAIL = "privacy@maxfunded.com";
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <Navbar />
+    <div className="min-h-screen bg-slate-950 text-white">
       <section className="pt-24 pb-8 px-4 text-center bg-gradient-to-b from-gray-900 to-gray-950">
         <h1 className="text-3xl md:text-4xl font-extrabold mb-2">Privacy Policy</h1>
-        <p className="text-gray-500 text-sm">Last Updated: {LAST_UPDATED}</p>
+        <p className="text-slate-500 text-sm">Last Updated: {LAST_UPDATED}</p>
       </section>
 
       <article className="max-w-3xl mx-auto px-4 pb-24">
-        <div className="space-y-8 text-gray-400 text-sm leading-relaxed">
+        <div className="space-y-8 text-slate-400 text-sm leading-relaxed">
           <div>
             <h2 className="text-white text-xl font-bold mb-3">1. Introduction</h2>
             <p>
-              Riffmax Technologies (&ldquo;Company&rdquo;, &ldquo;we&rdquo;) is committed to protecting your personal data.
+              MaxFunded Global Ltd. (&ldquo;Company&rdquo;, &ldquo;we&rdquo;) is committed to protecting your personal data.
               This Privacy Policy explains what data we collect, why we collect it, how we use it,
-              and your rights regarding it. It applies to all users of the RiffMax Funding platform.
+              and your rights regarding it. It applies to all users of the MaxFunded platform.
             </p>
           </div>
 
@@ -133,8 +130,6 @@ export default function PrivacyPage() {
           </div>
         </div>
       </article>
-
-      <Footer />
     </div>
   );
 }

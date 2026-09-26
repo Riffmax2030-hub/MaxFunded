@@ -250,7 +250,7 @@ export default function KYCPage() {
                 {summary?.rejection_reason || "Verification requirements not met."}
               </div>
               <p className="text-xs text-slate-400 mt-2">
-                For appeals, please contact <a href="mailto:compliance@riffmaxfunding.com" className="text-primary-400 underline">compliance@riffmaxfunding.com</a>.
+                For appeals, please contact <a href="mailto:compliance@maxfunded.com" className="text-primary-400 underline">compliance@maxfunded.com</a>.
               </p>
             </div>
           </div>
@@ -467,7 +467,7 @@ export default function KYCPage() {
                     className="mt-1 rounded bg-dark-800 border-dark-700 text-primary-600 focus:ring-0"
                   />
                   <div className="text-xs text-slate-300">
-                    <span className="font-semibold text-white">Compliance Attestation:</span> I hereby certify that the information and documents provided are genuine, valid, and belong to me. I acknowledge that RiffMax Technologies Ltd verifies identities in accordance with global Anti-Money Laundering (AML) and Counter-Terrorist Financing (CTF) standards.
+                    <span className="font-semibold text-white">Compliance Attestation:</span> I hereby certify that the information and documents provided are genuine, valid, and belong to me. I acknowledge that MaxFunded Global Ltd. Ltd verifies identities in accordance with global Anti-Money Laundering (AML) and Counter-Terrorist Financing (CTF) standards.
                   </div>
                 </label>
               </div>

@@ -6,8 +6,8 @@ export interface AuthSession {
   isAdmin: boolean;
 }
 
-const TOKEN_KEY = "riffmax_auth_token";
-const USER_KEY = "riffmax_auth_user";
+const TOKEN_KEY = "maxfunded_auth_token";
+const USER_KEY = "maxfunded_auth_user";
 
 export function saveSession(token: string, user: { id: string; email: string; role: string; is_admin: boolean }) {
   if (typeof window !== "undefined") {

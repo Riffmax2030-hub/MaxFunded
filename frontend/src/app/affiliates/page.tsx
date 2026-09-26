@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { getSession } from "@/lib/auth";
 import {
   fetchMyAffiliateProfile,
@@ -84,7 +82,7 @@ export default function AffiliateDashboardPage() {
 
   const copyReferralUrl = () => {
     if (!profile) return;
-    const origin = typeof window !== "undefined" ? window.location.origin : "https://riffmaxfunding.com";
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://maxfunded.com";
     const url = `${origin}?ref=${profile.referral_code}`;
     navigator.clipboard.writeText(url);
     setCopiedLink(true);
@@ -144,7 +142,6 @@ export default function AffiliateDashboardPage() {
 
   return (
     <>
-      <Navbar />
       <main className="min-h-screen bg-slate-950 text-white pt-24 pb-20 px-4">
         <div className="max-w-6xl mx-auto space-y-8">
           {/* Header */}
@@ -195,7 +192,7 @@ export default function AffiliateDashboardPage() {
 
                     <div className="flex items-center gap-2 bg-slate-950/80 border border-slate-700/80 rounded-xl p-2.5">
                       <div className="font-mono text-xs sm:text-sm text-slate-200 flex-1 truncate px-2 select-all">
-                        {typeof window !== "undefined" ? window.location.origin : "https://riffmaxfunding.com"}?ref={profile.referral_code}
+                        {typeof window !== "undefined" ? window.location.origin : "https://maxfunded.com"}?ref={profile.referral_code}
                       </div>
                       <button
                         onClick={copyReferralUrl}
@@ -492,8 +489,6 @@ export default function AffiliateDashboardPage() {
           </div>
         </div>
       )}
-
-      <Footer />
     </>
   );
 }

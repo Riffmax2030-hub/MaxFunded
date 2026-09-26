@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { getSession, clearSession, AuthSession } from "@/lib/auth";
 import NotificationBell from "@/components/NotificationBell";
-import { ShieldCheck, User, LogOut, LayoutDashboard, Sliders, Award, Users } from "lucide-react";
+import Logo from "@/components/Logo";
+import { LayoutDashboard, Sliders, Award, Users, LogOut } from "lucide-react";
 
 export default function Navbar() {
   const [session, setSession] = useState<AuthSession | null>(null);
@@ -19,16 +20,11 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-dark-900/80 border-b border-dark-700/60">
+    <header className="sticky top-0 z-50 backdrop-blur-xl bg-slate-950/80 border-b border-slate-800/80 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand */}
-        <Link href="/" className="flex items-center space-x-2">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-brand-600/30">
-            <ShieldCheck className="w-5 h-5 text-white" />
-          </div>
-          <span className="text-xl font-bold tracking-tight text-white">
-            RIFFMAX <span className="text-brand-500 font-light">FUNDING</span>
-          </span>
+        <Link href="/" className="flex items-center group">
+          <Logo size="md" />
         </Link>
 
         {/* Navigation links */}

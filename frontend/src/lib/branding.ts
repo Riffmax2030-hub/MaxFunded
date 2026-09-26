@@ -1,0 +1,15 @@
+export const BRAND = {
+  name: "MaxFunded",
+  shortName: "MaxFunded",
+  fullName: "MaxFunded Evaluation Firm",
+  tagline: "Trade to the Maximum. Zero Personal Risk.",
+  domain: "maxfunded.com",
+  appUrl: process.env.NEXT_PUBLIC_APP_URL || "https://maxfunded.com",
+  supportEmail: "support@maxfunded.com",
+  complianceEmail: "compliance@maxfunded.com",
+  payoutsEmail: "payouts@maxfunded.com",
+  legalEmail: "legal@maxfunded.com",
+  parentCompany: "Riffmax Technologies",
+  operatingEntity: "MaxFunded Global Ltd.",
+  establishedYear: 2026,
+};

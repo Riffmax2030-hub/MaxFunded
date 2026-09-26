@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { getSession } from "@/lib/auth";
 import {
   fetchDashboardSummary,
@@ -676,14 +674,10 @@ export default function TraderDashboard() {
   };
 
   return (
-    <>
-      <Navbar />
-      <main className="min-h-screen bg-slate-900 text-white pt-20 pb-16">
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          {renderContent()}
-        </div>
-      </main>
-      <Footer />
-    </>
+    <div className="min-h-screen bg-slate-950 text-white pt-6 pb-16">
+      <div className="max-w-6xl mx-auto px-4 py-4">
+        {renderContent()}
+      </div>
+    </div>
   );
 }

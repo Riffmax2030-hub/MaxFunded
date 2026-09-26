@@ -1,23 +1,20 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 
 const LAST_UPDATED = "1 September 2025";
 
 export default function RiskDisclosurePage() {
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <Navbar />
+    <div className="min-h-screen bg-slate-950 text-white">
       <section className="pt-24 pb-8 px-4 text-center bg-gradient-to-b from-gray-900 to-gray-950">
         <h1 className="text-3xl md:text-4xl font-extrabold mb-2">Risk Disclosure</h1>
-        <p className="text-gray-500 text-sm">Last Updated: {LAST_UPDATED}</p>
+        <p className="text-slate-500 text-sm">Last Updated: {LAST_UPDATED}</p>
       </section>
 
       <article className="max-w-3xl mx-auto px-4 pb-24">
         <div className="bg-red-950/20 border border-red-700/40 rounded-xl p-6 mb-10">
           <p className="text-red-400 font-bold text-sm mb-2">⚠ Important — Read Carefully</p>
-          <p className="text-gray-300 text-sm leading-relaxed">
+          <p className="text-slate-300 text-sm leading-relaxed">
             Trading financial instruments involves significant risk of loss. Past performance —
             including your performance in a simulated evaluation — is not indicative of future
             results. You should not participate in this programme unless you understand and accept
@@ -25,11 +22,11 @@ export default function RiskDisclosurePage() {
           </p>
         </div>
 
-        <div className="space-y-8 text-gray-400 text-sm leading-relaxed">
+        <div className="space-y-8 text-slate-400 text-sm leading-relaxed">
           <div>
             <h2 className="text-white text-xl font-bold mb-3">1. Nature of the Programme</h2>
             <p>
-              RiffMax Funding offers simulated trading evaluation accounts. Simulated trading
+              MaxFunded offers simulated trading evaluation accounts. Simulated trading
               environments do not perfectly replicate live market conditions. Prices, spreads,
               execution speeds, and liquidity in the simulated environment may differ materially
               from real market conditions. Performance in a simulated environment cannot guarantee
@@ -114,16 +111,14 @@ export default function RiskDisclosurePage() {
             </p>
           </div>
 
-          <div className="bg-gray-900 border border-gray-700 rounded-xl p-5">
-            <p className="text-gray-300 font-semibold text-sm">
+          <div className="bg-slate-900 border border-slate-700 rounded-xl p-5">
+            <p className="text-slate-300 font-semibold text-sm">
               By registering on this platform, you confirm that you have read, understood,
               and accepted this Risk Disclosure in full.
             </p>
           </div>
         </div>
       </article>
-
-      <Footer />
     </div>
   );
 }

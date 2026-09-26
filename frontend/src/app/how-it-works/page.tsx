@@ -1,7 +1,6 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import { BRAND } from "@/lib/branding";
 
 const steps = [
   {
@@ -73,15 +72,13 @@ const faqs = [
 
 export default function HowItWorksPage() {
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <Navbar />
-
+    <div className="min-h-screen bg-slate-950 text-white">
       {/* Hero */}
-      <section className="pt-24 pb-16 px-4 text-center bg-gradient-to-b from-gray-900 to-gray-950">
+      <section className="pt-20 pb-16 px-4 text-center bg-gradient-to-b from-slate-900 to-slate-950">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
-          How <span className="text-emerald-400">RiffMax Funding</span> Works
+          How <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">{BRAND.name}</span> Works
         </h1>
-        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+        <p className="text-slate-400 text-lg max-w-2xl mx-auto">
           A transparent, merit-based evaluation process. Prove your edge,
           follow the rules, and earn a funded account.
         </p>
@@ -163,8 +160,6 @@ export default function HowItWorksPage() {
           ))}
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }
