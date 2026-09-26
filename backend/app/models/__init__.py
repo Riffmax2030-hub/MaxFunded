@@ -39,6 +39,11 @@ from app.models.affiliate import (
     CommissionStatus,
     AffiliatePayoutStatus,
 )
+from app.models.notification import (
+    Notification,
+    NotificationType,
+    WebhookConfig,
+)
 
 __all__ = [
     "BaseModel",
@@ -79,6 +84,9 @@ __all__ = [
     "AffiliateTier",
     "CommissionStatus",
     "AffiliatePayoutStatus",
+    "Notification",
+    "NotificationType",
+    "WebhookConfig",
 ]
 
 

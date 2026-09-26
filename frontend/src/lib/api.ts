@@ -931,3 +931,102 @@ export async function validateCoupon(code: string, price: number): Promise<Coupo
   }
   return res.json();
 }
+
+// ============================================================
+// Phase 11 — Notifications & Community Webhooks
+// ============================================================
+
+export interface NotificationItem {
+  id: string;
+  user_id: string;
+  title: string;
+  message: string;
+  notification_type: string;
+  is_read: boolean;
+  action_url: string | null;
+  created_at: string;
+}
+
+export interface NotificationFeedData {
+  unread_count: number;
+  notifications: NotificationItem[];
+}
+
+export interface WebhookConfigItem {
+  id: string;
+  name: string;
+  target_service: "DISCORD" | "TELEGRAM" | "GENERIC";
+  webhook_url: string;
+  is_active: boolean;
+  events_subscribed: string;
+  created_at: string;
+}
+
+export async function fetchMyNotifications(token: string): Promise<NotificationFeedData> {
+  const res = await fetch(`${API_BASE}/notifications/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return { unread_count: 0, notifications: [] };
+  return res.json();
+}
+
+export async function markNotificationRead(token: string, id: string): Promise<NotificationItem> {
+  const res = await fetch(`${API_BASE}/notifications/${id}/read`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Failed to mark notification as read");
+  return res.json();
+}
+
+export async function markAllNotificationsRead(token: string): Promise<{ marked_read: number }> {
+  const res = await fetch(`${API_BASE}/notifications/read-all`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Failed to mark all as read");
+  return res.json();
+}
+
+export async function fetchAdminWebhooks(token: string): Promise<WebhookConfigItem[]> {
+  const res = await fetch(`${API_BASE}/notifications/admin/webhooks`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function createAdminWebhook(
+  token: string,
+  payload: { name: string; target_service: string; webhook_url: string; events_subscribed?: string }
+): Promise<WebhookConfigItem> {
+  const res = await fetch(`${API_BASE}/notifications/admin/webhooks`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Failed to register webhook" }));
+    throw new Error(err.detail || "Failed to register webhook");
+  }
+  return res.json();
+}
+
+export async function testDispatchWebhook(
+  token: string,
+  payload: { target_service: string; webhook_url: string; event_type: string; custom_title?: string; custom_message?: string }
+): Promise<{ dispatched: boolean }> {
+  const res = await fetch(`${API_BASE}/notifications/admin/test-dispatch`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("Webhook test dispatch failed");
+  return res.json();
+}

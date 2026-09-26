@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1 import auth, users, challenges, admin, payments, trading, company_capital, kyc, payouts, dashboard, certificates, affiliates
+from app.api.v1 import auth, users, challenges, admin, payments, trading, company_capital, kyc, payouts, dashboard, certificates, affiliates, notifications
 
 api_router = APIRouter()
 
@@ -35,6 +35,10 @@ api_router.include_router(
 api_router.include_router(
     affiliates.router,
     tags=["Affiliate & Referral Network"],
+)
+api_router.include_router(
+    notifications.router,
+    tags=["Notifications & Alerts"],
 )
 
 

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { getSession, clearSession, AuthSession } from "@/lib/auth";
+import NotificationBell from "@/components/NotificationBell";
 import { ShieldCheck, User, LogOut, LayoutDashboard, Sliders, Award, Users } from "lucide-react";
 
 export default function Navbar() {
@@ -86,6 +87,7 @@ export default function Navbar() {
                   <span>Admin</span>
                 </Link>
               )}
+              <NotificationBell />
               <button
                 onClick={handleLogout}
                 className="p-1.5 text-gray-400 hover:text-red-400 transition-colors"
