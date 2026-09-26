@@ -14,27 +14,13 @@ export default function ChallengeCard({ challenge, onPurchased }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSelect = async () => {
-    setError(null);
+  const handleSelect = () => {
     const session = getSession();
     if (!session) {
-      window.location.href = `/register?redirect=/challenges`;
+      window.location.href = `/register?redirect=/checkout/${challenge.id}`;
       return;
     }
-
-    try {
-      setLoading(true);
-      await purchaseChallenge(challenge.id, session.token);
-      if (onPurchased) {
-        onPurchased();
-      } else {
-        window.location.href = "/dashboard";
-      }
-    } catch (err: any) {
-      setError(err.message || "Failed to purchase challenge");
-    } finally {
-      setLoading(false);
-    }
+    window.location.href = `/checkout/${challenge.id}`;
   };
 
   const startingBalanceNum = Number(challenge.starting_balance).toLocaleString();

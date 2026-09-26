@@ -1,7 +1,26 @@
+import enum
 from decimal import Decimal
 from sqlalchemy import Column, String, Boolean, Numeric, Integer, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from app.models.base import BaseModel
+
+
+class PurchaseStatus(str, enum.Enum):
+    PENDING_PAYMENT = "PENDING_PAYMENT"
+    PAYMENT_CONFIRMED = "PAYMENT_CONFIRMED"
+    PROVISIONING = "PROVISIONING"
+    ACTIVE = "ACTIVE"
+    WARNING = "WARNING"
+    BREACHED = "BREACHED"
+    TARGET_REACHED = "TARGET_REACHED"
+    UNDER_REVIEW = "UNDER_REVIEW"
+    PASSED = "PASSED"
+    FUNDED = "FUNDED"
+    SUSPENDED = "SUSPENDED"
+    PAYOUT_PENDING = "PAYOUT_PENDING"
+    PAYOUT_APPROVED = "PAYOUT_APPROVED"
+    PAYOUT_PAID = "PAYOUT_PAID"
+    CLOSED = "CLOSED"
 
 
 class Challenge(BaseModel):

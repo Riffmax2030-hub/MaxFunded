@@ -24,6 +24,47 @@ class Settings(BaseSettings):
     RESTRICTED_COUNTRIES: Union[str, List[str]] = "IR,KP,SY,CU,RU,BY"
     KYC_REQUIRED_COUNTRIES: Union[str, List[str]] = "US,NG,GB"
 
+    # URLs
+    FRONTEND_URL: str = "http://localhost:3000"
+    BACKEND_URL: str = "http://localhost:8000"
+
+    # Stripe
+    STRIPE_SECRET_KEY: str = ""
+    STRIPE_PUBLISHABLE_KEY: str = ""
+    STRIPE_WEBHOOK_SECRET: str = ""
+
+    # PayPal
+    PAYPAL_CLIENT_ID: str = ""
+    PAYPAL_CLIENT_SECRET: str = ""
+    PAYPAL_MODE: str = "sandbox"  # sandbox or live
+    PAYPAL_WEBHOOK_ID: str = ""
+
+    # Flutterwave
+    FLUTTERWAVE_PUBLIC_KEY: str = ""
+    FLUTTERWAVE_SECRET_KEY: str = ""
+    FLUTTERWAVE_ENCRYPTION_KEY: str = ""
+    FLUTTERWAVE_SECRET_HASH: str = ""
+
+    # Paystack
+    PAYSTACK_SECRET_KEY: str = ""
+    PAYSTACK_PUBLIC_KEY: str = ""
+
+    # NowPayments (Crypto)
+    NOWPAYMENTS_API_KEY: str = ""
+    NOWPAYMENTS_IPN_SECRET: str = ""
+    NOWPAYMENTS_SANDBOX: bool = True
+
+    # Bank Transfer (Wire / Local)
+    BANK_TRANSFER_ENABLED: bool = True
+    BANK_NAME: str = "Standard Chartered / Zenith Bank"
+    BANK_ACCOUNT_NAME: str = "Riffmax Technologies Ltd"
+    BANK_ACCOUNT_NUMBER: str = "1018942351"
+    BANK_SWIFT_BIC: str = "SCBLNGLA"
+    BANK_IBAN: str = ""
+    BANK_ROUTING: str = ""
+    BANK_CURRENCY: str = "USD"
+    BANK_INSTRUCTIONS: str = "Include your unique reference code in the transfer memo/description."
+
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
