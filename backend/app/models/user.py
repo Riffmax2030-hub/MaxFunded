@@ -29,3 +29,4 @@ class User(BaseModel):
     
     # Relationships
     purchases = relationship("ChallengePurchase", back_populates="user", cascade="all, delete-orphan")
+    kyc_verifications = relationship("KYCVerification", foreign_keys="KYCVerification.user_id", back_populates="user", cascade="all, delete-orphan")

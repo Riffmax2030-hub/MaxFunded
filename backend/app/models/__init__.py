@@ -13,6 +13,14 @@ from app.models.company_capital import (
     BrokerConnectionStatus,
     AllocationStatus,
 )
+from app.models.kyc import (
+    KYCVerification,
+    KYCDocument,
+    KYCStatus,
+    KYCVendor,
+    DocumentType,
+    AMLStatus,
+)
 
 __all__ = [
     "BaseModel",
@@ -35,4 +43,11 @@ __all__ = [
     "BrokerType",
     "BrokerConnectionStatus",
     "AllocationStatus",
+    "KYCVerification",
+    "KYCDocument",
+    "KYCStatus",
+    "KYCVendor",
+    "DocumentType",
+    "AMLStatus",
 ]
+

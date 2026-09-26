@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1 import auth, users, challenges, admin, payments, trading, company_capital
+from app.api.v1 import auth, users, challenges, admin, payments, trading, company_capital, kyc
 
 api_router = APIRouter()
 
@@ -14,3 +14,9 @@ api_router.include_router(
     prefix="/capital",
     tags=["Company Capital (Admin Only)"],
 )
+api_router.include_router(
+    kyc.router,
+    prefix="/kyc",
+    tags=["KYC & AML Compliance"],
+)
+
