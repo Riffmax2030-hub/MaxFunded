@@ -1030,3 +1030,75 @@ export async function testDispatchWebhook(
   if (!res.ok) throw new Error("Webhook test dispatch failed");
   return res.json();
 }
+
+// ──────────────────────────────────────────
+// Phase 12: System Health & Audit Logs
+// ──────────────────────────────────────────
+
+export interface SystemMetrics {
+  total_registered_traders: number;
+  active_trading_accounts: number;
+  pending_payout_requests: number;
+  active_challenge_tiers: number;
+}
+
+export interface SystemHealthData {
+  status: string;
+  version: string;
+  database: string;
+  timestamp: string;
+  metrics: SystemMetrics;
+}
+
+export interface AuditLogItem {
+  id: string;
+  actor_id: string;
+  actor_email: string | null;
+  action: string;
+  target_type: string;
+  target_id: string;
+  previous_value: string | null;
+  new_value: string | null;
+  ip_address: string | null;
+  reason: string | null;
+  created_at: string;
+}
+
+export interface AuditLogListResponse {
+  total: number;
+  items: AuditLogItem[];
+}
+
+export async function fetchSystemHealth(): Promise<SystemHealthData> {
+  const res = await fetch(`${API_BASE}/health`, { cache: "no-store" });
+  if (!res.ok) throw new Error("Failed to fetch system health");
+  return res.json();
+}
+
+export async function fetchAdminAuditLogs(
+  token: string,
+  params?: {
+    action?: string;
+    target_type?: string;
+    actor_id?: string;
+    limit?: number;
+    offset?: number;
+  }
+): Promise<AuditLogListResponse> {
+  const query = new URLSearchParams();
+  if (params?.action) query.set("action", params.action);
+  if (params?.target_type) query.set("target_type", params.target_type);
+  if (params?.actor_id) query.set("actor_id", params.actor_id);
+  if (params?.limit !== undefined) query.set("limit", String(params.limit));
+  if (params?.offset !== undefined) query.set("offset", String(params.offset));
+
+  const res = await fetch(`${API_BASE}/admin/audit-logs?${query.toString()}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Failed to fetch audit logs" }));
+    throw new Error(err.detail || "Failed to fetch audit logs");
+  }
+  return res.json();
+}
