@@ -641,4 +641,101 @@ export async function reviewAdminPayout(
 
 
 
+// ============================================================
+// Phase 8 — Trader Dashboard
+// ============================================================
 
+export interface RuleComplianceItem {
+  rule_name: string;
+  description: string;
+  current_value: string | null;
+  limit_value: string | null;
+  percentage_used: number | null;
+  is_breached: boolean;
+  is_achieved: boolean;
+}
+
+export interface DashboardSummaryData {
+  purchase_id: number;
+  challenge_name: string;
+  account_size: string;
+  phase: string;
+  current_balance: string;
+  current_equity: string;
+  total_profit: string;
+  total_profit_pct: number;
+  open_positions: number;
+  daily_drawdown_used_pct: number;
+  daily_drawdown_limit_pct: number;
+  max_drawdown_used_pct: number;
+  max_drawdown_limit_pct: number;
+  profit_target_pct: number;
+  profit_target_reached_pct: number;
+  profit_target_achieved: boolean;
+  total_trades: number;
+  winning_trades: number;
+  losing_trades: number;
+  win_rate_pct: number;
+  avg_profit_per_trade: string;
+  avg_loss_per_trade: string;
+  profit_factor: number | null;
+  account_status: string;
+  days_remaining: number | null;
+  challenge_start_date: string | null;
+  kyc_status: string;
+  has_pending_payout: boolean;
+  rule_compliance: RuleComplianceItem[];
+}
+
+export interface EquityPoint {
+  recorded_at: string;
+  equity: string;
+  balance: string;
+  daily_pnl: string | null;
+}
+
+export interface DailyPerformance {
+  trade_date: string;
+  realized_pnl: string;
+  trades_count: number;
+  win_count: number;
+}
+
+export interface PerformanceReportData {
+  purchase_id: number;
+  daily_breakdown: DailyPerformance[];
+  best_day_pnl: string | null;
+  worst_day_pnl: string | null;
+  avg_daily_pnl: string | null;
+  trading_days: number;
+}
+
+export async function fetchDashboardSummary(token: string): Promise<DashboardSummaryData> {
+  const res = await fetch(`${API_BASE}/dashboard/summary`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Dashboard unavailable" }));
+    throw new Error(err.detail || "Dashboard unavailable");
+  }
+  return res.json();
+}
+
+export async function fetchEquityCurve(token: string, days = 30): Promise<EquityPoint[]> {
+  const res = await fetch(`${API_BASE}/dashboard/equity-curve?days=${days}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function fetchPerformanceReport(token: string): Promise<PerformanceReportData> {
+  const res = await fetch(`${API_BASE}/dashboard/performance`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Performance report unavailable" }));
+    throw new Error(err.detail || "Performance report unavailable");
+  }
+  return res.json();
+}

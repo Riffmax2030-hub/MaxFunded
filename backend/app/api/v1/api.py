@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1 import auth, users, challenges, admin, payments, trading, company_capital, kyc, payouts
+from app.api.v1 import auth, users, challenges, admin, payments, trading, company_capital, kyc, payouts, dashboard
 
 api_router = APIRouter()
 
@@ -23,6 +23,10 @@ api_router.include_router(
     payouts.router,
     prefix="/payouts",
     tags=["Trader Profit Payouts"],
+)
+api_router.include_router(
+    dashboard.router,
+    tags=["Trader Dashboard"],
 )
 
 

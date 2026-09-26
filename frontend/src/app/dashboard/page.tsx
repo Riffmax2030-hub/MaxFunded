@@ -1,537 +1,689 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getSession } from "@/lib/auth";
 import {
-  fetchTradingAccounts,
-  fetchAccountTrades,
-  fetchAccountSnapshots,
-  simulateTrade,
-  AccountMetrics,
-  TradeItem,
-  DailySnapshotItem,
+  fetchDashboardSummary,
+  fetchEquityCurve,
+  fetchPerformanceReport,
+  DashboardSummaryData,
+  EquityPoint,
+  PerformanceReportData,
+  RuleComplianceItem,
 } from "@/lib/api";
 import {
   TrendingUp,
+  TrendingDown,
   AlertTriangle,
   CheckCircle,
   Clock,
-  Layers,
-  Server,
   DollarSign,
   ArrowUpRight,
+  ArrowDownRight,
   Shield,
   Loader2,
-  Copy,
-  Play,
-  RotateCcw,
-  Key,
-  ShieldAlert,
+  Target,
+  BarChart2,
   Calendar,
+  Award,
+  RefreshCw,
+  ExternalLink,
+  ShieldCheck,
+  CreditCard,
+  Activity,
+  Zap,
 } from "lucide-react";
 
-export default function TraderDashboard() {
-  const [accounts, setAccounts] = useState<AccountMetrics[]>([]);
-  const [selectedAccount, setSelectedAccount] = useState<AccountMetrics | null>(null);
-  const [trades, setTrades] = useState<TradeItem[]>([]);
-  const [snapshots, setSnapshots] = useState<DailySnapshotItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [simulating, setSimulating] = useState(false);
-  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+// ──────────────────────────────────────────
+// Utility helpers
+// ──────────────────────────────────────────
 
-  useEffect(() => {
-    const session = getSession();
-    if (!session) {
-      window.location.href = "/login?redirect=/dashboard";
-      return;
-    }
+function fmt(value: string | number | null | undefined, decimals = 2): string {
+  if (value === null || value === undefined) return "—";
+  const n = typeof value === "string" ? parseFloat(value) : value;
+  if (isNaN(n)) return "—";
+  return n.toLocaleString("en-US", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  });
+}
 
-    async function loadDashboard() {
-      try {
-        setLoading(true);
-        const accs = await fetchTradingAccounts(session!.token);
-        setAccounts(accs);
-        if (accs.length > 0) {
-          setSelectedAccount(accs[0]);
-          // Load trades & snapshots for first account
-          const [tData, sData] = await Promise.all([
-            fetchAccountTrades(accs[0].purchase_id, session!.token).catch(() => []),
-            fetchAccountSnapshots(accs[0].purchase_id, session!.token).catch(() => []),
-          ]);
-          setTrades(tData);
-          setSnapshots(sData);
-        }
-      } catch (err: any) {
-        setError(err.message || "Failed to load dashboard data");
-      } finally {
-        setLoading(false);
-      }
-    }
+function fmtCurrency(value: string | number | null | undefined): string {
+  if (value === null || value === undefined) return "—";
+  const n = typeof value === "string" ? parseFloat(value) : value;
+  if (isNaN(n)) return "—";
+  return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
 
-    loadDashboard();
-  }, []);
+function fmtPct(value: number | null | undefined): string {
+  if (value === null || value === undefined) return "—";
+  return value.toFixed(2) + "%";
+}
 
-  const handleAccountSelect = async (purchaseId: string) => {
-    const session = getSession();
-    if (!session) return;
-    const acc = accounts.find((a) => a.purchase_id === purchaseId);
-    if (!acc) return;
-    setSelectedAccount(acc);
-    try {
-      const [tData, sData] = await Promise.all([
-        fetchAccountTrades(acc.purchase_id, session.token).catch(() => []),
-        fetchAccountSnapshots(acc.purchase_id, session.token).catch(() => []),
-      ]);
-      setTrades(tData);
-      setSnapshots(sData);
-    } catch (_) {}
+function statusColor(status: string): string {
+  const map: Record<string, string> = {
+    ACTIVE: "text-emerald-400",
+    WARNING: "text-amber-400",
+    BREACHED: "text-red-400",
+    TARGET_REACHED: "text-cyan-400",
+    FUNDED: "text-violet-400",
+    PASSED: "text-blue-400",
   };
+  return map[status] ?? "text-slate-400";
+}
 
-  const handleSimulate = async (profitAmount: number, isWin: boolean) => {
-    const session = getSession();
-    if (!session || !selectedAccount) return;
-    try {
-      setSimulating(true);
-      const updated = await simulateTrade(
-        selectedAccount.purchase_id,
-        {
-          symbol: isWin ? "EURUSD" : "XAUUSD",
-          trade_type: isWin ? "BUY" : "SELL",
-          lots: 1.0,
-          open_price: 1.08500,
-          close_price: isWin ? 1.09000 : 1.07000,
-          profit: profitAmount,
-          is_closed: true,
-        },
-        session.token
-      );
-      setSelectedAccount(updated);
-      // Refresh accounts list & trades
-      const [accs, tData, sData] = await Promise.all([
-        fetchTradingAccounts(session.token),
-        fetchAccountTrades(selectedAccount.purchase_id, session.token),
-        fetchAccountSnapshots(selectedAccount.purchase_id, session.token),
-      ]);
-      setAccounts(accs);
-      setTrades(tData);
-      setSnapshots(sData);
-    } catch (err: any) {
-      alert(err.message || "Simulation failed");
-    } finally {
-      setSimulating(false);
-    }
+function statusBadge(status: string): string {
+  const map: Record<string, string> = {
+    ACTIVE: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+    WARNING: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+    BREACHED: "bg-red-500/20 text-red-400 border-red-500/30",
+    TARGET_REACHED: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
+    FUNDED: "bg-violet-500/20 text-violet-400 border-violet-500/30",
+    PASSED: "bg-blue-500/20 text-blue-400 border-blue-500/30",
   };
+  return map[status] ?? "bg-slate-700 text-slate-400 border-slate-600";
+}
 
-  const copyToClipboard = (text: string, key: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedKey(key);
-    setTimeout(() => setCopiedKey(null), 2000);
+function phaseLabel(phase: string): string {
+  return phase === "FUNDED" ? "Funded Account" : phase === "PHASE_2" ? "Phase 2" : "Phase 1";
+}
+
+// ──────────────────────────────────────────
+// Sub-components
+// ──────────────────────────────────────────
+
+function MetricCard({
+  label,
+  value,
+  sub,
+  icon: Icon,
+  accent = "emerald",
+  danger = false,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  icon: React.ElementType;
+  accent?: string;
+  danger?: boolean;
+}) {
+  const accentMap: Record<string, string> = {
+    emerald: "bg-emerald-500/10 text-emerald-400",
+    blue: "bg-blue-500/10 text-blue-400",
+    amber: "bg-amber-500/10 text-amber-400",
+    red: "bg-red-500/10 text-red-400",
+    violet: "bg-violet-500/10 text-violet-400",
+    cyan: "bg-cyan-500/10 text-cyan-400",
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-dark-950 text-white flex flex-col justify-between">
-        <Navbar />
-        <div className="flex flex-col items-center justify-center py-32 space-y-4">
-          <Loader2 className="w-10 h-10 text-brand-500 animate-spin" />
-          <p className="text-gray-400 text-sm">Syncing with Risk Engine & MT5 Server...</p>
-        </div>
-        <Footer />
+  return (
+    <div className={`bg-slate-800 border ${danger ? "border-red-500/40" : "border-slate-700"} rounded-xl p-5 flex flex-col gap-3`}>
+      <div className="flex items-center justify-between">
+        <span className="text-slate-400 text-sm">{label}</span>
+        <span className={`p-2 rounded-lg ${accentMap[accent] ?? accentMap.emerald}`}>
+          <Icon size={16} />
+        </span>
       </div>
-    );
-  }
-
-  if (accounts.length === 0) {
-    return (
-      <div className="min-h-screen bg-dark-950 text-white flex flex-col justify-between">
-        <Navbar />
-        <div className="max-w-4xl mx-auto px-4 py-24 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-dark-800 border border-dark-700 mx-auto flex items-center justify-center mb-6 text-brand-500">
-            <Layers className="w-8 h-8" />
-          </div>
-          <h2 className="text-2xl font-bold text-white mb-2">No Active Evaluation Account</h2>
-          <p className="text-sm text-gray-400 max-w-md mx-auto mb-8">
-            You don&apos;t have an active simulated challenge account yet. Select an evaluation tier to begin your prop firm journey.
-          </p>
-          <Link
-            href="/challenges"
-            className="px-6 py-3.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm transition shadow-lg shadow-brand-600/30"
-          >
-            Explore Evaluation Challenges
-          </Link>
-        </div>
-        <Footer />
+      <div>
+        <p className={`text-2xl font-bold ${danger ? "text-red-400" : "text-white"}`}>{value}</p>
+        {sub && <p className="text-slate-500 text-xs mt-0.5">{sub}</p>}
       </div>
-    );
-  }
+    </div>
+  );
+}
 
-  const acc = selectedAccount!;
-  const isBreached = acc.status === "BREACHED";
-  const isPassed = acc.status === "TARGET_REACHED" || acc.status === "PASSED" || acc.status === "FUNDED";
-  const profit = acc.current_equity - acc.starting_balance;
+function DrawdownGauge({
+  label,
+  used,
+  limit,
+  usedPct,
+}: {
+  label: string;
+  used: number;
+  limit: number;
+  usedPct: number;
+}) {
+  const color =
+    usedPct >= 80 ? "bg-red-500" : usedPct >= 60 ? "bg-amber-500" : "bg-emerald-500";
+  return (
+    <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-slate-300 text-sm font-medium">{label}</span>
+        <span
+          className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+            usedPct >= 80
+              ? "bg-red-500/20 text-red-400"
+              : usedPct >= 60
+              ? "bg-amber-500/20 text-amber-400"
+              : "bg-emerald-500/20 text-emerald-400"
+          }`}
+        >
+          {fmtPct(usedPct)} used
+        </span>
+      </div>
+      <div className="w-full bg-slate-700 rounded-full h-2.5 mb-3">
+        <div
+          className={`${color} h-2.5 rounded-full transition-all duration-500`}
+          style={{ width: `${Math.min(100, usedPct)}%` }}
+        />
+      </div>
+      <div className="flex justify-between text-xs text-slate-500">
+        <span>Used: {fmtPct(usedPct)}</span>
+        <span>Limit: {fmtPct(limit)}</span>
+      </div>
+    </div>
+  );
+}
+
+function RuleComplianceCard({ rule }: { rule: RuleComplianceItem }) {
+  const pct = rule.percentage_used ?? 0;
+  const color = rule.is_breached
+    ? "bg-red-500"
+    : rule.is_achieved
+    ? "bg-emerald-500"
+    : pct >= 80
+    ? "bg-amber-500"
+    : "bg-blue-500";
 
   return (
-    <div className="min-h-screen bg-dark-950 text-white flex flex-col justify-between">
-      <Navbar />
+    <div
+      className={`bg-slate-800 border rounded-xl p-4 ${
+        rule.is_breached
+          ? "border-red-500/40"
+          : rule.is_achieved
+          ? "border-emerald-500/40"
+          : "border-slate-700"
+      }`}
+    >
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-slate-300 text-sm font-medium">{rule.rule_name}</span>
+        {rule.is_breached ? (
+          <AlertTriangle size={14} className="text-red-400" />
+        ) : rule.is_achieved ? (
+          <CheckCircle size={14} className="text-emerald-400" />
+        ) : (
+          <Clock size={14} className="text-slate-500" />
+        )}
+      </div>
+      <p className="text-slate-500 text-xs mb-3">{rule.description}</p>
+      <div className="w-full bg-slate-700 rounded-full h-1.5 mb-2">
+        <div
+          className={`${color} h-1.5 rounded-full transition-all duration-500`}
+          style={{ width: `${Math.min(100, pct)}%` }}
+        />
+      </div>
+      <div className="flex justify-between text-xs text-slate-500">
+        <span>{rule.current_value ? fmtCurrency(rule.current_value) : `${pct.toFixed(1)}%`}</span>
+        <span>{rule.limit_value ? fmtCurrency(rule.limit_value) : "—"}</span>
+      </div>
+    </div>
+  );
+}
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow w-full space-y-8">
-        {/* Header & Account Switcher */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-dark-700">
-          <div>
-            <div className="flex items-center space-x-3 mb-1">
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                Trader Analytics
-              </h1>
-              <span
-                className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                  isBreached
-                    ? "bg-red-950/80 text-red-400 border border-red-700/60"
-                    : isPassed
-                    ? "bg-emerald-950/80 text-emerald-400 border border-emerald-700/60"
-                    : "bg-brand-950/80 text-brand-400 border border-brand-700/60"
-                }`}
-              >
-                {acc.status}
-              </span>
-            </div>
-            <p className="text-xs text-gray-400">
-              Account: <span className="text-white font-medium">{acc.challenge_name}</span> &bull; MT5 Login:{" "}
-              <span className="font-mono text-brand-400">{acc.mt5_login || "Pending"}</span>
-            </p>
-          </div>
+function SimpleEquityChart({ points }: { points: EquityPoint[] }) {
+  if (points.length < 2) {
+    return (
+      <div className="h-40 flex items-center justify-center text-slate-500 text-sm">
+        No equity history yet — start trading to see your curve.
+      </div>
+    );
+  }
 
-          {/* Account Selector */}
-          {accounts.length > 1 && (
-            <div className="flex items-center space-x-2">
-              <span className="text-xs text-gray-400 font-semibold">Account:</span>
-              <select
-                value={acc.purchase_id}
-                onChange={(e) => handleAccountSelect(e.target.value)}
-                className="px-3 py-2 rounded-xl bg-dark-800 border border-dark-700 text-xs text-white font-medium focus:outline-none focus:border-brand-500"
-              >
-                {accounts.map((a, idx) => (
-                  <option key={a.purchase_id} value={a.purchase_id}>
-                    #{idx + 1} - {a.challenge_name} ({a.status})
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+  const equities = points.map((p) => parseFloat(p.equity));
+  const min = Math.min(...equities);
+  const max = Math.max(...equities);
+  const range = max - min || 1;
+
+  const w = 100;
+  const h = 100;
+  const step = w / (points.length - 1);
+
+  const path = equities
+    .map((v, i) => {
+      const x = i * step;
+      const y = h - ((v - min) / range) * h;
+      return `${i === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
+    })
+    .join(" ");
+
+  const isPositive = equities[equities.length - 1] >= equities[0];
+  const strokeColor = isPositive ? "#10b981" : "#ef4444";
+
+  return (
+    <div className="h-40 w-full">
+      <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className="w-full h-full">
+        <defs>
+          <linearGradient id="eq-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={strokeColor} stopOpacity="0.3" />
+            <stop offset="100%" stopColor={strokeColor} stopOpacity="0.02" />
+          </linearGradient>
+        </defs>
+        <path
+          d={path + ` L ${((points.length - 1) * step).toFixed(2)} ${h} L 0 ${h} Z`}
+          fill="url(#eq-grad)"
+        />
+        <path d={path} fill="none" stroke={strokeColor} strokeWidth="1.5" />
+      </svg>
+      <div className="flex justify-between text-xs text-slate-500 mt-1">
+        <span>{points[0].recorded_at.slice(0, 10)}</span>
+        <span>{points[points.length - 1].recorded_at.slice(0, 10)}</span>
+      </div>
+    </div>
+  );
+}
+
+// ──────────────────────────────────────────
+// Main page
+// ──────────────────────────────────────────
+
+export default function TraderDashboard() {
+  const [summary, setSummary] = useState<DashboardSummaryData | null>(null);
+  const [equityCurve, setEquityCurve] = useState<EquityPoint[]>([]);
+  const [performance, setPerformance] = useState<PerformanceReportData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"overview" | "compliance" | "performance">("overview");
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+
+  const loadData = useCallback(async () => {
+    const session = getSession();
+    if (!session) {
+      setError("Please log in to view your dashboard.");
+      setLoading(false);
+      return;
+    }
+    try {
+      setLoading(true);
+      setError(null);
+      const [sum, curve, perf] = await Promise.all([
+        fetchDashboardSummary(session.token),
+        fetchEquityCurve(session.token, 30),
+        fetchPerformanceReport(session.token),
+      ]);
+      setSummary(sum);
+      setEquityCurve(curve);
+      setPerformance(perf);
+      setLastRefresh(new Date());
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Dashboard unavailable";
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadData();
+    // Auto-refresh every 60 seconds
+    const interval = setInterval(loadData, 60_000);
+    return () => clearInterval(interval);
+  }, [loadData]);
+
+  // ── Render states ───────────────────────
+  const renderContent = () => {
+    if (loading && !summary) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+          <Loader2 size={40} className="text-emerald-400 animate-spin" />
+          <p className="text-slate-400">Loading dashboard…</p>
         </div>
+      );
+    }
 
-        {/* Breach Alert Banner */}
-        {isBreached && (
-          <div className="p-5 rounded-2xl bg-red-950/40 border border-red-700/80 flex items-start space-x-4 shadow-xl">
-            <ShieldAlert className="w-6 h-6 text-red-400 flex-shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <h3 className="font-bold text-red-300 text-sm">Evaluation Challenge Breached</h3>
-              <p className="text-xs text-red-200/80 leading-relaxed">
-                {acc.breached_reason || "Trading rule limit was exceeded. The account has been deactivated."}
-              </p>
-              <div className="pt-2">
+    if (error) {
+      const isNoAccount = error.toLowerCase().includes("no active challenge");
+      return (
+        <div className="max-w-lg mx-auto mt-24 text-center">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-10">
+            {isNoAccount ? (
+              <>
+                <Activity size={48} className="mx-auto text-slate-500 mb-4" />
+                <h2 className="text-xl font-bold text-white mb-2">No Active Challenge</h2>
+                <p className="text-slate-400 mb-6">
+                  Purchase a challenge to unlock your live trading dashboard.
+                </p>
                 <Link
                   href="/challenges"
-                  className="inline-block text-xs font-bold text-white bg-red-800 hover:bg-red-700 px-3 py-1.5 rounded-lg transition"
+                  className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-lg font-semibold transition"
                 >
-                  Start New Evaluation →
+                  <Zap size={16} /> Browse Challenges
                 </Link>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Target Reached Banner */}
-        {isPassed && (
-          <div className="p-5 rounded-2xl bg-emerald-950/40 border border-emerald-700/80 flex items-start space-x-4 shadow-xl">
-            <CheckCircle className="w-6 h-6 text-emerald-400 flex-shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <h3 className="font-bold text-emerald-300 text-sm">Profit Target Achieved!</h3>
-              <p className="text-xs text-emerald-200/80 leading-relaxed">
-                Congratulations! You met the profit target while complying with all risk guidelines. Our compliance team is finalizing review for funded account transition.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* MT5 Simulated Credentials Card */}
-        <div className="bg-gradient-to-r from-dark-900 to-dark-850 border border-dark-700/80 rounded-2xl p-6 shadow-xl">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-xl bg-brand-600/10 border border-brand-500/20 flex items-center justify-center text-brand-500 flex-shrink-0">
-                <Server className="w-6 h-6" />
-              </div>
-              <div>
-                <div className="text-[11px] font-bold uppercase tracking-wider text-gray-400">
-                  Simulated MetaTrader 5 Terminal Credentials
-                </div>
-                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-1">
-                  <div>
-                    <span className="text-xs text-gray-500">Login: </span>
-                    <span className="font-mono text-sm font-bold text-brand-400">{acc.mt5_login || "N/A"}</span>
-                  </div>
-                  <div>
-                    <span className="text-xs text-gray-500">Server: </span>
-                    <span className="text-sm font-bold text-white">{acc.mt5_server || "RiffMax-Simulated-MT5"}</span>
-                  </div>
-                  <div>
-                    <span className="text-xs text-gray-500">Leverage: </span>
-                    <span className="text-sm font-bold text-emerald-400">1:{acc.leverage}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Investor & Master Passwords with copy */}
-            <div className="flex flex-wrap items-center gap-3">
-              {acc.mt5_investor_password && (
-                <div className="bg-dark-950 px-3 py-1.5 rounded-lg border border-dark-700 flex items-center space-x-2 text-xs">
-                  <Key className="w-3.5 h-3.5 text-gray-400" />
-                  <span className="text-gray-400">Investor:</span>
-                  <span className="font-mono font-bold text-white">{acc.mt5_investor_password}</span>
-                  <button
-                    onClick={() => copyToClipboard(acc.mt5_investor_password!, "investor")}
-                    className="text-gray-400 hover:text-white"
-                  >
-                    <Copy className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              )}
-              {acc.mt5_password && (
-                <div className="bg-dark-950 px-3 py-1.5 rounded-lg border border-dark-700 flex items-center space-x-2 text-xs">
-                  <Key className="w-3.5 h-3.5 text-brand-400" />
-                  <span className="text-gray-400">Master:</span>
-                  <span className="font-mono font-bold text-white">{acc.mt5_password}</span>
-                  <button
-                    onClick={() => copyToClipboard(acc.mt5_password!, "master")}
-                    className="text-gray-400 hover:text-white"
-                  >
-                    <Copy className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              )}
-            </div>
+              </>
+            ) : (
+              <>
+                <AlertTriangle size={48} className="mx-auto text-amber-400 mb-4" />
+                <h2 className="text-xl font-bold text-white mb-2">Dashboard Error</h2>
+                <p className="text-slate-400 mb-6">{error}</p>
+                <button
+                  onClick={loadData}
+                  className="inline-flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-lg font-semibold transition"
+                >
+                  <RefreshCw size={16} /> Retry
+                </button>
+              </>
+            )}
           </div>
         </div>
+      );
+    }
 
-        {/* Real-Time Risk Gauges Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Equity & Balance */}
-          <div className="bg-dark-900 border border-dark-700/60 rounded-2xl p-6 shadow-xl space-y-3">
-            <div className="flex items-center justify-between text-xs text-gray-400">
-              <span>Account Equity</span>
-              <DollarSign className="w-4 h-4 text-emerald-400" />
-            </div>
-            <div className="text-3xl font-extrabold text-white">
-              ${acc.current_equity.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </div>
-            <div className="flex items-center justify-between text-xs pt-1 border-t border-dark-800 text-gray-400">
-              <span>Balance: ${acc.current_balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-              <span className={profit >= 0 ? "text-emerald-400 font-bold" : "text-red-400 font-bold"}>
-                {profit >= 0 ? `+$${profit.toFixed(2)}` : `-$${Math.abs(profit).toFixed(2)}`}
-              </span>
-            </div>
-          </div>
+    if (!summary) return null;
 
-          {/* Daily Loss Gauge */}
-          <div className="bg-dark-900 border border-dark-700/60 rounded-2xl p-6 shadow-xl space-y-3">
-            <div className="flex items-center justify-between text-xs text-gray-400">
-              <span>Daily Loss Buffer</span>
-              <span className="text-[10px] font-semibold text-gray-500">Floor: ${acc.daily_loss_floor.toFixed(0)}</span>
-            </div>
-            <div className="text-3xl font-extrabold text-emerald-400">
-              ${acc.daily_loss_remaining_usd.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-            </div>
-            <div className="w-full bg-dark-800 h-2 rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all ${
-                  acc.daily_loss_percent_remaining > 50
-                    ? "bg-emerald-500"
-                    : acc.daily_loss_percent_remaining > 20
-                    ? "bg-amber-500"
-                    : "bg-red-500"
-                }`}
-                style={{ width: `${Math.min(100, acc.daily_loss_percent_remaining * 20)}%` }}
-              />
-            </div>
-            <div className="flex items-center justify-between text-[11px] text-gray-400">
-              <span>Remaining allowance</span>
-              <span className="font-semibold text-white">{acc.daily_loss_percent_remaining.toFixed(1)}%</span>
-            </div>
-          </div>
+    const profit = parseFloat(summary.total_profit);
+    const profitPositive = profit >= 0;
 
-          {/* Max Drawdown Gauge */}
-          <div className="bg-dark-900 border border-dark-700/60 rounded-2xl p-6 shadow-xl space-y-3">
-            <div className="flex items-center justify-between text-xs text-gray-400">
-              <span>Max Drawdown Buffer</span>
-              <span className="text-[10px] font-semibold text-gray-500">Floor: ${acc.max_drawdown_floor.toFixed(0)}</span>
-            </div>
-            <div className="text-3xl font-extrabold text-emerald-400">
-              ${acc.max_drawdown_remaining_usd.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-            </div>
-            <div className="w-full bg-dark-800 h-2 rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all ${
-                  acc.max_drawdown_percent_remaining > 50
-                    ? "bg-emerald-500"
-                    : acc.max_drawdown_percent_remaining > 20
-                    ? "bg-amber-500"
-                    : "bg-red-500"
-                }`}
-                style={{ width: `${Math.min(100, acc.max_drawdown_percent_remaining * 10)}%` }}
-              />
-            </div>
-            <div className="flex items-center justify-between text-[11px] text-gray-400">
-              <span>Cushion from floor</span>
-              <span className="font-semibold text-white">{acc.max_drawdown_percent_remaining.toFixed(1)}%</span>
-            </div>
-          </div>
-
-          {/* Profit Target Gauge */}
-          <div className="bg-dark-900 border border-dark-700/60 rounded-2xl p-6 shadow-xl space-y-3">
-            <div className="flex items-center justify-between text-xs text-gray-400">
-              <span>Target: ${acc.profit_target_amount.toLocaleString()}</span>
-              <span className="text-xs font-bold text-brand-400">{acc.profit_target_progress_percent}%</span>
-            </div>
-            <div className="text-3xl font-extrabold text-white">
-              ${acc.profit_target_distance_usd > 0 ? acc.profit_target_distance_usd.toLocaleString(undefined, { minimumFractionDigits: 2 }) : "0.00"}
-            </div>
-            <div className="w-full bg-dark-800 h-2 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-brand-500 rounded-full transition-all"
-                style={{ width: `${Math.min(100, acc.profit_target_progress_percent)}%` }}
-              />
-            </div>
-            <div className="flex items-center justify-between text-[11px] text-gray-400">
-              <span>Distance to target</span>
-              <span className="flex items-center space-x-1">
-                <Calendar className="w-3 h-3 text-gray-400" />
-                <span>{acc.trading_days_completed}/{acc.trading_days_required} days</span>
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Sandbox Trade Simulator (Interactive Testing Panel) */}
-        <div className="bg-dark-900 border border-dark-700/60 rounded-2xl p-6 shadow-xl">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+    return (
+      <div className="space-y-6">
+        {/* ── Account header banner ── */}
+        <div className="bg-gradient-to-r from-slate-800 to-slate-800/50 border border-slate-700 rounded-2xl p-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-                <Play className="w-4 h-4 text-brand-500" />
-                <span>Sandbox Trade Simulator</span>
-              </h3>
-              <p className="text-xs text-gray-400 mt-0.5">
-                Simulate instant MT5 trades to test the Deterministic Risk Engine, daily loss triggers, and target milestones.
+              <div className="flex items-center gap-3 mb-1">
+                <span
+                  className={`text-xs font-semibold px-3 py-1 rounded-full border ${statusBadge(summary.account_status)}`}
+                >
+                  {summary.account_status}
+                </span>
+                <span className="text-xs text-slate-500 bg-slate-700 px-2 py-0.5 rounded-full">
+                  {phaseLabel(summary.phase)}
+                </span>
+              </div>
+              <h1 className="text-2xl font-bold text-white">{summary.challenge_name}</h1>
+              <p className="text-slate-400 text-sm">
+                Account Size: {fmtCurrency(summary.account_size)}
+                {summary.challenge_start_date && (
+                  <> &nbsp;·&nbsp; Started {summary.challenge_start_date}</>
+                )}
+                {summary.days_remaining !== null && (
+                  <> &nbsp;·&nbsp; {summary.days_remaining} days remaining</>
+                )}
               </p>
             </div>
-            {simulating && (
-              <div className="flex items-center space-x-2 text-xs text-brand-400 font-semibold">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Executing & Calculating Limits...</span>
+            <div className="flex items-center gap-3">
+              {/* Quick links */}
+              {summary.kyc_status !== "APPROVED" && (
+                <Link
+                  href="/kyc"
+                  className="flex items-center gap-1.5 text-xs bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-2 rounded-lg hover:bg-amber-500/30 transition"
+                >
+                  <ShieldCheck size={13} /> Complete KYC
+                </Link>
+              )}
+              {!summary.has_pending_payout && summary.kyc_status === "APPROVED" && (
+                <Link
+                  href="/payouts"
+                  className="flex items-center gap-1.5 text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-2 rounded-lg hover:bg-emerald-500/30 transition"
+                >
+                  <CreditCard size={13} /> Request Payout
+                </Link>
+              )}
+              {summary.has_pending_payout && (
+                <Link
+                  href="/payouts"
+                  className="flex items-center gap-1.5 text-xs bg-violet-500/20 text-violet-400 border border-violet-500/30 px-3 py-2 rounded-lg hover:bg-violet-500/30 transition"
+                >
+                  <Clock size={13} /> Payout Pending
+                </Link>
+              )}
+              <button
+                onClick={loadData}
+                title="Refresh"
+                className="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-400 hover:text-white transition"
+              >
+                <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Core metrics row ── */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <MetricCard
+            label="Current Balance"
+            value={fmtCurrency(summary.current_balance)}
+            icon={DollarSign}
+            accent="emerald"
+          />
+          <MetricCard
+            label="Current Equity"
+            value={fmtCurrency(summary.current_equity)}
+            sub={`${summary.open_positions} open position${summary.open_positions !== 1 ? "s" : ""}`}
+            icon={Activity}
+            accent="blue"
+          />
+          <MetricCard
+            label="Total Profit"
+            value={fmtCurrency(summary.total_profit)}
+            sub={`${profitPositive ? "+" : ""}${fmtPct(summary.total_profit_pct)}`}
+            icon={profitPositive ? TrendingUp : TrendingDown}
+            accent={profitPositive ? "emerald" : "red"}
+            danger={!profitPositive}
+          />
+          <MetricCard
+            label="Win Rate"
+            value={fmtPct(summary.win_rate_pct)}
+            sub={`${summary.winning_trades}W / ${summary.losing_trades}L — ${summary.total_trades} closed`}
+            icon={Target}
+            accent="cyan"
+          />
+        </div>
+
+        {/* ── Profit target progress ── */}
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Award size={16} className="text-amber-400" />
+              <span className="text-slate-300 font-medium">Profit Target Progress</span>
+            </div>
+            <span
+              className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                summary.profit_target_achieved
+                  ? "bg-emerald-500/20 text-emerald-400"
+                  : "bg-slate-700 text-slate-400"
+              }`}
+            >
+              {summary.profit_target_achieved ? "✓ Target Achieved!" : `${fmtPct(summary.profit_target_reached_pct)} of target`}
+            </span>
+          </div>
+          <div className="w-full bg-slate-700 rounded-full h-3">
+            <div
+              className={`h-3 rounded-full transition-all duration-700 ${
+                summary.profit_target_achieved ? "bg-emerald-400" : "bg-amber-500"
+              }`}
+              style={{ width: `${Math.min(100, summary.profit_target_reached_pct)}%` }}
+            />
+          </div>
+          <div className="flex justify-between text-xs text-slate-500 mt-2">
+            <span>
+              Current profit: {fmtCurrency(summary.total_profit)} ({fmtPct(summary.total_profit_pct)})
+            </span>
+            <span>Target: {fmtPct(summary.profit_target_pct)}</span>
+          </div>
+        </div>
+
+        {/* ── Tabs ── */}
+        <div className="flex gap-2 border-b border-slate-700 pb-0">
+          {(["overview", "compliance", "performance"] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2.5 text-sm font-medium rounded-t-lg transition capitalize ${
+                activeTab === tab
+                  ? "bg-slate-800 text-white border border-b-slate-800 border-slate-700 -mb-px"
+                  : "text-slate-500 hover:text-slate-300"
+              }`}
+            >
+              {tab === "overview" ? "Overview & Drawdown" : tab === "compliance" ? "Rule Compliance" : "Performance"}
+            </button>
+          ))}
+        </div>
+
+        {/* ── Tab content ── */}
+        {activeTab === "overview" && (
+          <div className="space-y-6">
+            {/* Drawdown gauges */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <DrawdownGauge
+                label="Daily Loss Drawdown"
+                used={summary.daily_drawdown_used_pct}
+                limit={summary.daily_drawdown_limit_pct}
+                usedPct={summary.daily_drawdown_used_pct}
+              />
+              <DrawdownGauge
+                label="Maximum Drawdown"
+                used={summary.max_drawdown_used_pct}
+                limit={summary.max_drawdown_limit_pct}
+                usedPct={summary.max_drawdown_used_pct}
+              />
+            </div>
+
+            {/* Equity curve */}
+            <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <BarChart2 size={16} className="text-blue-400" />
+                <span className="text-slate-300 font-medium">30-Day Equity Curve</span>
+              </div>
+              <SimpleEquityChart points={equityCurve} />
+            </div>
+
+            {/* Trade statistics */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <MetricCard
+                label="Avg. Profit / Trade"
+                value={fmtCurrency(summary.avg_profit_per_trade)}
+                icon={ArrowUpRight}
+                accent="emerald"
+              />
+              <MetricCard
+                label="Avg. Loss / Trade"
+                value={fmtCurrency(summary.avg_loss_per_trade)}
+                icon={ArrowDownRight}
+                accent="red"
+                danger={parseFloat(summary.avg_loss_per_trade) > 0}
+              />
+              <MetricCard
+                label="Profit Factor"
+                value={summary.profit_factor !== null ? summary.profit_factor.toFixed(2) : "—"}
+                sub={summary.profit_factor !== null && summary.profit_factor >= 1.5 ? "Excellent" : summary.profit_factor !== null && summary.profit_factor >= 1 ? "Profitable" : "Unprofitable"}
+                icon={TrendingUp}
+                accent={summary.profit_factor !== null && summary.profit_factor >= 1 ? "emerald" : "red"}
+              />
+            </div>
+          </div>
+        )}
+
+        {activeTab === "compliance" && (
+          <div>
+            <p className="text-slate-400 text-sm mb-4">
+              All rules must be satisfied before a payout can be requested.
+              <Link href="/rules" className="text-emerald-400 ml-1 hover:underline inline-flex items-center gap-1">
+                View full rules <ExternalLink size={11} />
+              </Link>
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {summary.rule_compliance.map((rule) => (
+                <RuleComplianceCard key={rule.rule_name} rule={rule} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === "performance" && performance && (
+          <div className="space-y-6">
+            {/* Summary stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <MetricCard
+                label="Trading Days"
+                value={String(performance.trading_days)}
+                icon={Calendar}
+                accent="blue"
+              />
+              <MetricCard
+                label="Best Day P&L"
+                value={fmtCurrency(performance.best_day_pnl)}
+                icon={ArrowUpRight}
+                accent="emerald"
+              />
+              <MetricCard
+                label="Worst Day P&L"
+                value={fmtCurrency(performance.worst_day_pnl)}
+                icon={ArrowDownRight}
+                accent="red"
+              />
+              <MetricCard
+                label="Avg. Daily P&L"
+                value={fmtCurrency(performance.avg_daily_pnl)}
+                icon={BarChart2}
+                accent="cyan"
+              />
+            </div>
+
+            {/* Daily breakdown table */}
+            {performance.daily_breakdown.length > 0 ? (
+              <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-700/50">
+                    <tr>
+                      <th className="text-left px-4 py-3 text-slate-400 font-medium">Date</th>
+                      <th className="text-right px-4 py-3 text-slate-400 font-medium">P&L</th>
+                      <th className="text-right px-4 py-3 text-slate-400 font-medium">Trades</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-700">
+                    {performance.daily_breakdown.map((d) => {
+                      const pnl = parseFloat(d.realized_pnl);
+                      return (
+                        <tr key={d.trade_date} className="hover:bg-slate-700/30 transition">
+                          <td className="px-4 py-3 text-slate-300">{d.trade_date}</td>
+                          <td
+                            className={`px-4 py-3 text-right font-medium ${
+                              pnl >= 0 ? "text-emerald-400" : "text-red-400"
+                            }`}
+                          >
+                            {pnl >= 0 ? "+" : ""}{fmtCurrency(d.realized_pnl)}
+                          </td>
+                          <td className="px-4 py-3 text-right text-slate-400">{d.trades_count}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="bg-slate-800 border border-slate-700 rounded-xl p-10 text-center text-slate-500">
+                No trading days recorded yet. Complete your first trading day to see breakdown here.
               </div>
             )}
           </div>
+        )}
 
-          <div className="flex flex-wrap gap-3">
-            <button
-              onClick={() => handleSimulate(500, true)}
-              disabled={simulating || isBreached}
-              className="px-4 py-2 rounded-xl bg-emerald-950/60 border border-emerald-700/60 hover:bg-emerald-900/60 disabled:opacity-40 text-emerald-300 font-bold text-xs transition flex items-center space-x-1.5"
-            >
-              <span>+ Simulate Win (+$500)</span>
-            </button>
-            <button
-              onClick={() => handleSimulate(2000, true)}
-              disabled={simulating || isBreached}
-              className="px-4 py-2 rounded-xl bg-emerald-950/60 border border-emerald-700/60 hover:bg-emerald-900/60 disabled:opacity-40 text-emerald-300 font-bold text-xs transition flex items-center space-x-1.5"
-            >
-              <span>+ Simulate Big Win (+$2,000)</span>
-            </button>
-            <button
-              onClick={() => handleSimulate(-400, false)}
-              disabled={simulating || isBreached}
-              className="px-4 py-2 rounded-xl bg-amber-950/60 border border-amber-700/60 hover:bg-amber-900/60 disabled:opacity-40 text-amber-300 font-bold text-xs transition flex items-center space-x-1.5"
-            >
-              <span>- Simulate Loss (-$400)</span>
-            </button>
-            <button
-              onClick={() => handleSimulate(-6000, false)}
-              disabled={simulating || isBreached}
-              className="px-4 py-2 rounded-xl bg-red-950/60 border border-red-700/60 hover:bg-red-900/60 disabled:opacity-40 text-red-300 font-bold text-xs transition flex items-center space-x-1.5"
-            >
-              <span>⚠ Trigger Daily Breach (-$6,000)</span>
-            </button>
+        {/* ── Footer row ── */}
+        <div className="flex items-center justify-between text-xs text-slate-600">
+          <span>Last updated: {lastRefresh.toLocaleTimeString()} &nbsp;·&nbsp; Auto-refreshes every 60s</span>
+          <div className="flex gap-4">
+            <Link href="/kyc" className="hover:text-slate-400 transition flex items-center gap-1">
+              <Shield size={11} /> KYC Status: <span className={
+                summary.kyc_status === "APPROVED" ? "text-emerald-500" : "text-amber-500"
+              }>{summary.kyc_status}</span>
+            </Link>
+            <Link href="/payouts" className="hover:text-slate-400 transition">Payouts →</Link>
           </div>
         </div>
+      </div>
+    );
+  };
 
-        {/* Trade History Table */}
-        <div className="bg-dark-900 border border-dark-700/60 rounded-2xl overflow-hidden shadow-xl">
-          <div className="px-6 py-4 border-b border-dark-700 flex items-center justify-between">
-            <h3 className="font-bold text-sm text-white">Closed Trades History ({trades.length})</h3>
-            <span className="text-xs text-gray-500 font-mono">Live MT5 Execution Journal</span>
-          </div>
-
-          {trades.length === 0 ? (
-            <div className="py-12 text-center text-gray-500 text-xs">
-              No trades recorded yet. Connect to MT5 or use the simulator above to open positions.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs divide-y divide-dark-800">
-                <thead className="bg-dark-850/80 text-gray-400 font-semibold uppercase tracking-wider text-[10px]">
-                  <tr>
-                    <th className="px-6 py-3">Ticket</th>
-                    <th className="px-6 py-3">Symbol</th>
-                    <th className="px-6 py-3">Type</th>
-                    <th className="px-6 py-3">Lots</th>
-                    <th className="px-6 py-3">Open Price</th>
-                    <th className="px-6 py-3">Close Price</th>
-                    <th className="px-6 py-3">Profit (USD)</th>
-                    <th className="px-6 py-3">Date</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-dark-800 font-medium">
-                  {trades.map((t) => (
-                    <tr key={t.id} className="hover:bg-dark-850/50 transition">
-                      <td className="px-6 py-3 font-mono text-gray-400">{t.ticket}</td>
-                      <td className="px-6 py-3 font-bold text-white">{t.symbol}</td>
-                      <td className="px-6 py-3">
-                        <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                            t.trade_type === "BUY"
-                              ? "bg-emerald-950 text-emerald-400 border border-emerald-800/40"
-                              : "bg-red-950 text-red-400 border border-red-800/40"
-                          }`}
-                        >
-                          {t.trade_type}
-                        </span>
-                      </td>
-                      <td className="px-6 py-3 text-gray-300">{t.lots.toFixed(2)}</td>
-                      <td className="px-6 py-3 font-mono text-gray-400">{t.open_price.toFixed(5)}</td>
-                      <td className="px-6 py-3 font-mono text-gray-400">{t.close_price?.toFixed(5) || "Open"}</td>
-                      <td
-                        className={`px-6 py-3 font-bold ${
-                          t.profit >= 0 ? "text-emerald-400" : "text-red-400"
-                        }`}
-                      >
-                        {t.profit >= 0 ? `+$${t.profit.toFixed(2)}` : `-$${Math.abs(t.profit).toFixed(2)}`}
-                      </td>
-                      <td className="px-6 py-3 text-gray-500 font-mono text-[11px]">
-                        {new Date(t.open_time).toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+  return (
+    <>
+      <Navbar />
+      <main className="min-h-screen bg-slate-900 text-white pt-20 pb-16">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          {renderContent()}
         </div>
       </main>
-
       <Footer />
-    </div>
+    </>
   );
 }
