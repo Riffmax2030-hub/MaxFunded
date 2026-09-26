@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { getSession, clearSession, AuthSession } from "@/lib/auth";
-import { ShieldCheck, User, LogOut, LayoutDashboard, Sliders, Award } from "lucide-react";
+import { ShieldCheck, User, LogOut, LayoutDashboard, Sliders, Award, Users } from "lucide-react";
 
 export default function Navbar() {
   const [session, setSession] = useState<AuthSession | null>(null);
@@ -69,6 +69,13 @@ export default function Navbar() {
               >
                 <Award className="w-4 h-4 text-amber-500" />
                 <span>Certificates</span>
+              </Link>
+              <Link
+                href="/affiliates"
+                className="hidden md:flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold rounded-md bg-dark-800 border border-dark-700 hover:border-brand-500 text-gray-200"
+              >
+                <Users className="w-4 h-4 text-brand-500" />
+                <span>Affiliates</span>
               </Link>
               {session.isAdmin && (
                 <Link

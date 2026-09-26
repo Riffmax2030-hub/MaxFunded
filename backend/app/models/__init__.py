@@ -30,6 +30,15 @@ from app.models.certificate import (
     Certificate,
     CertificateType,
 )
+from app.models.affiliate import (
+    AffiliateProfile,
+    Coupon,
+    ReferralCommission,
+    AffiliatePayoutRequest,
+    AffiliateTier,
+    CommissionStatus,
+    AffiliatePayoutStatus,
+)
 
 __all__ = [
     "BaseModel",
@@ -63,6 +72,13 @@ __all__ = [
     "PayoutStatus",
     "Certificate",
     "CertificateType",
+    "AffiliateProfile",
+    "Coupon",
+    "ReferralCommission",
+    "AffiliatePayoutRequest",
+    "AffiliateTier",
+    "CommissionStatus",
+    "AffiliatePayoutStatus",
 ]
 
 

@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1 import auth, users, challenges, admin, payments, trading, company_capital, kyc, payouts, dashboard, certificates
+from app.api.v1 import auth, users, challenges, admin, payments, trading, company_capital, kyc, payouts, dashboard, certificates, affiliates
 
 api_router = APIRouter()
 
@@ -31,6 +31,10 @@ api_router.include_router(
 api_router.include_router(
     certificates.router,
     tags=["Certificates & Verification"],
+)
+api_router.include_router(
+    affiliates.router,
+    tags=["Affiliate & Referral Network"],
 )
 
 

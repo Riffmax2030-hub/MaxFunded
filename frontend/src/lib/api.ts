@@ -795,3 +795,139 @@ export async function verifyCertificatePublic(code: string): Promise<PublicCerti
   }
   return res.json();
 }
+
+// ============================================================
+// Phase 10 — Affiliate Partner Network & Coupons
+// ============================================================
+
+export interface AffiliateProfileData {
+  id: string;
+  user_id: string;
+  referral_code: string;
+  commission_rate: string;
+  tier: "STANDARD" | "PRO" | "ELITE";
+  total_referred_users: number;
+  total_purchases_referred: number;
+  total_sales_volume: string;
+  total_commission_earned: string;
+  commission_balance: string;
+  total_commission_paid: string;
+  payout_method: string | null;
+  payout_address: string | null;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface ReferralCommissionItem {
+  id: string;
+  affiliate_id: string;
+  purchase_id: string;
+  purchase_amount: string;
+  commission_rate: string;
+  commission_amount: string;
+  status: string;
+  created_at: string;
+}
+
+export interface AffiliatePayoutItem {
+  id: string;
+  affiliate_id: string;
+  amount: string;
+  method: string;
+  destination: string;
+  status: string;
+  admin_notes: string | null;
+  processed_at: string | null;
+  created_at: string;
+}
+
+export interface CouponValidateResult {
+  valid: boolean;
+  code: string;
+  discount_percentage: string;
+  discount_amount: string;
+  final_price: string;
+  message: string;
+}
+
+export async function fetchMyAffiliateProfile(token: string): Promise<AffiliateProfileData> {
+  const res = await fetch(`${API_BASE}/affiliates/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Failed to fetch affiliate profile" }));
+    throw new Error(err.detail || "Failed to fetch affiliate profile");
+  }
+  return res.json();
+}
+
+export async function registerAffiliate(
+  token: string,
+  payload: { referral_code?: string; payout_method?: string; payout_address?: string }
+): Promise<AffiliateProfileData> {
+  const res = await fetch(`${API_BASE}/affiliates/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Affiliate enrollment failed" }));
+    throw new Error(err.detail || "Affiliate enrollment failed");
+  }
+  return res.json();
+}
+
+export async function fetchMyCommissions(token: string): Promise<ReferralCommissionItem[]> {
+  const res = await fetch(`${API_BASE}/affiliates/commissions`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function requestAffiliatePayout(
+  token: string,
+  payload: { amount: number; method: string; destination: string }
+): Promise<AffiliatePayoutItem> {
+  const res = await fetch(`${API_BASE}/affiliates/payout-request`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Payout request failed" }));
+    throw new Error(err.detail || "Payout request failed");
+  }
+  return res.json();
+}
+
+export async function fetchMyAffiliatePayouts(token: string): Promise<AffiliatePayoutItem[]> {
+  const res = await fetch(`${API_BASE}/affiliates/payouts`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function validateCoupon(code: string, price: number): Promise<CouponValidateResult> {
+  const res = await fetch(
+    `${API_BASE}/affiliates/coupons/validate?code=${encodeURIComponent(code)}&price=${price}`
+  );
+  if (!res.ok) {
+    return {
+      valid: false,
+      code,
+      discount_percentage: "0",
+      discount_amount: "0",
+      final_price: price.toString(),
+      message: "Coupon invalid or network error",
+    };
+  }
+  return res.json();
+}
