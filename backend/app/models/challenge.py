@@ -1,6 +1,6 @@
 import enum
 from decimal import Decimal
-from sqlalchemy import Column, String, Boolean, Numeric, Integer, ForeignKey, Text
+from sqlalchemy import Column, String, Boolean, Numeric, Integer, ForeignKey, Text, DateTime
 from sqlalchemy.orm import relationship
 from app.models.base import BaseModel
 
@@ -88,6 +88,8 @@ class ChallengePurchase(BaseModel):
     # MT5 Simulated Account Details (Provisioned upon payment confirmation)
     mt5_login = Column(String(50), nullable=True, index=True)
     mt5_server = Column(String(100), nullable=True)
+    mt5_password = Column(String(100), nullable=True)
+    mt5_investor_password = Column(String(100), nullable=True)
     
     # Performance & Metric Tracking
     current_balance = Column(Numeric(18, 4), default=Decimal("0.00"), nullable=False)
@@ -95,7 +97,15 @@ class ChallengePurchase(BaseModel):
     high_water_mark = Column(Numeric(18, 4), default=Decimal("0.00"), nullable=False)
     daily_starting_equity = Column(Numeric(18, 4), default=Decimal("0.00"), nullable=False)
     trading_days_count = Column(Integer, default=0, nullable=False)
+
+    # Lifecycle milestones & breach recording
+    breached_reason = Column(String(255), nullable=True)
+    breached_at = Column(DateTime(timezone=True), nullable=True)
+    passed_at = Column(DateTime(timezone=True), nullable=True)
     
     # Relationships
     user = relationship("User", back_populates="purchases")
     challenge = relationship("Challenge", back_populates="purchases")
+    trades = relationship("Trade", back_populates="purchase", cascade="all, delete-orphan")
+    daily_snapshots = relationship("DailySnapshot", back_populates="purchase", cascade="all, delete-orphan")
+    breach_logs = relationship("BreachLog", back_populates="purchase", cascade="all, delete-orphan")

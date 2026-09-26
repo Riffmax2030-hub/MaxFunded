@@ -15,6 +15,7 @@ from app.models.payment import Payment, PaymentProvider, PaymentStatus
 from app.models.user import User
 from app.payments.base import PaymentInitResult
 from app.payments.factory import payment_factory
+from app.services.provisioning import provisioning_service
 from app.schemas.payment import (
     BankDetailsSchema,
     BankTransferConfirmRequest,
@@ -266,11 +267,13 @@ async def payment_webhook(
         payment.provider_metadata = {**payment.provider_metadata, "webhook": event.raw}
 
         if payment.purchase:
-            payment.purchase.status = PurchaseStatus.ACTIVE
-            # Auto-assign simulated MT5 login credentials
-            if not payment.purchase.mt5_login:
-                payment.purchase.mt5_login = f"88{payment.purchase.id[:6].upper()}"
-                payment.purchase.mt5_server = "RiffMax-Simulated-MT5"
+            ch_stmt = select(Challenge).where(Challenge.id == payment.purchase.challenge_id)
+            ch_res = await db.execute(ch_stmt)
+            challenge_obj = ch_res.scalar_one_or_none()
+            if challenge_obj:
+                await provisioning_service.provision_account(payment.purchase, challenge_obj, db)
+            else:
+                payment.purchase.status = PurchaseStatus.ACTIVE
 
         audit = AuditLog(
             action="PAYMENT_COMPLETED_VIA_WEBHOOK",
@@ -319,10 +322,13 @@ async def confirm_bank_transfer(
     payment.admin_notes = payload.admin_notes
 
     if payment.purchase:
-        payment.purchase.status = PurchaseStatus.ACTIVE
-        if not payment.purchase.mt5_login:
-            payment.purchase.mt5_login = f"88{payment.purchase.id[:6].upper()}"
-            payment.purchase.mt5_server = "RiffMax-Simulated-MT5"
+        ch_stmt = select(Challenge).where(Challenge.id == payment.purchase.challenge_id)
+        ch_res = await db.execute(ch_stmt)
+        challenge_obj = ch_res.scalar_one_or_none()
+        if challenge_obj:
+            await provisioning_service.provision_account(payment.purchase, challenge_obj, db)
+        else:
+            payment.purchase.status = PurchaseStatus.ACTIVE
 
     audit = AuditLog(
         action="BANK_TRANSFER_CONFIRMED",
