@@ -25,24 +25,29 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-4 text-xs uppercase tracking-wider">Evaluation</h4>
             <ul className="space-y-2 text-xs">
               <li><Link href="/challenges" className="hover:text-white transition">Challenges Catalog</Link></li>
-              <li><Link href="/#rules" className="hover:text-white transition">Trading Rules</Link></li>
-              <li><Link href="/#how-it-works" className="hover:text-white transition">Evaluation Roadmap</Link></li>
-              <li><Link href="/#faq" className="hover:text-white transition">Frequently Asked Questions</Link></li>
+              <li><Link href="/how-it-works" className="hover:text-white transition">How It Works</Link></li>
+              <li><Link href="/rules" className="hover:text-white transition">Trading Rules</Link></li>
+              <li><Link href="/trading-conditions" className="hover:text-white transition">Trading Conditions</Link></li>
+              <li><Link href="/faq" className="hover:text-white transition">FAQ</Link></li>
+              <li><Link href="/about" className="hover:text-white transition">About Us</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition">Contact Support</Link></li>
             </ul>
           </div>
 
           {/* Compliance & Legal */}
           <div>
-            <h4 className="text-white font-semibold mb-4 text-xs uppercase tracking-wider">Compliance & Legal</h4>
+            <h4 className="text-white font-semibold mb-4 text-xs uppercase tracking-wider">Legal</h4>
             <ul className="space-y-2 text-xs">
-              <li><span className="text-gray-400">Terms of Service (v1.0)</span></li>
-              <li><span className="text-gray-400">Privacy Policy</span></li>
-              <li><span className="text-gray-400">Risk Disclosure</span></li>
-              <li><span className="text-gray-400">Restricted Jurisdictions</span></li>
+              <li><Link href="/terms" className="hover:text-white transition">Terms of Service</Link></li>
+              <li><Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link></li>
+              <li><Link href="/risk-disclosure" className="hover:text-white transition">Risk Disclosure</Link></li>
+              <li><Link href="/refund-policy" className="hover:text-white transition">Refund Policy</Link></li>
+              <li><Link href="/payout-policy" className="hover:text-white transition">Payout Policy</Link></li>
+              <li><Link href="/restricted-countries" className="hover:text-white transition">Restricted Countries</Link></li>
             </ul>
           </div>
 
-          {/* Security & Regulatory Note */}
+          {/* Regulatory Note */}
           <div>
             <h4 className="text-white font-semibold mb-4 text-xs uppercase tracking-wider">Regulatory Disclaimer</h4>
             <p className="text-xs text-gray-400 leading-relaxed">

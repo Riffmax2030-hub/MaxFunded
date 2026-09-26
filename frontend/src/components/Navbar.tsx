@@ -35,14 +35,20 @@ export default function Navbar() {
           <Link href="/challenges" className="hover:text-white transition-colors">
             Challenges
           </Link>
-          <Link href="/#how-it-works" className="hover:text-white transition-colors">
+          <Link href="/how-it-works" className="hover:text-white transition-colors">
             How It Works
           </Link>
-          <Link href="/#rules" className="hover:text-white transition-colors">
-            Trading Rules
+          <Link href="/rules" className="hover:text-white transition-colors">
+            Rules
           </Link>
-          <Link href="/#faq" className="hover:text-white transition-colors">
+          <Link href="/trading-conditions" className="hover:text-white transition-colors">
+            Conditions
+          </Link>
+          <Link href="/faq" className="hover:text-white transition-colors">
             FAQ
+          </Link>
+          <Link href="/about" className="hover:text-white transition-colors">
+            About
           </Link>
         </nav>
 
