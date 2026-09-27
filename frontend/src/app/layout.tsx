@@ -1,6 +1,8 @@
 import "@/styles/globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import LiveTicker from "@/components/LiveTicker";
+import ContactWidget from "@/components/ContactWidget";
 
 export const metadata = {
   title: "MaxFunded — Trade to the Maximum. Zero Personal Risk.",
@@ -13,11 +15,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased selection:bg-brand-600 selection:text-white">
+    <html lang="en" className="dark">
+      <body className="min-h-screen flex flex-col bg-[#08090b] text-neutral-100 antialiased selection:bg-[#ccff00] selection:text-black">
+        <LiveTicker />
         <Navbar />
         <main className="flex-grow">{children}</main>
         <Footer />
+        <ContactWidget />
       </body>
     </html>
   );
