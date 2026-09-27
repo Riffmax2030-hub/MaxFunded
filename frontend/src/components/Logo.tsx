@@ -37,62 +37,52 @@ export default function Logo({
   return (
     <div className={`inline-flex items-center space-x-3 select-none ${className}`}>
       {/* ========================================================================= */}
-      {/* PROFITABLE CHART "M" EMBLEM WITH UPWARD BREAKOUT ARROW */}
+      {/* ICONIC PROFITABLE "M" CHART LOGO WITH BREAKOUT ARROW */}
       {/* ========================================================================= */}
       <div
-        className={`relative ${iconDimensions} rounded-xl bg-gradient-to-br from-[#ccff00] via-[#84cc16] to-[#15803d] p-[1.5px] shadow-[0_0_20px_rgba(204,255,0,0.3)] transition-transform duration-300 hover:scale-105 shrink-0`}
+        className={`relative ${iconDimensions} rounded-xl bg-gradient-to-br from-[#ccff00] via-[#a3e635] to-[#4d7c0f] p-[1.5px] shadow-[0_0_18px_rgba(204,255,0,0.25)] transition-transform duration-300 hover:scale-105 shrink-0`}
       >
-        <div className="w-full h-full bg-[#090b0e] rounded-[10.5px] flex items-center justify-center overflow-hidden relative">
-          {/* Subtle chart grid background lines */}
-          <div className="absolute inset-0 opacity-[0.08] pointer-events-none">
-            <div className="w-full h-full grid grid-cols-3 grid-rows-3 border-neutral-500 divide-x divide-y divide-neutral-500" />
-          </div>
+        <div className="w-full h-full bg-[#08090b] rounded-[10.5px] flex items-center justify-center relative overflow-hidden">
+          {/* Subtle soft green ambient glow behind the chart arrow */}
+          <div className="absolute top-0 right-0 w-8 h-8 bg-[#ccff00]/20 rounded-full blur-md pointer-events-none" />
 
-          {/* Upward green gradient aura */}
-          <div className="absolute bottom-0 inset-x-0 h-2/3 bg-gradient-to-t from-[#ccff00]/15 to-transparent pointer-events-none" />
-
+          {/* Clean, Simple, Bold "M" Chart Vector */}
           <svg
-            viewBox="0 0 38 38"
+            viewBox="0 0 36 36"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="w-[82%] h-[82%] relative z-10"
+            className="w-[78%] h-[78%] relative z-10"
           >
-            {/* Candlestick support stems / wicks for authentic trading chart feel */}
-            <line x1="11" y1="9" x2="11" y2="28" stroke="#ccff00" strokeWidth="1" strokeOpacity="0.3" strokeDasharray="1.5 1.5" />
-            <line x1="22" y1="12" x2="22" y2="28" stroke="#ccff00" strokeWidth="1" strokeOpacity="0.3" strokeDasharray="1.5 1.5" />
+            <defs>
+              <linearGradient id="mChartFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#ccff00" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="#ccff00" stopOpacity="0.0" />
+              </linearGradient>
+            </defs>
 
-            {/* Support baseline */}
-            <line x1="4" y1="30" x2="34" y2="30" stroke="#ffffff" strokeWidth="1" strokeOpacity="0.1" />
-
-            {/* 
-              THE PROFITABLE "M" CHART PATH:
-              Starts at bottom-left support (5, 28)
-              Rallies UP to Peak 1 (11, 12)
-              Pulls back to higher low (16, 21)
-              Rallies UP to Peak 2 (22, 14)
-              EXPLODES UPWARD as a soaring breakout arrow to (33, 5)
-            */}
+            {/* Subtle filled area beneath the M chart */}
             <path
-              d="M5 28L11 12L16 21L22 14L33 5"
+              d="M6 27L12 13L18 21L26 8V27H6Z"
+              fill="url(#mChartFill)"
+            />
+
+            {/* Bold Profitable "M" Line Chart */}
+            <path
+              d="M6 27L12 13L18 21L27 8"
               stroke="#ccff00"
-              strokeWidth="3.4"
+              strokeWidth="3.6"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
 
-            {/* Upward Breakout Arrow Head pointing ↗ */}
+            {/* Breakout Arrow Head pointing ↗ */}
             <path
-              d="M23 5H33V15"
+              d="M19 8H27V16"
               stroke="#ccff00"
-              strokeWidth="3.4"
+              strokeWidth="3.6"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
-
-            {/* Glowing breakout vertex nodes on chart peaks */}
-            <circle cx="11" cy="12" r="1.8" fill="#ffffff" />
-            <circle cx="16" cy="21" r="1.6" fill="#ccff00" />
-            <circle cx="22" cy="14" r="1.8" fill="#ffffff" />
           </svg>
         </div>
       </div>

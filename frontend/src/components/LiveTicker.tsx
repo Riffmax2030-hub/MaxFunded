@@ -21,10 +21,12 @@ const LIVE_EVENTS = [
 export default function LiveTicker() {
   const [index, setIndex] = useState(0);
 
+  // 6.5 seconds total cycle:
+  // ~1.1s slide in from right to center -> 4.3s resting in the middle -> ~1.1s slide out to left
   useEffect(() => {
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % LIVE_EVENTS.length);
-    }, 4000);
+    }, 6500);
     return () => clearInterval(timer);
   }, []);
 
@@ -32,21 +34,27 @@ export default function LiveTicker() {
 
   return (
     <div className="w-full bg-[#ccff00] text-black font-extrabold text-xs sm:text-[13px] py-2 overflow-hidden select-none relative z-50 border-b border-black/10">
-      <div className="max-w-4xl mx-auto flex items-center justify-center px-4 min-h-[22px]">
-        {/* Exactly one message at a time sliding from right to left */}
+      <div className="w-full max-w-7xl mx-auto relative flex items-center justify-center min-h-[22px] px-4">
+        {/* Exactly one message at a time sliding across the entire bar */}
         <AnimatePresence mode="wait">
           <motion.div
             key={index}
-            initial={{ x: 60, opacity: 0 }}
+            // Enters from the far right of the bar
+            initial={{ x: "60vw", opacity: 0 }}
+            // Glides to the dead center and pauses
             animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -60, opacity: 0 }}
-            transition={{ duration: 0.45, ease: "easeOut" }}
-            className="flex items-center justify-center gap-2.5 text-center"
+            // Exits smoothly to the far left of the bar
+            exit={{ x: "-60vw", opacity: 0 }}
+            transition={{
+              duration: 1.1,
+              ease: [0.16, 1, 0.3, 1], // Smooth cubic deceleration into center and acceleration out
+            }}
+            className="flex items-center justify-center gap-2.5 text-center whitespace-nowrap"
           >
-            {/* Country Flag (SVG - 100% visible on Windows) */}
-            <CountryFlag code={current.country} size={14} className="shadow-sm" />
-            <span className="text-black font-black">{current.name}</span>
-            <span className="text-neutral-900 font-semibold">{current.action}</span>
+            {/* SVG Country Flag (visible on Windows OS) */}
+            <CountryFlag code={current.country} size={15} className="shadow-sm" />
+            <span className="text-black font-black tracking-tight">{current.name}</span>
+            <span className="text-neutral-900 font-bold">{current.action}</span>
           </motion.div>
         </AnimatePresence>
       </div>
