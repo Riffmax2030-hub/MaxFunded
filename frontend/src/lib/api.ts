@@ -648,21 +648,21 @@ export async function reviewAdminPayout(
 export interface RuleComplianceItem {
   rule_name: string;
   description: string;
-  current_value: string | null;
-  limit_value: string | null;
+  current_value: string | number | null;
+  limit_value: string | number | null;
   percentage_used: number | null;
   is_breached: boolean;
   is_achieved: boolean;
 }
 
 export interface DashboardSummaryData {
-  purchase_id: number;
+  purchase_id: string | number;
   challenge_name: string;
-  account_size: string;
+  account_size: string | number;
   phase: string;
-  current_balance: string;
-  current_equity: string;
-  total_profit: string;
+  current_balance: string | number;
+  current_equity: string | number;
+  total_profit: string | number;
   total_profit_pct: number;
   open_positions: number;
   daily_drawdown_used_pct: number;
@@ -676,8 +676,8 @@ export interface DashboardSummaryData {
   winning_trades: number;
   losing_trades: number;
   win_rate_pct: number;
-  avg_profit_per_trade: string;
-  avg_loss_per_trade: string;
+  avg_profit_per_trade: string | number;
+  avg_loss_per_trade: string | number;
   profit_factor: number | null;
   account_status: string;
   days_remaining: number | null;

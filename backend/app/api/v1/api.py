@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1 import auth, users, challenges, admin, payments, trading, company_capital, kyc, payouts, dashboard, certificates, affiliates, notifications, system
+from app.api.v1 import auth, users, challenges, admin, payments, trading, company_capital, kyc, payouts, dashboard, certificates, affiliates, notifications, system, ws
 
 api_router = APIRouter()
 
@@ -43,4 +43,8 @@ api_router.include_router(
 api_router.include_router(
     system.router,
     tags=["System Health & Audit Logs"],
+)
+api_router.include_router(
+    ws.router,
+    tags=["WebSocket Real-time"],
 )

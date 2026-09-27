@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { getSession } from "@/lib/auth";
 import {
   fetchDashboardSummary,
@@ -12,6 +13,9 @@ import {
   PerformanceReportData,
   RuleComplianceItem,
 } from "@/lib/api";
+import { useDashboardWebSocket } from "@/hooks/useDashboardWebSocket";
+import { useAnimatedNumber } from "@/hooks/useAnimatedNumber";
+import InteractiveEquityChart from "@/components/InteractiveEquityChart";
 import {
   TrendingUp,
   TrendingDown,
@@ -33,6 +37,7 @@ import {
   CreditCard,
   Activity,
   Zap,
+  Radio,
 } from "lucide-react";
 
 // ──────────────────────────────────────────
@@ -61,28 +66,16 @@ function fmtPct(value: number | null | undefined): string {
   return value.toFixed(2) + "%";
 }
 
-function statusColor(status: string): string {
-  const map: Record<string, string> = {
-    ACTIVE: "text-emerald-400",
-    WARNING: "text-amber-400",
-    BREACHED: "text-red-400",
-    TARGET_REACHED: "text-cyan-400",
-    FUNDED: "text-violet-400",
-    PASSED: "text-blue-400",
-  };
-  return map[status] ?? "text-slate-400";
-}
-
 function statusBadge(status: string): string {
   const map: Record<string, string> = {
     ACTIVE: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
     WARNING: "bg-amber-500/20 text-amber-400 border-amber-500/30",
     BREACHED: "bg-red-500/20 text-red-400 border-red-500/30",
-    TARGET_REACHED: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
+    TARGET_REACHED: "bg-[#ccff00]/20 text-[#ccff00] border-[#ccff00]/30",
     FUNDED: "bg-violet-500/20 text-violet-400 border-violet-500/30",
     PASSED: "bg-blue-500/20 text-blue-400 border-blue-500/30",
   };
-  return map[status] ?? "bg-slate-700 text-slate-400 border-slate-600";
+  return map[status] ?? "bg-neutral-800 text-neutral-400 border-neutral-700";
 }
 
 function phaseLabel(phase: string): string {
@@ -90,185 +83,166 @@ function phaseLabel(phase: string): string {
 }
 
 // ──────────────────────────────────────────
-// Sub-components
+// Sub-components with Framer Motion
 // ──────────────────────────────────────────
 
 function MetricCard({
   label,
   value,
+  numericValue,
+  prefix = "$",
+  suffix = "",
   sub,
   icon: Icon,
   accent = "emerald",
   danger = false,
 }: {
   label: string;
-  value: string;
+  value?: string;
+  numericValue?: number;
+  prefix?: string;
+  suffix?: string;
   sub?: string;
   icon: React.ElementType;
   accent?: string;
   danger?: boolean;
 }) {
   const accentMap: Record<string, string> = {
-    emerald: "bg-emerald-500/10 text-emerald-400",
-    blue: "bg-blue-500/10 text-blue-400",
+    emerald: "bg-[#ccff00]/10 text-[#ccff00]",
+    blue: "bg-sky-500/10 text-sky-400",
     amber: "bg-amber-500/10 text-amber-400",
-    red: "bg-red-500/10 text-red-400",
+    red: "bg-rose-500/10 text-rose-400",
     violet: "bg-violet-500/10 text-violet-400",
     cyan: "bg-cyan-500/10 text-cyan-400",
   };
+
+  const animatedNum = useAnimatedNumber(numericValue !== undefined ? numericValue : 0, 700);
+
+  const displayValue =
+    numericValue !== undefined
+      ? `${prefix}${animatedNum.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${suffix}`
+      : value;
+
   return (
-    <div className={`bg-slate-800 border ${danger ? "border-red-500/40" : "border-slate-700"} rounded-xl p-5 flex flex-col gap-3`}>
+    <motion.div
+      whileHover={{ y: -3, transition: { duration: 0.15 } }}
+      className={`bg-[#0d0e10] border ${danger ? "border-rose-500/40" : "border-white/[0.08]"} rounded-2xl p-5 flex flex-col justify-between shadow-lg relative overflow-hidden`}
+    >
       <div className="flex items-center justify-between">
-        <span className="text-slate-400 text-sm">{label}</span>
-        <span className={`p-2 rounded-lg ${accentMap[accent] ?? accentMap.emerald}`}>
+        <span className="text-neutral-400 text-xs font-medium uppercase tracking-wider">{label}</span>
+        <span className={`p-2 rounded-xl ${accentMap[accent] ?? accentMap.emerald}`}>
           <Icon size={16} />
         </span>
       </div>
-      <div>
-        <p className={`text-2xl font-bold ${danger ? "text-red-400" : "text-white"}`}>{value}</p>
-        {sub && <p className="text-slate-500 text-xs mt-0.5">{sub}</p>}
+      <div className="mt-3">
+        <p className={`text-2xl font-black font-mono tracking-tight ${danger ? "text-rose-400" : "text-white"}`}>
+          {displayValue}
+        </p>
+        {sub && <p className="text-neutral-500 text-xs mt-1 font-medium">{sub}</p>}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function DrawdownGauge({
   label,
-  used,
   limit,
   usedPct,
 }: {
   label: string;
-  used: number;
   limit: number;
   usedPct: number;
 }) {
-  const color =
-    usedPct >= 80 ? "bg-red-500" : usedPct >= 60 ? "bg-amber-500" : "bg-emerald-500";
+  const isHighDanger = usedPct >= 80;
+  const isWarning = usedPct >= 60;
+  const color = isHighDanger ? "bg-rose-500" : isWarning ? "bg-amber-500" : "bg-[#ccff00]";
+
   return (
-    <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+    <motion.div
+      whileHover={{ y: -2, transition: { duration: 0.15 } }}
+      className="bg-[#0d0e10] border border-white/[0.08] rounded-2xl p-5 shadow-lg"
+    >
       <div className="flex items-center justify-between mb-3">
-        <span className="text-slate-300 text-sm font-medium">{label}</span>
+        <span className="text-neutral-200 text-sm font-semibold">{label}</span>
         <span
-          className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-            usedPct >= 80
-              ? "bg-red-500/20 text-red-400"
-              : usedPct >= 60
-              ? "bg-amber-500/20 text-amber-400"
-              : "bg-emerald-500/20 text-emerald-400"
+          className={`text-xs font-bold font-mono px-2.5 py-0.5 rounded-full ${
+            isHighDanger
+              ? "bg-rose-500/20 text-rose-400 border border-rose-500/30"
+              : isWarning
+              ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+              : "bg-[#ccff00]/15 text-[#ccff00] border border-[#ccff00]/30"
           }`}
         >
           {fmtPct(usedPct)} used
         </span>
       </div>
-      <div className="w-full bg-slate-700 rounded-full h-2.5 mb-3">
-        <div
-          className={`${color} h-2.5 rounded-full transition-all duration-500`}
-          style={{ width: `${Math.min(100, usedPct)}%` }}
+      <div className="w-full bg-[#16181d] rounded-full h-3 mb-3 p-0.5 border border-white/5">
+        <motion.div
+          className={`${color} h-2 rounded-full`}
+          initial={{ width: 0 }}
+          animate={{ width: `${Math.min(100, Math.max(0, usedPct))}%` }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         />
       </div>
-      <div className="flex justify-between text-xs text-slate-500">
-        <span>Used: {fmtPct(usedPct)}</span>
-        <span>Limit: {fmtPct(limit)}</span>
+      <div className="flex justify-between text-xs text-neutral-400 font-mono">
+        <span>Current Drawdown: {fmtPct(usedPct)}</span>
+        <span>Hard Limit: {fmtPct(limit)}</span>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 function RuleComplianceCard({ rule }: { rule: RuleComplianceItem }) {
   const pct = rule.percentage_used ?? 0;
   const color = rule.is_breached
-    ? "bg-red-500"
+    ? "bg-rose-500"
     : rule.is_achieved
-    ? "bg-emerald-500"
+    ? "bg-[#ccff00]"
     : pct >= 80
     ? "bg-amber-500"
-    : "bg-blue-500";
+    : "bg-sky-500";
 
   return (
-    <div
-      className={`bg-slate-800 border rounded-xl p-4 ${
+    <motion.div
+      whileHover={{ y: -2, transition: { duration: 0.15 } }}
+      className={`bg-[#0d0e10] border rounded-2xl p-5 shadow-lg ${
         rule.is_breached
-          ? "border-red-500/40"
+          ? "border-rose-500/40"
           : rule.is_achieved
-          ? "border-emerald-500/40"
-          : "border-slate-700"
+          ? "border-[#ccff00]/40"
+          : "border-white/[0.08]"
       }`}
     >
       <div className="flex items-center justify-between mb-2">
-        <span className="text-slate-300 text-sm font-medium">{rule.rule_name}</span>
+        <span className="text-white text-sm font-semibold">{rule.rule_name}</span>
         {rule.is_breached ? (
-          <AlertTriangle size={14} className="text-red-400" />
+          <span className="flex items-center gap-1 text-xs text-rose-400 font-semibold bg-rose-500/10 px-2 py-0.5 rounded-md">
+            <AlertTriangle size={13} /> Breached
+          </span>
         ) : rule.is_achieved ? (
-          <CheckCircle size={14} className="text-emerald-400" />
+          <span className="flex items-center gap-1 text-xs text-[#ccff00] font-semibold bg-[#ccff00]/10 px-2 py-0.5 rounded-md">
+            <CheckCircle size={13} /> Passed
+          </span>
         ) : (
-          <Clock size={14} className="text-slate-500" />
+          <span className="flex items-center gap-1 text-xs text-neutral-400 bg-white/5 px-2 py-0.5 rounded-md">
+            <Clock size={13} /> Tracking
+          </span>
         )}
       </div>
-      <p className="text-slate-500 text-xs mb-3">{rule.description}</p>
-      <div className="w-full bg-slate-700 rounded-full h-1.5 mb-2">
-        <div
-          className={`${color} h-1.5 rounded-full transition-all duration-500`}
-          style={{ width: `${Math.min(100, pct)}%` }}
+      <p className="text-neutral-400 text-xs mb-3">{rule.description}</p>
+      <div className="w-full bg-[#16181d] rounded-full h-2 mb-2 overflow-hidden border border-white/5">
+        <motion.div
+          className={`${color} h-2 rounded-full`}
+          initial={{ width: 0 }}
+          animate={{ width: `${Math.min(100, pct)}%` }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         />
       </div>
-      <div className="flex justify-between text-xs text-slate-500">
-        <span>{rule.current_value ? fmtCurrency(rule.current_value) : `${pct.toFixed(1)}%`}</span>
-        <span>{rule.limit_value ? fmtCurrency(rule.limit_value) : "—"}</span>
+      <div className="flex justify-between text-xs text-neutral-400 font-mono">
+        <span>Current: {rule.current_value ? fmtCurrency(rule.current_value) : `${pct.toFixed(1)}%`}</span>
+        <span>Target / Cap: {rule.limit_value ? fmtCurrency(rule.limit_value) : "—"}</span>
       </div>
-    </div>
-  );
-}
-
-function SimpleEquityChart({ points }: { points: EquityPoint[] }) {
-  if (points.length < 2) {
-    return (
-      <div className="h-40 flex items-center justify-center text-slate-500 text-sm">
-        No equity history yet — start trading to see your curve.
-      </div>
-    );
-  }
-
-  const equities = points.map((p) => parseFloat(p.equity));
-  const min = Math.min(...equities);
-  const max = Math.max(...equities);
-  const range = max - min || 1;
-
-  const w = 100;
-  const h = 100;
-  const step = w / (points.length - 1);
-
-  const path = equities
-    .map((v, i) => {
-      const x = i * step;
-      const y = h - ((v - min) / range) * h;
-      return `${i === 0 ? "M" : "L"} ${x.toFixed(2)} ${y.toFixed(2)}`;
-    })
-    .join(" ");
-
-  const isPositive = equities[equities.length - 1] >= equities[0];
-  const strokeColor = isPositive ? "#10b981" : "#ef4444";
-
-  return (
-    <div className="h-40 w-full">
-      <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className="w-full h-full">
-        <defs>
-          <linearGradient id="eq-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={strokeColor} stopOpacity="0.3" />
-            <stop offset="100%" stopColor={strokeColor} stopOpacity="0.02" />
-          </linearGradient>
-        </defs>
-        <path
-          d={path + ` L ${((points.length - 1) * step).toFixed(2)} ${h} L 0 ${h} Z`}
-          fill="url(#eq-grad)"
-        />
-        <path d={path} fill="none" stroke={strokeColor} strokeWidth="1.5" />
-      </svg>
-      <div className="flex justify-between text-xs text-slate-500 mt-1">
-        <span>{points[0].recorded_at.slice(0, 10)}</span>
-        <span>{points[points.length - 1].recorded_at.slice(0, 10)}</span>
-      </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -285,6 +259,10 @@ export default function TraderDashboard() {
   const [activeTab, setActiveTab] = useState<"overview" | "compliance" | "performance">("overview");
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
+  // Real-time WebSocket hook
+  const { data: wsData, status: wsStatus } = useDashboardWebSocket();
+
+  // Load initial data via REST API
   const loadData = useCallback(async () => {
     const session = getSession();
     if (!session) {
@@ -312,9 +290,18 @@ export default function TraderDashboard() {
     }
   }, []);
 
+  // Update summary when WebSocket pushes live data
+  useEffect(() => {
+    if (wsData) {
+      setSummary(wsData as unknown as DashboardSummaryData);
+      setLastRefresh(new Date());
+      setLoading(false);
+    }
+  }, [wsData]);
+
+  // Initial fetch and 60-second background polling fallback
   useEffect(() => {
     loadData();
-    // Auto-refresh every 60 seconds
     const interval = setInterval(loadData, 60_000);
     return () => clearInterval(interval);
   }, [loadData]);
@@ -324,27 +311,27 @@ export default function TraderDashboard() {
     if (loading && !summary) {
       return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-          <Loader2 size={40} className="text-emerald-400 animate-spin" />
-          <p className="text-slate-400">Loading dashboard…</p>
+          <Loader2 size={40} className="text-[#ccff00] animate-spin" />
+          <p className="text-neutral-400 text-sm font-medium">Synchronizing MT5 trading metrics…</p>
         </div>
       );
     }
 
-    if (error) {
+    if (error && !summary) {
       const isNoAccount = error.toLowerCase().includes("no active challenge");
       return (
         <div className="max-w-lg mx-auto mt-24 text-center">
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl p-10">
+          <div className="bg-[#0d0e10] border border-white/[0.08] rounded-2xl p-10 shadow-2xl">
             {isNoAccount ? (
               <>
-                <Activity size={48} className="mx-auto text-slate-500 mb-4" />
+                <Activity size={48} className="mx-auto text-[#ccff00] mb-4 opacity-80" />
                 <h2 className="text-xl font-bold text-white mb-2">No Active Challenge</h2>
-                <p className="text-slate-400 mb-6">
-                  Purchase a challenge to unlock your live trading dashboard.
+                <p className="text-neutral-400 mb-6 text-sm">
+                  Start an evaluation challenge to unlock your real-time institutional dashboard.
                 </p>
                 <Link
                   href="/challenges"
-                  className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-lg font-semibold transition"
+                  className="inline-flex items-center gap-2 bg-[#ccff00] hover:bg-[#b3e600] text-black font-bold px-6 py-3 rounded-full transition shadow-[0_0_25px_rgba(204,255,0,0.3)]"
                 >
                   <Zap size={16} /> Browse Challenges
                 </Link>
@@ -353,10 +340,10 @@ export default function TraderDashboard() {
               <>
                 <AlertTriangle size={48} className="mx-auto text-amber-400 mb-4" />
                 <h2 className="text-xl font-bold text-white mb-2">Dashboard Error</h2>
-                <p className="text-slate-400 mb-6">{error}</p>
+                <p className="text-neutral-400 mb-6 text-sm">{error}</p>
                 <button
                   onClick={loadData}
-                  className="inline-flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-lg font-semibold transition"
+                  className="inline-flex items-center gap-2 bg-[#1b1e24] hover:bg-[#252932] text-white px-6 py-3 rounded-lg font-semibold transition"
                 >
                   <RefreshCw size={16} /> Retry
                 </button>
@@ -369,304 +356,362 @@ export default function TraderDashboard() {
 
     if (!summary) return null;
 
-    const profit = parseFloat(summary.total_profit);
+    const profit = parseFloat(String(summary.total_profit));
     const profitPositive = profit >= 0;
+    const balanceNum = parseFloat(String(summary.current_balance));
+    const equityNum = parseFloat(String(summary.current_equity));
+    const accountSizeNum = parseFloat(String(summary.account_size)) || 100000;
 
     return (
       <div className="space-y-6">
-        {/* ── Account header banner ── */}
-        <div className="bg-gradient-to-r from-slate-800 to-slate-800/50 border border-slate-700 rounded-2xl p-6">
+        {/* ── Account header banner with Live Streaming Status ── */}
+        <div className="bg-[#0d0e10] border border-white/[0.08] rounded-2xl p-6 shadow-xl relative overflow-hidden">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <div className="flex items-center gap-3 mb-1">
-                <span
-                  className={`text-xs font-semibold px-3 py-1 rounded-full border ${statusBadge(summary.account_status)}`}
-                >
+              <div className="flex flex-wrap items-center gap-2.5 mb-2">
+                <span className={`text-xs font-bold px-3 py-1 rounded-full border ${statusBadge(summary.account_status)}`}>
                   {summary.account_status}
                 </span>
-                <span className="text-xs text-slate-500 bg-slate-700 px-2 py-0.5 rounded-full">
+                <span className="text-xs text-neutral-300 bg-white/[0.07] px-2.5 py-0.5 rounded-full font-medium">
                   {phaseLabel(summary.phase)}
                 </span>
+
+                {/* Real-time WebSocket connection badge */}
+                {wsStatus === "connected" ? (
+                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/30 text-[#ccff00] text-xs font-semibold">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ccff00] opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#ccff00]"></span>
+                    </span>
+                    LIVE STREAM
+                  </div>
+                ) : wsStatus === "connecting" ? (
+                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold">
+                    <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
+                    CONNECTING
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/[0.05] border border-white/10 text-neutral-400 text-xs font-semibold">
+                    <span className="h-2 w-2 rounded-full bg-neutral-500" />
+                    REST POLLING (60s)
+                  </div>
+                )}
               </div>
-              <h1 className="text-2xl font-bold text-white">{summary.challenge_name}</h1>
-              <p className="text-slate-400 text-sm">
-                Account Size: {fmtCurrency(summary.account_size)}
+
+              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">{summary.challenge_name}</h1>
+              <p className="text-neutral-400 text-sm mt-1">
+                Account Size: <span className="font-semibold text-white">{fmtCurrency(summary.account_size)}</span>
                 {summary.challenge_start_date && (
                   <> &nbsp;·&nbsp; Started {summary.challenge_start_date}</>
                 )}
                 {summary.days_remaining !== null && (
-                  <> &nbsp;·&nbsp; {summary.days_remaining} days remaining</>
+                  <> &nbsp;·&nbsp; <span className="text-neutral-300">{summary.days_remaining} days remaining</span></>
                 )}
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              {/* Quick links */}
+
+            {/* Quick Actions */}
+            <div className="flex flex-wrap items-center gap-3">
               {summary.kyc_status !== "APPROVED" && (
                 <Link
                   href="/kyc"
-                  className="flex items-center gap-1.5 text-xs bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-2 rounded-lg hover:bg-amber-500/30 transition"
+                  className="flex items-center gap-1.5 text-xs bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3.5 py-2 rounded-xl font-medium hover:bg-amber-500/30 transition"
                 >
-                  <ShieldCheck size={13} /> Complete KYC
+                  <ShieldCheck size={14} /> Complete KYC
                 </Link>
               )}
               {!summary.has_pending_payout && summary.kyc_status === "APPROVED" && (
                 <Link
                   href="/payouts"
-                  className="flex items-center gap-1.5 text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-2 rounded-lg hover:bg-emerald-500/30 transition"
+                  className="flex items-center gap-1.5 text-xs bg-[#ccff00]/15 text-[#ccff00] border border-[#ccff00]/30 px-3.5 py-2 rounded-xl font-bold hover:bg-[#ccff00]/25 transition"
                 >
-                  <CreditCard size={13} /> Request Payout
+                  <CreditCard size={14} /> Request Payout
                 </Link>
               )}
               {summary.has_pending_payout && (
                 <Link
                   href="/payouts"
-                  className="flex items-center gap-1.5 text-xs bg-violet-500/20 text-violet-400 border border-violet-500/30 px-3 py-2 rounded-lg hover:bg-violet-500/30 transition"
+                  className="flex items-center gap-1.5 text-xs bg-violet-500/20 text-violet-400 border border-violet-500/30 px-3.5 py-2 rounded-xl font-medium hover:bg-violet-500/30 transition"
                 >
-                  <Clock size={13} /> Payout Pending
+                  <Clock size={14} /> Payout Pending
                 </Link>
               )}
               <button
                 onClick={loadData}
-                title="Refresh"
-                className="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-400 hover:text-white transition"
+                title="Refresh Metrics"
+                className="p-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-neutral-400 hover:text-white transition"
               >
-                <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+                <RefreshCw size={15} className={loading ? "animate-spin" : ""} />
               </button>
             </div>
           </div>
         </div>
 
-        {/* ── Core metrics row ── */}
+        {/* ── Core metrics row with Framer Motion & Number Counters ── */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <MetricCard
             label="Current Balance"
-            value={fmtCurrency(summary.current_balance)}
+            numericValue={balanceNum}
             icon={DollarSign}
-            accent="emerald"
-          />
-          <MetricCard
-            label="Current Equity"
-            value={fmtCurrency(summary.current_equity)}
-            sub={`${summary.open_positions} open position${summary.open_positions !== 1 ? "s" : ""}`}
-            icon={Activity}
             accent="blue"
           />
           <MetricCard
+            label="Current Equity"
+            numericValue={equityNum}
+            sub={`${summary.open_positions} open position${summary.open_positions !== 1 ? "s" : ""}`}
+            icon={Activity}
+            accent="emerald"
+          />
+          <MetricCard
             label="Total Profit"
-            value={fmtCurrency(summary.total_profit)}
-            sub={`${profitPositive ? "+" : ""}${fmtPct(summary.total_profit_pct)}`}
+            numericValue={profit}
+            prefix={profitPositive ? "+$" : "-$"}
+            sub={`${profitPositive ? "+" : ""}${fmtPct(summary.total_profit_pct)} gain`}
             icon={profitPositive ? TrendingUp : TrendingDown}
             accent={profitPositive ? "emerald" : "red"}
             danger={!profitPositive}
           />
           <MetricCard
             label="Win Rate"
-            value={fmtPct(summary.win_rate_pct)}
-            sub={`${summary.winning_trades}W / ${summary.losing_trades}L — ${summary.total_trades} closed`}
+            numericValue={summary.win_rate_pct}
+            prefix=""
+            suffix="%"
+            sub={`${summary.winning_trades}W / ${summary.losing_trades}L (${summary.total_trades} trades)`}
             icon={Target}
             accent="cyan"
           />
         </div>
 
         {/* ── Profit target progress ── */}
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+        <div className="bg-[#0d0e10] border border-white/[0.08] rounded-2xl p-5 shadow-lg">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <Award size={16} className="text-amber-400" />
-              <span className="text-slate-300 font-medium">Profit Target Progress</span>
+              <Award size={16} className="text-[#ccff00]" />
+              <span className="text-white font-semibold text-sm">Profit Target Progress</span>
             </div>
             <span
-              className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+              className={`text-xs font-bold font-mono px-2.5 py-0.5 rounded-full ${
                 summary.profit_target_achieved
-                  ? "bg-emerald-500/20 text-emerald-400"
-                  : "bg-slate-700 text-slate-400"
+                  ? "bg-[#ccff00]/20 text-[#ccff00] border border-[#ccff00]/30"
+                  : "bg-white/[0.05] text-neutral-400"
               }`}
             >
-              {summary.profit_target_achieved ? "✓ Target Achieved!" : `${fmtPct(summary.profit_target_reached_pct)} of target`}
+              {summary.profit_target_achieved ? "✓ Target Achieved!" : `${fmtPct(summary.profit_target_reached_pct)} completed`}
             </span>
           </div>
-          <div className="w-full bg-slate-700 rounded-full h-3">
-            <div
-              className={`h-3 rounded-full transition-all duration-700 ${
-                summary.profit_target_achieved ? "bg-emerald-400" : "bg-amber-500"
-              }`}
-              style={{ width: `${Math.min(100, summary.profit_target_reached_pct)}%` }}
+          <div className="w-full bg-[#16181d] rounded-full h-3 p-0.5 border border-white/5">
+            <motion.div
+              className={`h-2 rounded-full ${summary.profit_target_achieved ? "bg-[#ccff00]" : "bg-amber-400"}`}
+              initial={{ width: 0 }}
+              animate={{ width: `${Math.min(100, Math.max(0, summary.profit_target_reached_pct))}%` }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
             />
           </div>
-          <div className="flex justify-between text-xs text-slate-500 mt-2">
+          <div className="flex justify-between text-xs text-neutral-400 mt-2 font-mono">
             <span>
-              Current profit: {fmtCurrency(summary.total_profit)} ({fmtPct(summary.total_profit_pct)})
+              Realized P&L: {fmtCurrency(summary.total_profit)} ({fmtPct(summary.total_profit_pct)})
             </span>
-            <span>Target: {fmtPct(summary.profit_target_pct)}</span>
+            <span>Target Goal: {fmtPct(summary.profit_target_pct)}</span>
           </div>
         </div>
 
-        {/* ── Tabs ── */}
-        <div className="flex gap-2 border-b border-slate-700 pb-0">
+        {/* ── Navigation Tabs ── */}
+        <div className="flex gap-2 border-b border-white/[0.06] pb-0">
           {(["overview", "compliance", "performance"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2.5 text-sm font-medium rounded-t-lg transition capitalize ${
+              className={`px-5 py-3 text-sm font-semibold rounded-t-xl transition-all capitalize ${
                 activeTab === tab
-                  ? "bg-slate-800 text-white border border-b-slate-800 border-slate-700 -mb-px"
-                  : "text-slate-500 hover:text-slate-300"
+                  ? "bg-[#0d0e10] text-[#ccff00] border-t-2 border-t-[#ccff00] border-x border-x-white/[0.08] -mb-px shadow-sm"
+                  : "text-neutral-500 hover:text-neutral-300"
               }`}
             >
-              {tab === "overview" ? "Overview & Drawdown" : tab === "compliance" ? "Rule Compliance" : "Performance"}
+              {tab === "overview" ? "Overview & Live Charts" : tab === "compliance" ? "Rule Compliance Matrix" : "Trade Performance"}
             </button>
           ))}
         </div>
 
-        {/* ── Tab content ── */}
-        {activeTab === "overview" && (
-          <div className="space-y-6">
-            {/* Drawdown gauges */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <DrawdownGauge
-                label="Daily Loss Drawdown"
-                used={summary.daily_drawdown_used_pct}
-                limit={summary.daily_drawdown_limit_pct}
-                usedPct={summary.daily_drawdown_used_pct}
-              />
-              <DrawdownGauge
-                label="Maximum Drawdown"
-                used={summary.max_drawdown_used_pct}
-                limit={summary.max_drawdown_limit_pct}
-                usedPct={summary.max_drawdown_used_pct}
-              />
-            </div>
-
-            {/* Equity curve */}
-            <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <BarChart2 size={16} className="text-blue-400" />
-                <span className="text-slate-300 font-medium">30-Day Equity Curve</span>
+        {/* ── Animated Tab Content ── */}
+        <AnimatePresence mode="wait">
+          {activeTab === "overview" && (
+            <motion.div
+              key="overview"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-6"
+            >
+              {/* Drawdown gauges */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <DrawdownGauge
+                  label="Daily Loss Drawdown"
+                  limit={summary.daily_drawdown_limit_pct}
+                  usedPct={summary.daily_drawdown_used_pct}
+                />
+                <DrawdownGauge
+                  label="Maximum Overall Drawdown"
+                  limit={summary.max_drawdown_limit_pct}
+                  usedPct={summary.max_drawdown_used_pct}
+                />
               </div>
-              <SimpleEquityChart points={equityCurve} />
-            </div>
 
-            {/* Trade statistics */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <MetricCard
-                label="Avg. Profit / Trade"
-                value={fmtCurrency(summary.avg_profit_per_trade)}
-                icon={ArrowUpRight}
-                accent="emerald"
+              {/* High-Performance Recharts Equity Curve */}
+              <InteractiveEquityChart
+                points={equityCurve}
+                startingBalance={accountSizeNum}
               />
-              <MetricCard
-                label="Avg. Loss / Trade"
-                value={fmtCurrency(summary.avg_loss_per_trade)}
-                icon={ArrowDownRight}
-                accent="red"
-                danger={parseFloat(summary.avg_loss_per_trade) > 0}
-              />
-              <MetricCard
-                label="Profit Factor"
-                value={summary.profit_factor !== null ? summary.profit_factor.toFixed(2) : "—"}
-                sub={summary.profit_factor !== null && summary.profit_factor >= 1.5 ? "Excellent" : summary.profit_factor !== null && summary.profit_factor >= 1 ? "Profitable" : "Unprofitable"}
-                icon={TrendingUp}
-                accent={summary.profit_factor !== null && summary.profit_factor >= 1 ? "emerald" : "red"}
-              />
-            </div>
-          </div>
-        )}
 
-        {activeTab === "compliance" && (
-          <div>
-            <p className="text-slate-400 text-sm mb-4">
-              All rules must be satisfied before a payout can be requested.
-              <Link href="/rules" className="text-emerald-400 ml-1 hover:underline inline-flex items-center gap-1">
-                View full rules <ExternalLink size={11} />
-              </Link>
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {summary.rule_compliance.map((rule) => (
-                <RuleComplianceCard key={rule.rule_name} rule={rule} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === "performance" && performance && (
-          <div className="space-y-6">
-            {/* Summary stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <MetricCard
-                label="Trading Days"
-                value={String(performance.trading_days)}
-                icon={Calendar}
-                accent="blue"
-              />
-              <MetricCard
-                label="Best Day P&L"
-                value={fmtCurrency(performance.best_day_pnl)}
-                icon={ArrowUpRight}
-                accent="emerald"
-              />
-              <MetricCard
-                label="Worst Day P&L"
-                value={fmtCurrency(performance.worst_day_pnl)}
-                icon={ArrowDownRight}
-                accent="red"
-              />
-              <MetricCard
-                label="Avg. Daily P&L"
-                value={fmtCurrency(performance.avg_daily_pnl)}
-                icon={BarChart2}
-                accent="cyan"
-              />
-            </div>
-
-            {/* Daily breakdown table */}
-            {performance.daily_breakdown.length > 0 ? (
-              <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead className="bg-slate-700/50">
-                    <tr>
-                      <th className="text-left px-4 py-3 text-slate-400 font-medium">Date</th>
-                      <th className="text-right px-4 py-3 text-slate-400 font-medium">P&L</th>
-                      <th className="text-right px-4 py-3 text-slate-400 font-medium">Trades</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-700">
-                    {performance.daily_breakdown.map((d) => {
-                      const pnl = parseFloat(d.realized_pnl);
-                      return (
-                        <tr key={d.trade_date} className="hover:bg-slate-700/30 transition">
-                          <td className="px-4 py-3 text-slate-300">{d.trade_date}</td>
-                          <td
-                            className={`px-4 py-3 text-right font-medium ${
-                              pnl >= 0 ? "text-emerald-400" : "text-red-400"
-                            }`}
-                          >
-                            {pnl >= 0 ? "+" : ""}{fmtCurrency(d.realized_pnl)}
-                          </td>
-                          <td className="px-4 py-3 text-right text-slate-400">{d.trades_count}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+              {/* Trade statistics */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <MetricCard
+                  label="Avg. Profit / Trade"
+                  value={fmtCurrency(summary.avg_profit_per_trade)}
+                  icon={ArrowUpRight}
+                  accent="emerald"
+                />
+                <MetricCard
+                  label="Avg. Loss / Trade"
+                  value={fmtCurrency(summary.avg_loss_per_trade)}
+                  icon={ArrowDownRight}
+                  accent="red"
+                  danger={parseFloat(String(summary.avg_loss_per_trade)) > 0}
+                />
+                <MetricCard
+                  label="Profit Factor"
+                  value={summary.profit_factor !== null ? summary.profit_factor.toFixed(2) : "—"}
+                  sub={
+                    summary.profit_factor !== null && summary.profit_factor >= 1.5
+                      ? "High Edge"
+                      : summary.profit_factor !== null && summary.profit_factor >= 1
+                      ? "Profitable"
+                      : "Developing"
+                  }
+                  icon={TrendingUp}
+                  accent={summary.profit_factor !== null && summary.profit_factor >= 1 ? "emerald" : "red"}
+                />
               </div>
-            ) : (
-              <div className="bg-slate-800 border border-slate-700 rounded-xl p-10 text-center text-slate-500">
-                No trading days recorded yet. Complete your first trading day to see breakdown here.
+            </motion.div>
+          )}
+
+          {activeTab === "compliance" && (
+            <motion.div
+              key="compliance"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-neutral-400 text-sm">
+                  All challenge objectives must remain in full compliance to qualify for funded allocation or payouts.
+                </p>
+                <Link href="/rules" className="text-[#ccff00] text-sm hover:underline inline-flex items-center gap-1 font-semibold">
+                  Rule Handbook <ExternalLink size={13} />
+                </Link>
               </div>
-            )}
-          </div>
-        )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {summary.rule_compliance.map((rule) => (
+                  <RuleComplianceCard key={rule.rule_name} rule={rule} />
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === "performance" && performance && (
+            <motion.div
+              key="performance"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-6"
+            >
+              {/* Summary stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <MetricCard
+                  label="Trading Days"
+                  value={String(performance.trading_days)}
+                  icon={Calendar}
+                  accent="blue"
+                />
+                <MetricCard
+                  label="Best Day P&L"
+                  value={fmtCurrency(performance.best_day_pnl)}
+                  icon={ArrowUpRight}
+                  accent="emerald"
+                />
+                <MetricCard
+                  label="Worst Day P&L"
+                  value={fmtCurrency(performance.worst_day_pnl)}
+                  icon={ArrowDownRight}
+                  accent="red"
+                />
+                <MetricCard
+                  label="Avg. Daily P&L"
+                  value={fmtCurrency(performance.avg_daily_pnl)}
+                  icon={BarChart2}
+                  accent="cyan"
+                />
+              </div>
+
+              {/* Daily breakdown table */}
+              {performance.daily_breakdown.length > 0 ? (
+                <div className="bg-[#0d0e10] border border-white/[0.08] rounded-2xl overflow-hidden shadow-xl">
+                  <table className="w-full text-sm">
+                    <thead className="bg-white/[0.03]">
+                      <tr>
+                        <th className="text-left px-5 py-3.5 text-neutral-400 font-medium">Date</th>
+                        <th className="text-right px-5 py-3.5 text-neutral-400 font-medium">Realized P&L</th>
+                        <th className="text-right px-5 py-3.5 text-neutral-400 font-medium">Trades Executed</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/[0.04]">
+                      {performance.daily_breakdown.map((d) => {
+                        const pnl = parseFloat(String(d.realized_pnl));
+                        return (
+                          <tr key={d.trade_date} className="hover:bg-white/[0.02] transition">
+                            <td className="px-5 py-3.5 text-neutral-300 font-mono">{d.trade_date}</td>
+                            <td
+                              className={`px-5 py-3.5 text-right font-mono font-bold ${
+                                pnl >= 0 ? "text-[#ccff00]" : "text-rose-400"
+                              }`}
+                            >
+                              {pnl >= 0 ? "+" : ""}{fmtCurrency(d.realized_pnl)}
+                            </td>
+                            <td className="px-5 py-3.5 text-right text-neutral-400 font-mono">{d.trades_count}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="bg-[#0d0e10] border border-white/[0.08] rounded-2xl p-10 text-center text-neutral-500">
+                  No trading days recorded yet. Open and close positions on MetaTrader 5 to populate this ledger.
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* ── Footer row ── */}
-        <div className="flex items-center justify-between text-xs text-slate-600">
-          <span>Last updated: {lastRefresh.toLocaleTimeString()} &nbsp;·&nbsp; Auto-refreshes every 60s</span>
-          <div className="flex gap-4">
-            <Link href="/kyc" className="hover:text-slate-400 transition flex items-center gap-1">
-              <Shield size={11} /> KYC Status: <span className={
-                summary.kyc_status === "APPROVED" ? "text-emerald-500" : "text-amber-500"
-              }>{summary.kyc_status}</span>
+        <div className="flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-500 pt-4 border-t border-white/[0.05] gap-2">
+          <span>
+            Last synced: <span className="font-mono text-neutral-400">{lastRefresh.toLocaleTimeString()}</span>
+            &nbsp;·&nbsp; {wsStatus === "connected" ? "Real-time WebSocket streaming active" : "Auto-polling every 60s"}
+          </span>
+          <div className="flex gap-5">
+            <Link href="/kyc" className="hover:text-neutral-300 transition flex items-center gap-1.5">
+              <Shield size={12} /> KYC:{" "}
+              <span className={summary.kyc_status === "APPROVED" ? "text-[#ccff00] font-semibold" : "text-amber-400 font-semibold"}>
+                {summary.kyc_status}
+              </span>
             </Link>
-            <Link href="/payouts" className="hover:text-slate-400 transition">Payouts →</Link>
+            <Link href="/payouts" className="hover:text-neutral-300 transition font-semibold text-[#ccff00]">
+              Payouts Hub →
+            </Link>
           </div>
         </div>
       </div>
@@ -674,10 +719,8 @@ export default function TraderDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white pt-6 pb-16">
-      <div className="max-w-6xl mx-auto px-4 py-4">
-        {renderContent()}
-      </div>
+    <div className="min-h-screen bg-[#070809] text-white pt-6 pb-16">
+      <div className="max-w-6xl mx-auto px-4 py-4">{renderContent()}</div>
     </div>
   );
 }
