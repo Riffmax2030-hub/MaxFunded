@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { getSession, clearSession, AuthSession } from "@/lib/auth";
 import NotificationBell from "@/components/NotificationBell";
 import Logo from "@/components/Logo";
+import CountryFlag from "@/components/CountryFlag";
 import {
   LayoutDashboard,
   Sliders,
@@ -14,7 +15,6 @@ import {
   ChevronDown,
   Menu,
   X,
-  Sparkles,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -24,7 +24,6 @@ export default function Navbar() {
   const [selectedLang, setSelectedLang] = useState({
     code: "en-gb",
     label: "English",
-    flag: "🇬🇧",
   });
   const pathname = usePathname();
 
@@ -38,14 +37,14 @@ export default function Navbar() {
   };
 
   const languages = [
-    { code: "en-gb", label: "English (UK)", flag: "🇬🇧" },
-    { code: "en-us", label: "English (US)", flag: "🇺🇸" },
-    { code: "de", label: "Deutsch", flag: "🇩🇪" },
-    { code: "fr", label: "Français", flag: "🇫🇷" },
-    { code: "es", label: "Español", flag: "🇪🇸" },
-    { code: "ae", label: "العربية", flag: "🇦🇪" },
-    { code: "ng", label: "Nigeria", flag: "🇳🇬" },
-    { code: "jp", label: "日本語", flag: "🇯🇵" },
+    { code: "en-gb", label: "English (UK)" },
+    { code: "en-us", label: "English (US)" },
+    { code: "de", label: "Deutsch" },
+    { code: "fr", label: "Français" },
+    { code: "es", label: "Español" },
+    { code: "ae", label: "العربية" },
+    { code: "ng", label: "Nigeria" },
+    { code: "jp", label: "日本語" },
   ];
 
   const navLinks = [
@@ -65,7 +64,7 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-[#08090b]/95 backdrop-blur-xl border-b border-white/[0.08] transition-all">
       {/* Spacious Full-Width Container to Pin Logo Far-Left and Actions Far-Right */}
-      <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-10 h-20 flex items-center justify-between gap-6">
+      <div className="w-full max-w-[1850px] mx-auto px-4 sm:px-6 lg:px-10 h-20 flex items-center justify-between gap-6">
         
         {/* ========================================================================= */}
         {/* TOP LEFT CORNER: Max Funded Proprietary Firm Logo */}
@@ -77,33 +76,33 @@ export default function Navbar() {
         </div>
 
         {/* ========================================================================= */}
-        {/* CENTER NAVIGATION: Enlarged Font Size matching Pivex (text-[15px]) */}
+        {/* CENTER NAVIGATION: Increased Font Size (text-[17px] font-bold) */}
         {/* ========================================================================= */}
-        <nav className="hidden lg:flex items-center space-x-7 xl:space-x-9">
+        <nav className="hidden lg:flex items-center space-x-7 xl:space-x-10">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative flex items-center gap-1.5 text-[15px] font-semibold tracking-tight transition-colors duration-200 py-1 ${
+                className={`relative flex items-center gap-1.5 text-base xl:text-[17px] font-bold tracking-tight transition-colors duration-200 py-1.5 ${
                   isActive
-                    ? "text-[#ccff00] font-bold"
-                    : "text-neutral-300 hover:text-white"
+                    ? "text-[#ccff00] font-black"
+                    : "text-neutral-200 hover:text-white"
                 }`}
               >
                 <span>{link.label}</span>
 
                 {/* Rewards "New" Pill Badge */}
                 {link.badge && (
-                  <span className="text-[10px] font-extrabold bg-[#ccff00] text-black px-1.5 py-0.5 rounded-full uppercase tracking-wider shadow-[0_0_10px_rgba(204,255,0,0.5)]">
+                  <span className="text-[10px] font-black bg-[#ccff00] text-black px-1.5 py-0.5 rounded-full uppercase tracking-wider shadow-[0_0_10px_rgba(204,255,0,0.5)]">
                     {link.badge}
                   </span>
                 )}
 
                 {/* Subtle active line indicator */}
                 {isActive && (
-                  <span className="absolute bottom-[-6px] left-0 right-0 h-[2px] bg-[#ccff00] rounded-full shadow-[0_0_8px_#ccff00]" />
+                  <span className="absolute bottom-[-6px] left-0 right-0 h-[2.5px] bg-[#ccff00] rounded-full shadow-[0_0_10px_#ccff00]" />
                 )}
               </Link>
             );
@@ -111,26 +110,26 @@ export default function Navbar() {
         </nav>
 
         {/* ========================================================================= */}
-        {/* TOP RIGHT CORNER: Language Selector + Login + Start Now */}
+        {/* TOP RIGHT CORNER: SVG Language Selector + Login + Start Now */}
         {/* ========================================================================= */}
         <div className="flex items-center space-x-3 sm:space-x-5 shrink-0">
           
-          {/* Language Selector with Visible Country Flags */}
+          {/* Language Selector with Real SVG Country Flags (100% visible on Windows) */}
           <div className="relative">
             <button
               onClick={() => setLangOpen(!langOpen)}
-              className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm font-semibold text-neutral-200 hover:text-white rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 transition shadow-sm"
+              className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm font-bold text-neutral-200 hover:text-white rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 transition shadow-sm"
               title="Select Language"
             >
-              <span className="text-base sm:text-lg leading-none">{selectedLang.flag}</span>
-              <span className="hidden sm:inline font-medium text-xs text-neutral-300">{selectedLang.label}</span>
+              <CountryFlag code={selectedLang.code} size={14} />
+              <span className="hidden sm:inline font-semibold text-xs text-neutral-200">{selectedLang.label}</span>
               <ChevronDown className={`w-3.5 h-3.5 text-neutral-400 transition-transform ${langOpen ? "rotate-180" : ""}`} />
             </button>
 
             {langOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-[#101318]/95 backdrop-blur-xl border border-white/15 rounded-2xl shadow-2xl py-2 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-                <div className="px-3 py-1.5 text-[11px] font-bold text-neutral-400 uppercase tracking-wider border-b border-white/5">
-                  Select Language
+              <div className="absolute right-0 mt-2 w-52 bg-[#101318]/98 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-2xl py-2 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                <div className="px-3.5 py-1.5 text-[11px] font-bold text-neutral-400 uppercase tracking-wider border-b border-white/5">
+                  Language & Region
                 </div>
                 <div className="max-h-64 overflow-y-auto py-1">
                   {languages.map((l) => (
@@ -140,15 +139,15 @@ export default function Navbar() {
                         setSelectedLang(l);
                         setLangOpen(false);
                       }}
-                      className={`w-full flex items-center justify-between px-3.5 py-2 text-xs text-left transition ${
+                      className={`w-full flex items-center justify-between px-3.5 py-2.5 text-xs text-left transition ${
                         selectedLang.code === l.code
                           ? "bg-[#ccff00]/15 text-[#ccff00] font-bold"
                           : "text-neutral-300 hover:text-white hover:bg-white/10"
                       }`}
                     >
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-lg">{l.flag}</span>
-                        <span>{l.label}</span>
+                      <div className="flex items-center gap-3">
+                        <CountryFlag code={l.code} size={15} />
+                        <span className="font-medium">{l.label}</span>
                       </div>
                       {selectedLang.code === l.code && (
                         <span className="w-1.5 h-1.5 rounded-full bg-[#ccff00]" />
@@ -199,13 +198,13 @@ export default function Navbar() {
             <div className="flex items-center space-x-3 sm:space-x-4">
               <Link
                 href="/login"
-                className="text-xs sm:text-[14px] font-bold text-neutral-200 hover:text-white transition-colors px-3 py-2 rounded-xl hover:bg-white/5"
+                className="text-xs sm:text-[15px] font-bold text-neutral-200 hover:text-white transition-colors px-3 py-2 rounded-xl hover:bg-white/5"
               >
                 Log in
               </Link>
               <Link
                 href="/challenges"
-                className="px-5 sm:px-7 py-2.5 sm:py-3 rounded-full bg-white hover:bg-neutral-200 text-black font-black text-xs sm:text-[13px] tracking-tight uppercase transition-all transform hover:scale-[1.03] active:scale-[0.98] shadow-[0_4px_20px_rgba(255,255,255,0.2)]"
+                className="px-5 sm:px-7 py-2.5 sm:py-3 rounded-full bg-white hover:bg-neutral-200 text-black font-black text-xs sm:text-[14px] tracking-tight uppercase transition-all transform hover:scale-[1.03] active:scale-[0.98] shadow-[0_4px_25px_rgba(255,255,255,0.25)]"
               >
                 Start now
               </Link>
@@ -234,7 +233,7 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-between py-2 text-base font-semibold text-neutral-200 hover:text-[#ccff00] transition"
+                className="flex items-center justify-between py-2 text-lg font-bold text-neutral-200 hover:text-[#ccff00] transition"
               >
                 <span>{link.label}</span>
                 {link.badge && (
