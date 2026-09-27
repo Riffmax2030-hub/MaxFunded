@@ -1,3 +1,4 @@
+import "./globals.css";
 import "@/styles/globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -16,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className="min-h-screen flex flex-col bg-[#08090b] text-neutral-100 antialiased selection:bg-[#ccff00] selection:text-black">
+      <body className="min-h-screen flex flex-col bg-[#060709] text-neutral-100 antialiased selection:bg-[#ccff00] selection:text-black">
         <LiveTicker />
         <Navbar />
         <main className="flex-grow">{children}</main>
