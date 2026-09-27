@@ -2,8 +2,9 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Logo from "@/components/Logo";
 import { saveSession } from "@/lib/auth";
-import { ShieldCheck, Loader2, AlertCircle } from "lucide-react";
+import { ShieldCheck, Loader2, CheckCircle2, ChevronRight, Zap, Trophy, Award } from "lucide-react";
 
 const SUPPORTED_COUNTRIES = [
   { code: "US", name: "United States" },
@@ -16,6 +17,7 @@ const SUPPORTED_COUNTRIES = [
   { code: "AE", name: "United Arab Emirates" },
   { code: "SG", name: "Singapore" },
   { code: "AU", name: "Australia" },
+  { code: "NL", name: "Netherlands" },
 ];
 
 export default function RegisterPage() {
@@ -35,7 +37,7 @@ export default function RegisterPage() {
     setError(null);
 
     if (!acceptedTerms || !acceptedPrivacy || !acceptedRisk) {
-      setError("You must review and accept the Terms, Privacy Policy, and Risk Disclosure.");
+      setError("Please review and accept all agreements before proceeding.");
       return;
     }
 
@@ -63,167 +65,248 @@ export default function RegisterPage() {
         throw new Error(err.detail || "Registration failed");
       }
 
-      // Automatically sign in upon registration
-      const loginRes = await fetch(`${apiUrl}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const data = await res.json();
+      saveSession(data.access_token, {
+        id: data.user_id,
+        email: data.email,
+        role: data.role,
+        is_admin: data.is_admin,
       });
 
-      if (loginRes.ok) {
-        const data = await loginRes.json();
-        saveSession(data.access_token, {
-          id: data.user_id,
-          email: data.email,
-          role: data.role,
-          is_admin: data.is_admin,
-        });
-        window.location.href = "/challenges";
-      } else {
-        window.location.href = "/login";
-      }
+      window.location.href = "/dashboard";
     } catch (err: any) {
-      setError(err.message || "Registration failed");
+      setError(err.message || "Failed to create account");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-lg bg-dark-850 border border-dark-700 rounded-2xl p-8 shadow-2xl">
-        <div className="text-center mb-6">
-          <div className="inline-flex w-12 h-12 rounded-xl bg-brand-600/10 border border-brand-500/20 items-center justify-center mb-3">
-            <ShieldCheck className="w-6 h-6 text-brand-500" />
+    <div className="min-h-screen bg-[#08090b] bg-grid-pattern text-white flex items-center justify-center p-4 sm:p-6 lg:p-8 relative overflow-hidden">
+      {/* Background glow */}
+      <div className="absolute top-1/3 left-1/3 w-[600px] h-[600px] bg-[#ccff00]/[0.03] blur-3xl pointer-events-none rounded-full" />
+
+      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+        {/* ========================================================================= */}
+        {/* LEFT: REGISTER FORM CARD */}
+        {/* ========================================================================= */}
+        <div className="lg:col-span-6 bg-[#111418]/90 backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl">
+          <div className="flex items-center justify-between mb-6">
+            <Link href="/">
+              <Logo size="md" />
+            </Link>
+            <span className="text-[11px] font-black uppercase text-[#ccff00] bg-[#ccff00]/10 px-3 py-1 rounded-full border border-[#ccff00]/25">
+              Trader Registration
+            </span>
           </div>
-          <h2 className="text-2xl font-bold text-white tracking-tight">Create Trader Account</h2>
-          <p className="text-xs text-gray-400 mt-1">Start your simulated trading evaluation journey</p>
+
+          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-1">
+            Create Your Account
+          </h2>
+          <p className="text-xs sm:text-sm text-neutral-400 mb-6">
+            Get instant access to your simulated MT5 accounts and performance dashboard
+          </p>
+
+          {error && (
+            <div className="mb-5 p-3 rounded-xl bg-red-950/50 border border-red-500/30 text-red-300 text-xs text-center font-medium">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 mb-1.5">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="e.g. Alex Smith"
+                  className="w-full px-4 py-3 rounded-xl bg-[#08090b] border border-white/10 text-white placeholder-neutral-500 text-xs sm:text-sm focus:outline-none focus:border-[#ccff00] focus:ring-1 focus:ring-[#ccff00] transition"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 mb-1.5">
+                  Country of Residence
+                </label>
+                <select
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl bg-[#08090b] border border-white/10 text-white text-xs sm:text-sm focus:outline-none focus:border-[#ccff00] focus:ring-1 focus:ring-[#ccff00] transition"
+                >
+                  {SUPPORTED_COUNTRIES.map((c) => (
+                    <option key={c.code} value={c.code} className="bg-[#111418] text-white">
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-neutral-300 mb-1.5">
+                Email Address
+              </label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="trader@example.com"
+                className="w-full px-4 py-3 rounded-xl bg-[#08090b] border border-white/10 text-white placeholder-neutral-500 text-xs sm:text-sm focus:outline-none focus:border-[#ccff00] focus:ring-1 focus:ring-[#ccff00] transition"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 mb-1.5">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full px-4 py-3 rounded-xl bg-[#08090b] border border-white/10 text-white placeholder-neutral-500 text-xs sm:text-sm focus:outline-none focus:border-[#ccff00] focus:ring-1 focus:ring-[#ccff00] transition"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 mb-1.5">
+                  Phone (Optional)
+                </label>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+1 (555) 000-0000"
+                  className="w-full px-4 py-3 rounded-xl bg-[#08090b] border border-white/10 text-white placeholder-neutral-500 text-xs sm:text-sm focus:outline-none focus:border-[#ccff00] focus:ring-1 focus:ring-[#ccff00] transition"
+                />
+              </div>
+            </div>
+
+            {/* Agreements */}
+            <div className="space-y-2 pt-2 text-[11px] text-neutral-400">
+              <label className="flex items-start gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={acceptedTerms}
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  className="mt-0.5 rounded accent-[#ccff00]"
+                />
+                <span>
+                  I agree to the{" "}
+                  <Link href="/terms" target="_blank" className="text-white underline">
+                    Terms of Service
+                  </Link>
+                </span>
+              </label>
+
+              <label className="flex items-start gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={acceptedPrivacy}
+                  onChange={(e) => setAcceptedPrivacy(e.target.checked)}
+                  className="mt-0.5 rounded accent-[#ccff00]"
+                />
+                <span>
+                  I agree to the{" "}
+                  <Link href="/privacy" target="_blank" className="text-white underline">
+                    Privacy Policy
+                  </Link>
+                </span>
+              </label>
+
+              <label className="flex items-start gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={acceptedRisk}
+                  onChange={(e) => setAcceptedRisk(e.target.checked)}
+                  className="mt-0.5 rounded accent-[#ccff00]"
+                />
+                <span>
+                  I have read and understand the{" "}
+                  <Link href="/risk-disclosure" target="_blank" className="text-white underline">
+                    Simulated Trading Risk Disclosure
+                  </Link>
+                </span>
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-4 rounded-xl bg-[#ccff00] hover:bg-[#b3e600] text-black font-black text-sm uppercase tracking-tight shadow-neon transition flex items-center justify-center gap-2 disabled:opacity-50 mt-4"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-black" />
+                  <span>Provisioning Account...</span>
+                </>
+              ) : (
+                <>
+                  <span>Create MaxFunded Account</span>
+                  <ChevronRight className="w-4 h-4 stroke-[3]" />
+                </>
+              )}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-xs text-neutral-400">
+            Already have an account?{" "}
+            <Link href="/login" className="text-[#ccff00] font-bold hover:underline">
+              Log in
+            </Link>
+          </p>
         </div>
 
-        {error && (
-          <div className="mb-6 p-3 rounded-lg bg-red-950/40 border border-red-800 text-red-400 text-xs flex items-start space-x-2">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-            <span>{error}</span>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1">Full Name</label>
-              <input
-                type="text"
-                required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Alexander Hayes"
-                className="w-full px-3.5 py-2.5 rounded-lg bg-dark-900 border border-dark-700 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-500"
-              />
+        {/* ========================================================================= */}
+        {/* RIGHT: BENTO HIGHLIGHTS */}
+        {/* ========================================================================= */}
+        <div className="lg:col-span-6 space-y-4">
+          <div className="bg-[#12151c]/90 backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-7 shadow-xl">
+            <div className="flex items-center gap-3 mb-3 text-[#ccff00]">
+              <Zap className="w-6 h-6" />
+              <h3 className="text-xl font-black text-white">Instant Account Provisioning</h3>
             </div>
-
-            <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1">Country of Residence</label>
-              <select
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-lg bg-dark-900 border border-dark-700 text-sm text-white focus:outline-none focus:border-brand-500"
-              >
-                {SUPPORTED_COUNTRIES.map((c) => (
-                  <option key={c.code} value={c.code}>
-                    {c.name} ({c.code})
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Email Address</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="trader@example.com"
-              className="w-full px-3.5 py-2.5 rounded-lg bg-dark-900 border border-dark-700 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-500"
-            />
+            <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+              Your simulated MT5 credentials are automatically generated upon challenge confirmation. No waiting, no human verification delays.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1">Password</label>
-              <input
-                type="password"
-                required
-                minLength={8}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Min 8 characters"
-                className="w-full px-3.5 py-2.5 rounded-lg bg-dark-900 border border-dark-700 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-500"
-              />
+            <div className="bg-[#12151c]/90 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl">
+              <Award className="w-6 h-6 text-[#ccff00] mb-3" />
+              <h4 className="text-base font-black text-white mb-1">80% to 90% Split</h4>
+              <p className="text-xs text-neutral-400">
+                Keep the majority of your performance rewards with bi-weekly or on-demand payouts.
+              </p>
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1">Phone Number (Optional)</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+1 555 019 2831"
-                className="w-full px-3.5 py-2.5 rounded-lg bg-dark-900 border border-dark-700 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brand-500"
-              />
+            <div className="bg-[#12151c]/90 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl">
+              <Trophy className="w-6 h-6 text-[#ccff00] mb-3" />
+              <h4 className="text-base font-black text-white mb-1">Scale Up to $1M</h4>
+              <p className="text-xs text-neutral-400">
+                Quarterly 30% capital compounding scaling plan for consistent profitable traders.
+              </p>
             </div>
           </div>
 
-          {/* Legal Compliance Checkboxes */}
-          <div className="space-y-2 pt-2 border-t border-dark-800 text-xs text-gray-400">
-            <label className="flex items-start space-x-2.5 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={acceptedTerms}
-                onChange={(e) => setAcceptedTerms(e.target.checked)}
-                className="mt-0.5 rounded border-dark-700 bg-dark-900 text-brand-600 focus:ring-brand-500"
-              />
-              <span>I accept the Terms of Service & Challenge Evaluation Agreement.</span>
-            </label>
-
-            <label className="flex items-start space-x-2.5 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={acceptedPrivacy}
-                onChange={(e) => setAcceptedPrivacy(e.target.checked)}
-                className="mt-0.5 rounded border-dark-700 bg-dark-900 text-brand-600 focus:ring-brand-500"
-              />
-              <span>I accept the Privacy Policy & Data Processing terms.</span>
-            </label>
-
-            <label className="flex items-start space-x-2.5 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={acceptedRisk}
-                onChange={(e) => setAcceptedRisk(e.target.checked)}
-                className="mt-0.5 rounded border-dark-700 bg-dark-900 text-brand-600 focus:ring-brand-500"
-              />
-              <span>
-                I acknowledge the Risk Disclosure: all accounts are simulated, and evaluation fees do not constitute deposits.
-              </span>
-            </label>
+          <div className="bg-[#12151c]/90 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-xl flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <ShieldCheck className="w-8 h-8 text-emerald-400 shrink-0" />
+              <div>
+                <div className="text-sm font-bold text-white">Zero Personal Capital Risk</div>
+                <div className="text-xs text-neutral-400">Strictly simulated environment with real rewards</div>
+              </div>
+            </div>
+            <span className="text-xs font-black text-[#ccff00] font-mono shrink-0">100% SECURE</span>
           </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full mt-4 py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm transition shadow-lg shadow-brand-600/30 flex items-center justify-center disabled:opacity-50"
-          >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create Account & Continue"}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center text-xs text-gray-400">
-          Already registered?{" "}
-          <Link href="/login" className="text-brand-400 hover:underline font-semibold">
-            Sign In
-          </Link>
         </div>
       </div>
     </div>

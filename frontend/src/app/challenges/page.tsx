@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import ChallengeCard from "@/components/ChallengeCard";
 import { fetchChallenges, Challenge } from "@/lib/api";
-import { Loader2 } from "lucide-react";
+import { Loader2, Zap, ShieldCheck, Award, Star } from "lucide-react";
 
 export default function ChallengesPage() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
@@ -23,32 +23,58 @@ export default function ChallengesPage() {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <div className="text-center max-w-2xl mx-auto mb-16">
-        <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-4">
-          Select Your Evaluation Scale
-        </h1>
-        <p className="text-sm text-gray-400">
-          Choose a simulated account tier that matches your trading risk parameters. All tiers feature deterministic rule monitoring and clear reward splits.
-        </p>
-      </div>
+    <div className="bg-[#08090b] text-white min-h-screen py-16 px-4 sm:px-6 lg:px-8 bg-grid-pattern">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#111418] border border-white/10 text-xs text-neutral-300 mb-6 select-none">
+            <span className="font-bold text-white">4.9 ★ Rating</span>
+            <span className="text-neutral-500">•</span>
+            <span className="text-[#ccff00] font-bold">Instant MT5 Delivery</span>
+          </div>
 
-      {loading ? (
-        <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-          <Loader2 className="w-8 h-8 animate-spin text-brand-500 mb-3" />
-          <p className="text-sm">Loading evaluation challenges...</p>
+          <h1 className="text-3xl sm:text-6xl font-black text-white tracking-tight uppercase mb-4">
+            Select Your Account Balance
+          </h1>
+          <p className="text-sm sm:text-base text-neutral-400 max-w-xl mx-auto">
+            Choose your starting virtual capital. Transparent rules, fair targets, and instant credential delivery upon checkout.
+          </p>
+
+          {/* Quick Pillars */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-neutral-300 font-semibold">
+            <div className="flex items-center gap-1.5">
+              <Zap className="w-4 h-4 text-[#ccff00]" />
+              <span>Instant MT5 Credentials</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Award className="w-4 h-4 text-[#ccff00]" />
+              <span>Up to 90% Profit Split</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-[#ccff00]" />
+              <span>Zero Personal Risk</span>
+            </div>
+          </div>
         </div>
-      ) : error ? (
-        <div className="max-w-md mx-auto p-4 rounded-xl bg-red-950/30 border border-red-800 text-center text-red-400 text-sm">
-          {error}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {challenges.map((c) => (
-            <ChallengeCard key={c.id} challenge={c} />
-          ))}
-        </div>
-      )}
+
+        {/* Content */}
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-24 text-neutral-400">
+            <Loader2 className="w-8 h-8 animate-spin text-[#ccff00] mb-3" />
+            <p className="text-sm font-medium">Loading evaluation tiers...</p>
+          </div>
+        ) : error ? (
+          <div className="max-w-md mx-auto p-5 rounded-2xl bg-red-950/40 border border-red-500/30 text-center text-red-300 text-sm">
+            {error}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {challenges.map((c) => (
+              <ChallengeCard key={c.id} challenge={c} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -3,8 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { getSession } from "@/lib/auth";
 import {
   fetchChallengeById,
@@ -116,34 +114,26 @@ export default function CheckoutPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-dark-950 text-white flex flex-col justify-between">
-        <Navbar />
-        <div className="flex flex-col items-center justify-center py-32 space-y-4">
-          <Loader2 className="w-10 h-10 text-brand-500 animate-spin" />
-          <p className="text-gray-400 text-sm">Securing your checkout environment...</p>
-        </div>
-        <Footer />
+      <div className="min-h-screen bg-[#08090b] text-white flex flex-col justify-center items-center py-32 space-y-4">
+        <Loader2 className="w-10 h-10 text-[#ccff00] animate-spin" />
+        <p className="text-neutral-400 text-sm">Securing your checkout environment...</p>
       </div>
     );
   }
 
   if (error && !challenge) {
     return (
-      <div className="min-h-screen bg-dark-950 text-white flex flex-col justify-between">
-        <Navbar />
-        <div className="max-w-md mx-auto py-24 px-4 text-center">
-          <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-2">Checkout Error</h2>
-          <p className="text-gray-400 text-sm mb-6">{error}</p>
-          <Link
-            href="/challenges"
-            className="inline-flex items-center space-x-2 px-4 py-2 rounded-lg bg-dark-800 hover:bg-dark-700 text-sm font-semibold"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Return to Challenges</span>
-          </Link>
-        </div>
-        <Footer />
+      <div className="min-h-screen bg-[#08090b] text-white flex flex-col justify-center items-center py-24 px-4 text-center">
+        <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+        <h2 className="text-xl font-bold mb-2">Checkout Error</h2>
+        <p className="text-neutral-400 text-sm mb-6">{error}</p>
+        <Link
+          href="/challenges"
+          className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-full bg-white text-black text-xs font-black uppercase"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Return to Challenges</span>
+        </Link>
       </div>
     );
   }
@@ -151,8 +141,7 @@ export default function CheckoutPage() {
   const selectedMethodObj = methods.find((m) => m.id === selectedProvider);
 
   return (
-    <div className="min-h-screen bg-dark-950 text-white flex flex-col justify-between">
-      <Navbar />
+    <div className="min-h-screen bg-[#08090b] text-white py-12">
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow w-full">
         {/* Breadcrumb / Back */}
@@ -464,8 +453,6 @@ export default function CheckoutPage() {
           </div>
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import Link from "next/link";
 import {
   GraduationCap,
-  Cpu,
   DollarSign,
   Coins,
   ChevronRight,
@@ -23,6 +22,10 @@ import {
   Star,
   QrCode,
   Sparkles,
+  Zap,
+  Activity,
+  Layers,
+  Award,
 } from "lucide-react";
 import DiscountModal from "@/components/DiscountModal";
 
@@ -30,7 +33,13 @@ export default function HomePage() {
   const [discountOpen, setDiscountOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"app" | "ai" | "platform" | "support">("app");
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [selectedVideo, setSelectedVideo] = useState<{ name: string; country: string; flag: string; reward: string; account: string } | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<{
+    name: string;
+    country: string;
+    flag: string;
+    reward: string;
+    account: string;
+  } | null>(null);
 
   const toggleFaq = (idx: number) => {
     setOpenFaq(openFaq === idx ? null : idx);
@@ -43,13 +52,14 @@ export default function HomePage() {
       fee: "$299.99",
       tag: "Best Offer",
       tagClass: "bg-[#ccff00] text-black font-black",
-      borderClass: "border-[#ccff00]/60 shadow-[0_0_30px_rgba(204,255,0,0.15)]",
+      borderClass: "border-[#ccff00]/60 shadow-[0_0_35px_rgba(204,255,0,0.18)] ring-1 ring-[#ccff00]/40",
       target: "10%",
       split: "80%",
       maxLoss: "6%",
       dailyLoss: "4%",
       minDays: "5 Days",
       payout: "14 Days",
+      leverage: "1:100",
     },
     {
       size: "$50,000",
@@ -63,6 +73,7 @@ export default function HomePage() {
       dailyLoss: "4%",
       minDays: "5 Days",
       payout: "14 Days",
+      leverage: "1:100",
     },
     {
       size: "$25,000",
@@ -70,13 +81,14 @@ export default function HomePage() {
       fee: "$99.99",
       tag: "Most Popular",
       tagClass: "bg-[#ccff00] text-black font-black",
-      borderClass: "border-[#ccff00]/60 shadow-[0_0_30px_rgba(204,255,0,0.15)]",
+      borderClass: "border-[#ccff00]/60 shadow-[0_0_35px_rgba(204,255,0,0.18)] ring-1 ring-[#ccff00]/40",
       target: "10%",
       split: "80%",
       maxLoss: "6%",
       dailyLoss: "4%",
       minDays: "5 Days",
       payout: "14 Days",
+      leverage: "1:100",
     },
     {
       size: "$10,000",
@@ -90,6 +102,7 @@ export default function HomePage() {
       dailyLoss: "4%",
       minDays: "5 Days",
       payout: "14 Days",
+      leverage: "1:100",
     },
   ];
 
@@ -125,40 +138,43 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="bg-[#08090b] text-white selection:bg-[#ccff00] selection:text-black">
+    <div className="bg-[#08090b] text-white selection:bg-[#ccff00] selection:text-black min-h-screen">
       {/* 50% DISCOUNT LEAD CAPTURE MODAL */}
       <DiscountModal isOpen={discountOpen} onClose={() => setDiscountOpen(false)} />
 
       {/* VIDEO TESTIMONIAL MODAL */}
       {selectedVideo && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-          <div className="relative w-full max-w-lg bg-[#111418] border border-white/10 rounded-3xl p-6 shadow-2xl text-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
+          <div className="relative w-full max-w-lg bg-[#111418] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl text-center">
             <button
               onClick={() => setSelectedVideo(null)}
-              className="absolute top-4 right-4 text-neutral-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition"
+              className="absolute top-5 right-5 text-neutral-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition"
             >
               ✕
             </button>
-            <div className="w-16 h-16 rounded-full bg-[#ccff00]/20 flex items-center justify-center mx-auto mb-4 text-[#ccff00]">
+            <div className="w-16 h-16 rounded-full bg-[#ccff00]/15 flex items-center justify-center mx-auto mb-4 text-[#ccff00]">
               <Play className="w-8 h-8 fill-current ml-1" />
             </div>
-            <h3 className="text-xl font-bold text-white flex items-center justify-center gap-2 mb-1">
+            <h3 className="text-2xl font-black text-white flex items-center justify-center gap-2 mb-1">
               <span>{selectedVideo.flag}</span>
               <span>{selectedVideo.name}</span>
             </h3>
-            <p className="text-xs text-neutral-400 mb-4">{selectedVideo.country} • {selectedVideo.account} Account</p>
-            <div className="bg-[#08090b] border border-white/5 rounded-2xl p-4 text-left space-y-2 mb-6 text-sm text-neutral-300">
+            <p className="text-xs text-neutral-400 mb-5">
+              {selectedVideo.country} • {selectedVideo.account} Account
+            </p>
+            <div className="bg-[#08090b] border border-white/5 rounded-2xl p-5 text-left space-y-3 mb-6 text-xs sm:text-sm text-neutral-300 leading-relaxed">
               <p>
-                &quot;MaxFunded delivers the most responsive trading dashboard in the industry. The simulated MT5 execution is instantaneous with zero slippage, and my first reward of <strong className="text-[#ccff00]">{selectedVideo.reward}</strong> arrived in my wallet in under 60 seconds.&quot;
+                &quot;MaxFunded delivers the most responsive trading dashboard in the industry. The simulated MT5 execution is instantaneous with zero slippage, and my first reward of{" "}
+                <strong className="text-[#ccff00]">{selectedVideo.reward}</strong> arrived in my wallet in under 60 seconds.&quot;
               </p>
             </div>
-            <div className="flex items-center justify-between px-4 py-3 bg-[#171b22] rounded-xl text-xs">
-              <span className="text-neutral-400">Total Reward Received</span>
+            <div className="flex items-center justify-between px-5 py-3.5 bg-[#171b22] border border-white/5 rounded-xl text-xs">
+              <span className="text-neutral-400 font-semibold">Total Reward Received</span>
               <span className="font-extrabold text-[#ccff00] text-base">{selectedVideo.reward}</span>
             </div>
             <button
               onClick={() => setSelectedVideo(null)}
-              className="mt-6 w-full py-3 rounded-full bg-white text-black font-extrabold text-xs uppercase"
+              className="mt-6 w-full py-3.5 rounded-full bg-white hover:bg-neutral-200 text-black font-black text-xs uppercase tracking-tight transition"
             >
               Close Story
             </button>
@@ -169,12 +185,12 @@ export default function HomePage() {
       {/* ========================================================================= */}
       {/* 1. HERO SECTION (Screenshots 2 & 4) */}
       {/* ========================================================================= */}
-      <section className="relative pt-12 sm:pt-16 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center overflow-hidden">
+      <section className="relative pt-10 sm:pt-16 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center overflow-hidden bg-grid-pattern">
         {/* Subtle radial ambient neon glows */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[450px] bg-[#ccff00]/[0.04] blur-[150px] rounded-full pointer-events-none -z-10" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[750px] h-[480px] bg-[#ccff00]/[0.05] blur-[160px] rounded-full pointer-events-none -z-10" />
 
         {/* Trustpilot Widget Badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#111418] border border-white/10 text-xs text-neutral-300 mb-8 select-none">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#111418] border border-white/10 text-xs text-neutral-300 mb-8 select-none shadow-sm">
           <span className="font-bold text-white">Excellent</span>
           <div className="flex items-center space-x-0.5">
             {[...Array(5)].map((_, i) => (
@@ -187,13 +203,13 @@ export default function HomePage() {
         </div>
 
         {/* Big Bold Headline */}
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white max-w-5xl mx-auto leading-[1.08] uppercase">
+        <h1 className="text-4xl sm:text-6xl lg:text-[76px] font-black tracking-tight text-white max-w-5xl mx-auto leading-[1.06] uppercase">
           We Give You <span className="text-[#ccff00]">$100K</span> To Trade, <br />
           You Keep <span className="text-[#ccff00]">80% Of Rewards</span>.
         </h1>
 
         {/* Action Verbs Subtitle */}
-        <p className="mt-6 text-base sm:text-xl text-neutral-300 max-w-2xl mx-auto font-medium">
+        <p className="mt-6 text-base sm:text-xl text-neutral-300 max-w-2xl mx-auto font-medium leading-relaxed">
           <span className="text-[#ccff00] font-bold">Get</span> simulated account.{" "}
           <span className="text-[#ccff00] font-bold">Pass</span> trading challenge.{" "}
           <span className="text-[#ccff00] font-bold">Get</span> Real Rewards.
@@ -201,32 +217,32 @@ export default function HomePage() {
 
         {/* 4 Feature Value Pillars */}
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto text-center">
-          <div className="flex flex-col items-center p-3 sm:p-4">
-            <div className="w-10 h-10 mb-2 flex items-center justify-center text-[#ccff00]">
+          <div className="flex flex-col items-center p-3 sm:p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+            <div className="w-11 h-11 mb-2 flex items-center justify-center text-[#ccff00]">
               <GraduationCap className="w-8 h-8" />
             </div>
             <div className="font-black text-sm sm:text-base text-white">Learn Trading</div>
             <div className="text-xs text-neutral-400 mt-0.5">In our Trading Academy</div>
           </div>
 
-          <div className="flex flex-col items-center p-3 sm:p-4">
-            <div className="w-10 h-10 mb-2 flex items-center justify-center text-[#ccff00]">
+          <div className="flex flex-col items-center p-3 sm:p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+            <div className="w-11 h-11 mb-2 flex items-center justify-center text-[#ccff00]">
               <Bot className="w-8 h-8" />
             </div>
             <div className="font-black text-sm sm:text-base text-white">Use AI Assistant</div>
             <div className="text-xs text-neutral-400 mt-0.5">In Your Trading Challenge</div>
           </div>
 
-          <div className="flex flex-col items-center p-3 sm:p-4">
-            <div className="w-10 h-10 mb-2 flex items-center justify-center text-[#ccff00]">
+          <div className="flex flex-col items-center p-3 sm:p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+            <div className="w-11 h-11 mb-2 flex items-center justify-center text-[#ccff00]">
               <DollarSign className="w-8 h-8" />
             </div>
             <div className="font-black text-sm sm:text-base text-white">Get up to $100k</div>
             <div className="text-xs text-neutral-400 mt-0.5">Of Simulated Trading Funds</div>
           </div>
 
-          <div className="flex flex-col items-center p-3 sm:p-4">
-            <div className="w-10 h-10 mb-2 flex items-center justify-center text-[#ccff00]">
+          <div className="flex flex-col items-center p-3 sm:p-4 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+            <div className="w-11 h-11 mb-2 flex items-center justify-center text-[#ccff00]">
               <Coins className="w-8 h-8" />
             </div>
             <div className="font-black text-sm sm:text-base text-white">Get 80%</div>
@@ -246,7 +262,7 @@ export default function HomePage() {
 
           <button
             onClick={() => setDiscountOpen(true)}
-            className="w-full sm:w-auto px-6 py-4 rounded-xl bg-[#111418] hover:bg-white/10 text-neutral-300 hover:text-white font-bold text-xs uppercase tracking-tight border border-white/10 transition flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-7 py-4 rounded-xl bg-[#111418] hover:bg-white/10 text-neutral-300 hover:text-white font-bold text-xs uppercase tracking-tight border border-white/10 transition flex items-center justify-center gap-2"
           >
             <Sparkles className="w-4 h-4 text-[#ccff00]" />
             <span>Get 50% Off Coupon</span>
@@ -268,7 +284,7 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-          {/* Card 1: Evaluation Stage */}
+          {/* ==================== CARD 1: EVALUATION STAGE ==================== */}
           <div className="bg-[#12151c] border border-white/10 rounded-3xl p-6 sm:p-8 flex flex-col justify-between relative group hover:border-white/20 transition">
             <div>
               {/* Step Badge */}
@@ -282,25 +298,58 @@ export default function HomePage() {
               <h3 className="text-2xl font-black text-white mb-3">
                 Pass Trading Challenge
               </h3>
-              <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed mb-8">
+              <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed mb-6">
                 Trade a simulated trading account of up to $200,000 and hit 10% profit target within the platform rules
               </p>
             </div>
 
-            {/* Visual Graphic Mockup */}
-            <div className="bg-[#08090b] border border-white/5 rounded-2xl p-4 relative overflow-hidden">
-              <div className="flex items-center justify-between text-xs text-neutral-400 mb-2 font-bold">
-                <span>SIMULATED CHALLENGE</span>
-                <span className="text-[#ccff00]">+10.2% TARGET HIT</span>
+            {/* Rich Candlestick / Trading Terminal Graphic */}
+            <div className="bg-[#08090b] border border-white/10 rounded-2xl p-4 relative overflow-hidden">
+              <div className="flex items-center justify-between text-[11px] font-mono text-neutral-400 mb-2">
+                <span className="font-bold text-white">EUR/USD 1H</span>
+                <span className="text-[#ccff00] font-black flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#ccff00] animate-ping" />
+                  +10.2% TARGET HIT
+                </span>
               </div>
-              {/* Stylized Ascending Line Chart */}
-              <svg viewBox="0 0 200 60" className="w-full h-16 stroke-[#ccff00] fill-none">
-                <path
-                  d="M0 50 Q 30 45, 60 40 T 120 25 T 160 30 T 200 10"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-              </svg>
+
+              {/* Order Execution Flag */}
+              <div className="mb-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-950/60 border border-emerald-500/40 text-[10px] font-mono text-emerald-300">
+                <span>🟢 BUY 10.00 @ 1.08420</span>
+                <span className="text-neutral-500">•</span>
+                <span className="text-white font-bold">+$10,250.00</span>
+              </div>
+
+              {/* Candlestick & Glowing Trendline Visual */}
+              <div className="relative h-20 w-full flex items-end justify-between px-1 pt-2">
+                {/* Candlestick bars */}
+                <div className="flex items-end gap-1.5 w-full h-full justify-between">
+                  <div className="w-2.5 bg-emerald-500/40 rounded-sm h-[35%] relative flex justify-center"><div className="w-[1px] bg-emerald-400 h-14 absolute -top-2" /></div>
+                  <div className="w-2.5 bg-red-500/40 rounded-sm h-[25%] relative flex justify-center"><div className="w-[1px] bg-red-400 h-10 absolute -top-1" /></div>
+                  <div className="w-2.5 bg-emerald-500/60 rounded-sm h-[48%] relative flex justify-center"><div className="w-[1px] bg-emerald-400 h-16 absolute -top-3" /></div>
+                  <div className="w-2.5 bg-emerald-500/80 rounded-sm h-[65%] relative flex justify-center"><div className="w-[1px] bg-emerald-400 h-18 absolute -top-2" /></div>
+                  <div className="w-2.5 bg-emerald-400 rounded-sm h-[85%] relative flex justify-center"><div className="w-[1px] bg-[#ccff00] h-20 absolute -top-2" /></div>
+                  <div className="w-2.5 bg-[#ccff00] rounded-sm h-[98%] shadow-neon-sm relative flex justify-center"><div className="w-[1px] bg-white h-20 absolute -top-1" /></div>
+                </div>
+
+                {/* Ascending Trendline overlay */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 240 80" fill="none">
+                  <path
+                    d="M 5 65 Q 60 50, 110 40 T 180 20 T 235 8"
+                    stroke="#ccff00"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  />
+                  <circle cx="235" cy="8" r="3.5" fill="#ffffff" stroke="#ccff00" strokeWidth="2" />
+                </svg>
+              </div>
+
+              <div className="flex justify-between text-[9px] font-mono text-neutral-500 mt-2 pt-1 border-t border-white/5">
+                <span>09:00</span>
+                <span>12:00</span>
+                <span>15:00</span>
+                <span>18:00 (CLOSED)</span>
+              </div>
             </div>
 
             {/* Connecting arrow for desktop */}
@@ -309,7 +358,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Card 2: MAXFUNDED TRADER STAGE (Bright Neon Lime Highlight Card) */}
+          {/* ==================== CARD 2: MAXFUNDED TRADER STAGE (Bright Neon Hero Card) ==================== */}
           <div className="bg-[#ccff00] text-black rounded-3xl p-6 sm:p-8 flex flex-col justify-between relative shadow-neon group transform md:-translate-y-2">
             <div>
               {/* Step Badge */}
@@ -323,19 +372,47 @@ export default function HomePage() {
               <h3 className="text-2xl font-black text-black mb-3">
                 Earn Real Rewards
               </h3>
-              <p className="text-xs sm:text-sm text-neutral-900 font-semibold leading-relaxed mb-8">
+              <p className="text-xs sm:text-sm text-neutral-900 font-semibold leading-relaxed mb-6">
                 Trade risk-free, earn 80% of trading performance rewards, and get paid instantly*
               </p>
             </div>
 
-            {/* Certificate Preview Mockup */}
-            <div className="bg-black/90 text-white border border-black rounded-2xl p-5 relative overflow-hidden text-center">
-              <div className="text-[10px] text-neutral-400 uppercase tracking-widest mb-1">Presented To</div>
-              <div className="text-lg font-black text-white">Alex Smith</div>
-              <div className="text-xs text-neutral-400 mt-2">Your Reward</div>
-              <div className="text-2xl font-black text-[#ccff00] mt-0.5">$24,580</div>
-              <div className="mt-2 text-[10px] text-emerald-400 font-bold uppercase tracking-wider">
-                ✓ Cryptographically Verified
+            {/* Laurel Wreath Certificate Preview Mockup */}
+            <div className="bg-[#0c0e12] text-white border border-black/80 rounded-2xl p-5 relative overflow-hidden text-center shadow-xl">
+              <div className="text-[9px] text-[#ccff00] font-mono uppercase tracking-[0.2em] mb-1 font-bold">
+                OFFICIAL REWARD CERTIFICATE
+              </div>
+
+              <div className="text-[10px] text-neutral-400 uppercase tracking-widest mt-1">Present to</div>
+              <div className="text-xl font-black text-white">Alex Smith</div>
+
+              {/* Laurel Wreath + Reward Amount Container */}
+              <div className="relative py-3 flex items-center justify-center">
+                {/* Left Laurel Leaves SVG */}
+                <svg className="w-8 h-12 text-[#ccff00] mr-2 shrink-0 opacity-90" viewBox="0 0 32 48" fill="currentColor">
+                  <path d="M16 4C14 10 10 14 6 18C10 18 14 16 16 12C18 16 22 18 26 18C22 14 18 10 16 4Z" />
+                  <path d="M14 18C11 24 7 28 3 32C7 32 11 30 13 26C15 30 19 32 23 32C19 28 15 24 14 18Z" />
+                  <path d="M12 32C9 38 5 42 1 46C5 46 9 44 11 40C13 44 17 46 21 46C17 42 13 38 12 32Z" />
+                </svg>
+
+                <div className="text-center">
+                  <div className="text-[9px] uppercase tracking-wider text-neutral-400">Your Reward</div>
+                  <div className="text-3xl font-black text-[#ccff00] tracking-tight leading-none mt-1">
+                    $24,580
+                  </div>
+                </div>
+
+                {/* Right Laurel Leaves SVG */}
+                <svg className="w-8 h-12 text-[#ccff00] ml-2 shrink-0 opacity-90 scale-x-[-1]" viewBox="0 0 32 48" fill="currentColor">
+                  <path d="M16 4C14 10 10 14 6 18C10 18 14 16 16 12C18 16 22 18 26 18C22 14 18 10 16 4Z" />
+                  <path d="M14 18C11 24 7 28 3 32C7 32 11 30 13 26C15 30 19 32 23 32C19 28 15 24 14 18Z" />
+                  <path d="M12 32C9 38 5 42 1 46C5 46 9 44 11 40C13 44 17 46 21 46C17 42 13 38 12 32Z" />
+                </svg>
+              </div>
+
+              <div className="flex items-center justify-between text-[9px] text-neutral-400 pt-2 border-t border-white/5 font-mono">
+                <span>SERIAL: MF-8849-PASS</span>
+                <span className="text-[#ccff00] font-bold">✓ INSTANT PAYOUT</span>
               </div>
             </div>
 
@@ -345,7 +422,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Card 3: Scaling Stage */}
+          {/* ==================== CARD 3: SCALING STAGE ==================== */}
           <div className="bg-[#12151c] border border-white/10 rounded-3xl p-6 sm:p-8 flex flex-col justify-between relative group hover:border-white/20 transition">
             <div>
               {/* Step Badge */}
@@ -359,28 +436,40 @@ export default function HomePage() {
               <h3 className="text-2xl font-black text-white mb-3">
                 Scale Up To $1,000,000
               </h3>
-              <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed mb-8">
+              <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed mb-6">
                 Hit 15% profit on MaxFunded Trader stage, scale by 30% each quarter, and grow your account to $1,000,000
               </p>
             </div>
 
-            {/* Scaling Stepped Bars Graphic */}
-            <div className="bg-[#08090b] border border-white/5 rounded-2xl p-4 flex items-end justify-between gap-2 h-28">
-              <div className="w-1/5 bg-neutral-800 rounded-t-md h-1/4 flex items-center justify-center text-[9px] text-neutral-400 font-bold">
-                $100K
+            {/* Institutional Scaling Stepped Pillar Visual */}
+            <div className="bg-[#08090b] border border-white/10 rounded-2xl p-4 flex flex-col justify-between h-44">
+              <div className="flex items-center justify-between text-[11px] font-mono text-neutral-400">
+                <span className="font-bold text-white">CAPITAL LADDER</span>
+                <span className="text-[#ccff00] font-bold">+30% EVERY QUARTER</span>
               </div>
-              <div className="w-1/5 bg-neutral-700 rounded-t-md h-2/5 flex items-center justify-center text-[9px] text-neutral-400 font-bold">
-                $200K
-              </div>
-              <div className="w-1/5 bg-neutral-600 rounded-t-md h-3/5 flex items-center justify-center text-[9px] text-neutral-300 font-bold">
-                $300K
-              </div>
-              <div className="w-1/5 bg-neutral-500 rounded-t-md h-4/5 flex items-center justify-center text-[9px] text-neutral-200 font-bold">
-                $750K
-              </div>
-              <div className="w-1/5 bg-[#ccff00] rounded-t-md h-full flex flex-col items-center justify-center text-[10px] text-black font-black">
-                <Trophy className="w-3.5 h-3.5 mb-1" />
-                $1M
+
+              <div className="flex items-end justify-between gap-2 h-28 pt-2">
+                <div className="w-1/5 bg-neutral-800/80 rounded-t-lg h-[28%] flex flex-col items-center justify-end pb-1 border-t border-white/10">
+                  <span className="text-[9px] text-neutral-400 font-bold">$100K</span>
+                  <span className="text-[7px] text-neutral-500 font-mono">Q1</span>
+                </div>
+                <div className="w-1/5 bg-neutral-700/80 rounded-t-lg h-[46%] flex flex-col items-center justify-end pb-1 border-t border-white/15">
+                  <span className="text-[9px] text-neutral-300 font-bold">$200K</span>
+                  <span className="text-[7px] text-neutral-500 font-mono">Q2</span>
+                </div>
+                <div className="w-1/5 bg-neutral-600/80 rounded-t-lg h-[64%] flex flex-col items-center justify-end pb-1 border-t border-white/20">
+                  <span className="text-[9px] text-neutral-200 font-bold">$300K</span>
+                  <span className="text-[7px] text-neutral-500 font-mono">Q3</span>
+                </div>
+                <div className="w-1/5 bg-neutral-500/80 rounded-t-lg h-[82%] flex flex-col items-center justify-end pb-1 border-t border-white/25">
+                  <span className="text-[9px] text-white font-bold">$750K</span>
+                  <span className="text-[7px] text-neutral-400 font-mono">Q4</span>
+                </div>
+                <div className="w-1/5 bg-gradient-to-t from-[#a3e635] to-[#ccff00] rounded-t-lg h-full flex flex-col items-center justify-center text-black font-black shadow-neon-sm">
+                  <Trophy className="w-4 h-4 mb-0.5 text-black" />
+                  <span className="text-[11px] leading-tight">$1M</span>
+                  <span className="text-[7px] uppercase tracking-wider font-extrabold text-neutral-900">MAX</span>
+                </div>
               </div>
             </div>
           </div>
@@ -399,15 +488,15 @@ export default function HomePage() {
           {/* 3 Counter Stats */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-8 sm:gap-16">
             <div>
-              <span className="text-2xl sm:text-3xl font-black text-white">30K+</span>
+              <span className="text-2xl sm:text-4xl font-black text-white">30K+</span>
               <span className="text-xs sm:text-sm text-neutral-400 ml-2 font-medium">Customers worldwide</span>
             </div>
             <div>
-              <span className="text-2xl sm:text-3xl font-black text-white">$500M+</span>
+              <span className="text-2xl sm:text-4xl font-black text-white">$500M+</span>
               <span className="text-xs sm:text-sm text-neutral-400 ml-2 font-medium">In trading accounts</span>
             </div>
             <div>
-              <span className="text-2xl sm:text-3xl font-black text-white">170+</span>
+              <span className="text-2xl sm:text-4xl font-black text-white">170+</span>
               <span className="text-xs sm:text-sm text-neutral-400 ml-2 font-medium">Countries served</span>
             </div>
           </div>
@@ -422,7 +511,7 @@ export default function HomePage() {
               flag: "🇺🇸",
               rewards: "$12,160",
               account: "$100,000",
-              bg: "from-blue-950 to-neutral-900",
+              bg: "from-blue-950/70 to-neutral-950",
             },
             {
               name: "Tom J.",
@@ -430,7 +519,7 @@ export default function HomePage() {
               flag: "🇳🇱",
               rewards: "$10,019",
               account: "$100,000",
-              bg: "from-amber-950 to-neutral-900",
+              bg: "from-amber-950/70 to-neutral-950",
             },
             {
               name: "Andy L.",
@@ -438,7 +527,7 @@ export default function HomePage() {
               flag: "🇨🇦",
               rewards: "$8,523",
               account: "$100,000",
-              bg: "from-emerald-950 to-neutral-900",
+              bg: "from-emerald-950/70 to-neutral-950",
             },
             {
               name: "Dary B.",
@@ -446,17 +535,27 @@ export default function HomePage() {
               flag: "🇦🇺",
               rewards: "$4,735",
               account: "$50,000",
-              bg: "from-purple-950 to-neutral-900",
+              bg: "from-purple-950/70 to-neutral-950",
             },
           ].map((trader, i) => (
             <div
               key={i}
-              onClick={() => setSelectedVideo({ name: trader.name, country: trader.country, flag: trader.flag, reward: trader.rewards, account: trader.account })}
-              className="bg-[#12151c] border border-white/10 hover:border-[#ccff00]/50 rounded-2xl p-4 transition-all duration-300 group cursor-pointer"
+              onClick={() =>
+                setSelectedVideo({
+                  name: trader.name,
+                  country: trader.country,
+                  flag: trader.flag,
+                  reward: trader.rewards,
+                  account: trader.account,
+                })
+              }
+              className="bg-[#12151c] border border-white/10 hover:border-[#ccff00]/60 rounded-2xl p-4 transition-all duration-300 group cursor-pointer hover:shadow-neon-sm"
             >
               {/* Video Thumbnail Frame */}
-              <div className={`relative h-44 rounded-xl bg-gradient-to-b ${trader.bg} flex items-center justify-center overflow-hidden mb-4`}>
-                <div className="w-12 h-12 rounded-full bg-white/20 group-hover:bg-[#ccff00] text-white group-hover:text-black flex items-center justify-center transition-all duration-300 shadow-lg">
+              <div
+                className={`relative h-44 rounded-xl bg-gradient-to-b ${trader.bg} border border-white/5 flex items-center justify-center overflow-hidden mb-4`}
+              >
+                <div className="w-12 h-12 rounded-full bg-white/15 group-hover:bg-[#ccff00] text-white group-hover:text-black flex items-center justify-center transition-all duration-300 shadow-lg group-hover:scale-110">
                   <Play className="w-5 h-5 fill-current ml-0.5" />
                 </div>
               </div>
@@ -495,7 +594,7 @@ export default function HomePage() {
 
           {/* 3 Metric Highlights */}
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto text-left">
-            <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#12151c] border border-white/5">
+            <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#12151c] border border-white/5 shadow-sm">
               <div className="w-12 h-12 rounded-full bg-[#ccff00]/15 flex items-center justify-center text-[#ccff00] shrink-0">
                 <DollarSign className="w-6 h-6" />
               </div>
@@ -505,7 +604,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#12151c] border border-white/5">
+            <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#12151c] border border-white/5 shadow-sm">
               <div className="w-12 h-12 rounded-full bg-[#ccff00]/15 flex items-center justify-center text-[#ccff00] shrink-0">
                 <Clock className="w-6 h-6" />
               </div>
@@ -515,7 +614,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#12151c] border border-white/5">
+            <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#12151c] border border-white/5 shadow-sm">
               <div className="w-12 h-12 rounded-full bg-[#ccff00]/15 flex items-center justify-center text-[#ccff00] shrink-0">
                 <TrendingUp className="w-6 h-6" />
               </div>
@@ -530,7 +629,7 @@ export default function HomePage() {
         {/* 3 Certificates of Profit Reward */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
           {/* Certificate 1: Lark A. */}
-          <div className="bg-[#111418] border border-white/10 rounded-2xl p-6 text-left relative overflow-hidden group hover:border-white/20 transition">
+          <div className="bg-[#111418] border border-white/10 rounded-2xl p-6 text-left relative overflow-hidden group hover:border-white/25 transition">
             <div className="flex items-center justify-between mb-4">
               <span className="text-[10px] text-neutral-400 uppercase font-semibold">Certificate of Profit Reward</span>
               <span className="text-xs font-black text-[#ccff00]">MaxFunded</span>
@@ -565,7 +664,7 @@ export default function HomePage() {
           </div>
 
           {/* Certificate 3: Tom de J. */}
-          <div className="bg-[#111418] border border-white/10 rounded-2xl p-6 text-left relative overflow-hidden group hover:border-white/20 transition">
+          <div className="bg-[#111418] border border-white/10 rounded-2xl p-6 text-left relative overflow-hidden group hover:border-white/25 transition">
             <div className="flex items-center justify-between mb-4">
               <span className="text-[10px] text-neutral-400 uppercase font-semibold">Certificate of Profit Reward</span>
               <span className="text-xs font-black text-[#ccff00]">MaxFunded</span>
@@ -669,16 +768,13 @@ export default function HomePage() {
 
         {/* Feature Display Area */}
         <div className="bg-[#12151c] border border-white/10 rounded-3xl p-6 sm:p-10 relative overflow-hidden">
-          {/* Subtle glow background */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-[#ccff00]/[0.03] blur-3xl pointer-events-none rounded-full" />
-
           {activeTab === "app" && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
               <div>
                 <span className="px-3 py-1 rounded-full bg-[#ccff00]/15 text-[#ccff00] font-black text-xs uppercase tracking-wider">
                   Personal Web App
                 </span>
-                <h3 className="text-3xl font-black text-white mt-4 mb-4">
+                <h3 className="text-3xl sm:text-4xl font-black text-white mt-4 mb-4">
                   Institutional Risk & Account Management
                 </h3>
                 <p className="text-neutral-300 text-sm leading-relaxed mb-6">
@@ -696,23 +792,37 @@ export default function HomePage() {
                   </span>
                 </div>
               </div>
+
+              {/* Realistic Risk Dashboard Widget Mockup */}
               <div className="bg-[#08090b] border border-white/10 rounded-2xl p-6 shadow-2xl space-y-4">
                 <div className="flex items-center justify-between text-xs pb-3 border-b border-white/5">
-                  <span className="text-neutral-400">ACCOUNT STATUS</span>
-                  <span className="text-emerald-400 font-bold">ACTIVE EVALUATION</span>
+                  <span className="text-neutral-400 font-mono">ACCOUNT: #MF-109482</span>
+                  <span className="text-emerald-400 font-bold flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" /> ACTIVE EVALUATION
+                  </span>
                 </div>
+
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-[#111418] p-3 rounded-xl border border-white/5">
-                    <div className="text-[10px] text-neutral-400">CURRENT EQUITY</div>
-                    <div className="text-xl font-black text-white mt-0.5">$107,480.00</div>
+                  <div className="bg-[#111418] p-4 rounded-xl border border-white/5">
+                    <div className="text-[10px] font-mono text-neutral-400 uppercase">CURRENT BALANCE</div>
+                    <div className="text-2xl font-black text-white mt-1">$107,480.00</div>
+                    <div className="text-[10px] text-emerald-400 font-bold mt-1">+$7,480.00 (+7.48%)</div>
                   </div>
-                  <div className="bg-[#111418] p-3 rounded-xl border border-white/5">
-                    <div className="text-[10px] text-neutral-400">PROFIT TARGET</div>
-                    <div className="text-xl font-black text-[#ccff00] mt-0.5">94.8% Done</div>
+                  <div className="bg-[#111418] p-4 rounded-xl border border-white/5">
+                    <div className="text-[10px] font-mono text-neutral-400 uppercase">DAILY DRAWDOWN SAFE ZONE</div>
+                    <div className="text-2xl font-black text-[#ccff00] mt-1">1.2% / 4.0%</div>
+                    <div className="text-[10px] text-neutral-400 mt-1">Max buffer: $2,800.00</div>
                   </div>
                 </div>
-                <div className="w-full bg-neutral-800 rounded-full h-2 overflow-hidden">
-                  <div className="bg-[#ccff00] h-2 rounded-full" style={{ width: "94.8%" }} />
+
+                <div>
+                  <div className="flex justify-between text-xs font-mono text-neutral-400 mb-1.5">
+                    <span>PROFIT TARGET PROGRESS</span>
+                    <span className="text-[#ccff00] font-bold">74.8% OF GOAL</span>
+                  </div>
+                  <div className="w-full bg-neutral-800 rounded-full h-2.5 overflow-hidden">
+                    <div className="bg-[#ccff00] h-2.5 rounded-full" style={{ width: "74.8%" }} />
+                  </div>
                 </div>
               </div>
             </div>
@@ -724,7 +834,7 @@ export default function HomePage() {
                 <span className="px-3 py-1 rounded-full bg-[#ccff00]/15 text-[#ccff00] font-black text-xs uppercase tracking-wider">
                   AI Challenge Assistant
                 </span>
-                <h3 className="text-3xl font-black text-white mt-4 mb-4">
+                <h3 className="text-3xl sm:text-4xl font-black text-white mt-4 mb-4">
                   24/7 Automated Risk & Rules Guard
                 </h3>
                 <p className="text-neutral-300 text-sm leading-relaxed mb-6">
@@ -739,14 +849,15 @@ export default function HomePage() {
                   </span>
                 </div>
               </div>
-              <div className="bg-[#08090b] border border-white/10 rounded-2xl p-6 shadow-2xl space-y-3">
-                <div className="flex items-center gap-3 p-3 bg-emerald-950/40 border border-emerald-500/30 rounded-xl text-xs text-emerald-300">
-                  <CheckCircle2 className="w-4 h-4 shrink-0" />
-                  <span>Risk engine check passed: 0 rule violations detected</span>
+
+              <div className="bg-[#08090b] border border-white/10 rounded-2xl p-6 shadow-2xl space-y-3 font-mono">
+                <div className="flex items-center gap-3 p-3.5 bg-emerald-950/40 border border-emerald-500/30 rounded-xl text-xs text-emerald-300">
+                  <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-400" />
+                  <span>Rule check passed: Max daily loss limit safe (1.2% / 4.0% consumed)</span>
                 </div>
-                <div className="flex items-center gap-3 p-3 bg-[#111418] border border-white/5 rounded-xl text-xs text-neutral-300">
-                  <Bot className="w-4 h-4 text-[#ccff00] shrink-0" />
-                  <span>Next major economic release: US Non-Farm Payrolls in 4h 12m</span>
+                <div className="flex items-center gap-3 p-3.5 bg-[#111418] border border-white/5 rounded-xl text-xs text-neutral-300">
+                  <Bot className="w-5 h-5 text-[#ccff00] shrink-0" />
+                  <span>AI Monitor: Next major volatility event (US CPI) in 3h 15m. Lot limits confirmed.</span>
                 </div>
               </div>
             </div>
@@ -758,11 +869,11 @@ export default function HomePage() {
                 <span className="px-3 py-1 rounded-full bg-[#ccff00]/15 text-[#ccff00] font-black text-xs uppercase tracking-wider">
                   Trading Platform
                 </span>
-                <h3 className="text-3xl font-black text-white mt-4 mb-4">
+                <h3 className="text-3xl sm:text-4xl font-black text-white mt-4 mb-4">
                   High-Speed MetaTrader 5 Terminal
                 </h3>
                 <p className="text-neutral-300 text-sm leading-relaxed mb-6">
-                  Trade FX pairs, indices, gold, and digital assets on MT5 with raw spreads, sub-millisecond execution, and no artificial restrictions on your trading style.
+                  Trade FX pairs, indices, gold, and digital assets on MT5 with raw spreads, sub-millisecond execution, and zero artificial restrictions on your trading style.
                 </p>
                 <div className="flex flex-wrap gap-2 text-xs font-bold">
                   <span className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-neutral-200">
@@ -773,15 +884,37 @@ export default function HomePage() {
                   </span>
                 </div>
               </div>
-              <div className="bg-[#08090b] border border-white/10 rounded-2xl p-6 shadow-2xl text-center space-y-4">
-                <div className="text-xs text-neutral-400">SUPPORTED ASSETS</div>
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="p-3 bg-[#111418] rounded-xl border border-white/5 font-mono text-xs font-bold">EURUSD</div>
-                  <div className="p-3 bg-[#111418] rounded-xl border border-white/5 font-mono text-xs font-bold">XAUUSD</div>
-                  <div className="p-3 bg-[#111418] rounded-xl border border-white/5 font-mono text-xs font-bold">US100</div>
-                  <div className="p-3 bg-[#111418] rounded-xl border border-white/5 font-mono text-xs font-bold">BTCUSD</div>
-                  <div className="p-3 bg-[#111418] rounded-xl border border-white/5 font-mono text-xs font-bold">GBPUSD</div>
-                  <div className="p-3 bg-[#111418] rounded-xl border border-white/5 font-mono text-xs font-bold">US30</div>
+
+              <div className="bg-[#08090b] border border-white/10 rounded-2xl p-6 shadow-2xl space-y-3">
+                <div className="text-xs text-neutral-400 font-mono flex items-center justify-between pb-2 border-b border-white/5">
+                  <span>LIVE INSTITUTIONAL SPREADS</span>
+                  <span className="text-[#ccff00] font-bold">RAW ECN FEED</span>
+                </div>
+                <div className="grid grid-cols-3 gap-3 text-center">
+                  <div className="p-3 bg-[#111418] rounded-xl border border-white/5">
+                    <div className="text-xs font-mono font-bold text-white">EURUSD</div>
+                    <div className="text-[11px] text-[#ccff00] font-mono font-bold mt-1">0.0 pips</div>
+                  </div>
+                  <div className="p-3 bg-[#111418] rounded-xl border border-white/5">
+                    <div className="text-xs font-mono font-bold text-white">XAUUSD</div>
+                    <div className="text-[11px] text-[#ccff00] font-mono font-bold mt-1">0.8 pips</div>
+                  </div>
+                  <div className="p-3 bg-[#111418] rounded-xl border border-white/5">
+                    <div className="text-xs font-mono font-bold text-white">US100</div>
+                    <div className="text-[11px] text-[#ccff00] font-mono font-bold mt-1">0.5 pips</div>
+                  </div>
+                  <div className="p-3 bg-[#111418] rounded-xl border border-white/5">
+                    <div className="text-xs font-mono font-bold text-white">BTCUSD</div>
+                    <div className="text-[11px] text-[#ccff00] font-mono font-bold mt-1">5.0 pips</div>
+                  </div>
+                  <div className="p-3 bg-[#111418] rounded-xl border border-white/5">
+                    <div className="text-xs font-mono font-bold text-white">GBPUSD</div>
+                    <div className="text-[11px] text-[#ccff00] font-mono font-bold mt-1">0.2 pips</div>
+                  </div>
+                  <div className="p-3 bg-[#111418] rounded-xl border border-white/5">
+                    <div className="text-xs font-mono font-bold text-white">US30</div>
+                    <div className="text-[11px] text-[#ccff00] font-mono font-bold mt-1">1.2 pips</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -793,7 +926,7 @@ export default function HomePage() {
                 <span className="px-3 py-1 rounded-full bg-[#ccff00]/15 text-[#ccff00] font-black text-xs uppercase tracking-wider">
                   24/7 Human Support
                 </span>
-                <h3 className="text-3xl font-black text-white mt-4 mb-4">
+                <h3 className="text-3xl sm:text-4xl font-black text-white mt-4 mb-4">
                   Response Time &lt; 1 Minute
                 </h3>
                 <p className="text-neutral-300 text-sm leading-relaxed mb-6">
@@ -803,10 +936,17 @@ export default function HomePage() {
                   <span>RESPONSE TIME &lt; 1 MIN</span>
                 </div>
               </div>
+
               <div className="bg-[#08090b] border border-white/10 rounded-2xl p-6 shadow-2xl space-y-3 text-left">
-                <div className="text-xs text-neutral-400 pb-2 border-b border-white/5">LIVE CHAT TRANSCRIPT</div>
-                <div className="p-3 bg-[#111418] rounded-xl text-xs text-neutral-300">
+                <div className="text-xs text-neutral-400 pb-2 border-b border-white/5 flex items-center justify-between font-mono">
+                  <span>LIVE SUPPORT TICKET #9948</span>
+                  <span className="text-[#ccff00] font-bold">ONLINE</span>
+                </div>
+                <div className="p-3.5 bg-[#111418] rounded-xl text-xs text-neutral-300">
                   <span className="text-[#ccff00] font-bold">MaxFunded Support:</span> Hello! Your Phase 1 target is confirmed. Your Phase 2 login credentials have been dispatched to your email!
+                </div>
+                <div className="p-3.5 bg-[#171b22] rounded-xl text-xs text-neutral-300 text-right">
+                  <span className="text-white font-bold">Trader:</span> Perfect! Just received the credentials, logging in right now.
                 </div>
               </div>
             </div>
@@ -831,7 +971,7 @@ export default function HomePage() {
           {PLANS.map((plan, i) => (
             <div
               key={i}
-              className={`bg-[#12151c] rounded-3xl p-6 flex flex-col justify-between border ${plan.borderClass} relative transition-all duration-300 group`}
+              className={`bg-[#12151c] rounded-3xl p-6 flex flex-col justify-between border ${plan.borderClass} relative transition-all duration-300 group hover:scale-[1.02]`}
             >
               <div>
                 {/* Top Badge */}

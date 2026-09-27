@@ -1,54 +1,86 @@
+"use client";
+
 import React from "react";
 
 interface LogoProps {
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   showText?: boolean;
   className?: string;
 }
 
-export default function Logo({ size = "md", showText = true, className = "" }: LogoProps) {
+export default function Logo({
+  size = "md",
+  showText = true,
+  className = "",
+}: LogoProps) {
   const iconDimensions = {
     sm: "w-7 h-7",
     md: "w-9 h-9",
     lg: "w-11 h-11",
+    xl: "w-14 h-14",
   }[size];
 
   const textSizes = {
     sm: "text-lg",
     md: "text-xl",
     lg: "text-2xl",
+    xl: "text-3xl",
+  }[size];
+
+  const subTextSizes = {
+    sm: "text-[7px]",
+    md: "text-[8px]",
+    lg: "text-[9px]",
+    xl: "text-[10px]",
   }[size];
 
   return (
-    <div className={`inline-flex items-center space-x-2.5 select-none ${className}`}>
-      {/* Geometric Neon Arrow Emblem */}
-      <div className={`relative ${iconDimensions} rounded-xl bg-neon p-[1px] shadow-neon-sm transition-transform duration-300 hover:scale-105`}>
-        <div className="w-full h-full bg-[#08090b] rounded-[11px] flex items-center justify-center overflow-hidden">
+    <div className={`inline-flex items-center space-x-3 select-none ${className}`}>
+      {/* Institutional Geometric Emblem */}
+      <div
+        className={`relative ${iconDimensions} rounded-xl bg-gradient-to-br from-[#ccff00] via-[#a3e635] to-[#65a30d] p-[1.5px] shadow-[0_0_20px_rgba(204,255,0,0.3)] transition-transform duration-300 hover:scale-105 group-hover:shadow-[0_0_28px_rgba(204,255,0,0.5)] shrink-0`}
+      >
+        <div className="w-full h-full bg-[#0a0c0f] rounded-[10.5px] flex items-center justify-center overflow-hidden relative">
+          {/* Subtle inner ambient glow */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#ccff00]/15 to-transparent pointer-events-none" />
+
           <svg
-            viewBox="0 0 32 32"
+            viewBox="0 0 36 36"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="w-5 h-5"
+            className="w-[72%] h-[72%] relative z-10"
           >
-            {/* Dynamic Upward Growth Arrow + Hexagonal Energy */}
+            {/* Dynamic Ascending Apex "M" with Rocket Chevrons */}
             <path
-              d="M16 4L6 14H12V28H20V14H26L16 4Z"
+              d="M5 28V12L13 21L18 15L23 21L31 12V28"
+              stroke="#ccff00"
+              strokeWidth="3.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            {/* Ascending Performance Arrow Head */}
+            <path
+              d="M18 6L23 11H13L18 6Z"
               fill="#ccff00"
             />
-            <path
-              d="M16 8L22 14H18V24H14V14H10L16 8Z"
-              fill="#08090b"
-              fillOpacity="0.25"
-            />
+            {/* Pulse Indicator Core */}
+            <circle cx="18" cy="15" r="2" fill="#ffffff" />
           </svg>
         </div>
       </div>
 
       {/* Modern Wordmark */}
       {showText && (
-        <span className={`${textSizes} font-black tracking-tight text-white flex items-center`}>
-          Max<span className="text-neon ml-0.5">Funded</span>
-        </span>
+        <div className="flex flex-col leading-none">
+          <div className={`${textSizes} font-black tracking-tight text-white flex items-center`}>
+            MAX<span className="text-[#ccff00] ml-0.5">FUNDED</span>
+          </div>
+          <span
+            className={`${subTextSizes} font-bold uppercase tracking-[0.25em] text-neutral-400 mt-0.5`}
+          >
+            Proprietary Firm
+          </span>
+        </div>
       )}
     </div>
   );
