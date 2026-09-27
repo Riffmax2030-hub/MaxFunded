@@ -306,6 +306,34 @@ export default function TraderDashboard() {
     return () => clearInterval(interval);
   }, [loadData]);
 
+  // Quick 1-click test login for reviewers
+  const handleQuickDemoLogin = async () => {
+    try {
+      setLoading(true);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+      const res = await fetch(`${apiUrl}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: "trader@maxfunded.com", password: "Trader2026!" }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const { saveSession } = await import("@/lib/auth");
+        saveSession(data.access_token, {
+          id: data.user_id,
+          email: data.email,
+          role: data.role,
+          is_admin: data.is_admin,
+        });
+        await loadData();
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // ── Render states ───────────────────────
   const renderContent = () => {
     if (loading && !summary) {
@@ -318,7 +346,51 @@ export default function TraderDashboard() {
     }
 
     if (error && !summary) {
+      const isAuthError =
+        error.toLowerCase().includes("log in") ||
+        error.toLowerCase().includes("not authenticated");
       const isNoAccount = error.toLowerCase().includes("no active challenge");
+
+      if (isAuthError) {
+        return (
+          <div className="max-w-md mx-auto mt-20 text-center">
+            <div className="bg-[#0d0e10] border border-white/[0.08] rounded-3xl p-8 sm:p-10 shadow-2xl relative overflow-hidden">
+              <div className="w-16 h-16 rounded-2xl bg-[#ccff00]/10 border border-[#ccff00]/20 flex items-center justify-center mx-auto mb-6 text-[#ccff00]">
+                <ShieldCheck size={32} />
+              </div>
+              <h2 className="text-2xl font-black text-white mb-2 tracking-tight">Trader Portal Access</h2>
+              <p className="text-neutral-400 text-sm mb-8 leading-relaxed">
+                Sign in to your MaxFunded account to view your live MetaTrader 5 balance, real-time equity curve, and drawdown objectives.
+              </p>
+
+              <div className="space-y-3">
+                <Link
+                  href="/login"
+                  className="w-full inline-flex items-center justify-center gap-2 bg-[#ccff00] hover:bg-[#b3e600] text-black font-bold px-6 py-3.5 rounded-xl transition shadow-[0_0_25px_rgba(204,255,0,0.3)] text-sm"
+                >
+                  Sign In to Account
+                </Link>
+
+                <button
+                  onClick={handleQuickDemoLogin}
+                  className="w-full inline-flex items-center justify-center gap-2 bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-white font-semibold px-6 py-3.5 rounded-xl transition text-sm"
+                >
+                  <Zap size={15} className="text-[#ccff00]" />
+                  Instant Demo Mode (1-Click)
+                </button>
+              </div>
+
+              <div className="mt-6 pt-6 border-t border-white/5 text-xs text-neutral-500">
+                Don&apos;t have an account yet?{" "}
+                <Link href="/register" className="text-[#ccff00] hover:underline font-semibold">
+                  Register here
+                </Link>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
       return (
         <div className="max-w-lg mx-auto mt-24 text-center">
           <div className="bg-[#0d0e10] border border-white/[0.08] rounded-2xl p-10 shadow-2xl">
