@@ -44,30 +44,29 @@ function InstantFundedSection() {
 
       {/* Account size selector */}
       <div>
-        <p className="text-xs font-bold uppercase tracking-widest text-neutral-500 text-center mb-5">Choose Your Account Size</p>
+        <p className="text-xs font-bold uppercase tracking-widest text-neutral-400 text-center mb-5">Choose Your Account Size</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
-          {INSTANT_ACCOUNTS.map((acc, i) => (
-            <button
-              key={acc.size}
-              onClick={() => setSelected(i)}
-              className={`relative p-5 rounded-2xl border text-left transition-all ${
-                selected === i
-                  ? "bg-[#ccff00]/10 border-[#ccff00]/60 shadow-lg shadow-[#ccff00]/5"
-                  : "bg-[#0d0e10] border-white/10 hover:border-white/20"
-              }`}
-            >
-              {i === 1 && (
-                <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[9px] font-black uppercase tracking-widest bg-[#ccff00] text-black px-2.5 py-0.5 rounded-full whitespace-nowrap">
-                  Most Popular
-                </span>
-              )}
-              <div className="text-2xl font-black text-white mb-1">{acc.label}</div>
-              <div className={`text-lg font-bold ${selected === i ? "text-[#ccff00]" : "text-neutral-300"}`}>
-                ${acc.price.toLocaleString()}
-              </div>
-              <div className="text-xs text-neutral-500 mt-0.5">one-time fee</div>
-            </button>
-          ))}
+          {INSTANT_ACCOUNTS.map((acc, i) => {
+            const isSelected = selected === i;
+            return (
+              <button
+                key={acc.size}
+                onClick={() => setSelected(i)}
+                className={`calculator-tab relative p-5 text-left ${isSelected ? "active" : ""}`}
+              >
+                {i === 1 && (
+                  <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[9px] font-black uppercase tracking-widest bg-[#ccff00] text-black px-2.5 py-0.5 rounded-full whitespace-nowrap shadow-sm">
+                    Most Popular
+                  </span>
+                )}
+                <div className="text-2xl font-black text-white mb-1 font-mono">{acc.label}</div>
+                <div className={`text-lg font-bold font-mono ${isSelected ? "text-[#ccff00]" : "text-neutral-300"}`}>
+                  ${acc.price.toLocaleString()}
+                </div>
+                <div className="text-xs text-neutral-400 mt-0.5">one-time fee</div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -165,10 +164,8 @@ export default function ChallengesPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#111418] border border-white/10 text-xs text-neutral-300 mb-6 select-none">
-            <span className="font-bold text-white">4.9 ★ Rating</span>
-            <span className="text-neutral-500">•</span>
-            <span className="text-[#ccff00] font-bold">Instant MT5 Delivery</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#ccff00]/15 border border-[#ccff00]/30 text-[#ccff00] text-xs font-mono font-bold uppercase tracking-wider mb-5 animate-pulse">
+            <span>⚡ LIMITED TIME: 45% OFF FOR NEW USERS • CODE: MAX45</span>
           </div>
 
           <h1 className="text-3xl sm:text-6xl font-black text-white tracking-tight uppercase mb-4">
