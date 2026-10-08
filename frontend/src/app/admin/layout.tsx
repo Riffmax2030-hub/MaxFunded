@@ -127,7 +127,7 @@ export default function AdminLayout({
         <Link href="/admin" onClick={() => setSidebarOpen(false)}>
           <Logo size="sm" />
         </Link>
-        <div className="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+        <div className="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/20 text-[#ccff00] text-[10px] font-bold uppercase tracking-wider">
           <ShieldCheck size={10} />
           Admin Console
         </div>

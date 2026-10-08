@@ -138,7 +138,7 @@ function MetricCard({
   return (
     <motion.div
       whileHover={{ y: -3, transition: { duration: 0.15 } }}
-      className={`bg-[#0d0e10] border ${danger ? "border-rose-500/40" : "border-white/[0.08]"} rounded-2xl p-5 flex flex-col justify-between shadow-lg relative overflow-hidden`}
+      className={`metric-card flex flex-col justify-between relative overflow-hidden ${danger ? "border-rose-500/40" : ""}`}
     >
       <div className="flex items-center justify-between">
         <span className="text-neutral-400 text-xs font-medium uppercase tracking-wider">{label}</span>
@@ -147,7 +147,7 @@ function MetricCard({
         </span>
       </div>
       <div className="mt-3">
-        <p className={`text-2xl font-black font-mono tracking-tight ${danger ? "text-rose-400" : "text-white"}`}>
+        <p className={`text-2xl font-black font-mono tracking-tight animate-metric-shift ${danger ? "text-rose-400" : "text-white"}`}>
           {displayValue}
         </p>
         {sub && <p className="text-neutral-500 text-xs mt-1 font-medium">{sub}</p>}
@@ -172,7 +172,7 @@ function DrawdownGauge({
   return (
     <motion.div
       whileHover={{ y: -2, transition: { duration: 0.15 } }}
-      className="bg-[#0d0e10] border border-white/[0.08] rounded-2xl p-5 shadow-lg"
+      className="metric-card shadow-lg"
     >
       <div className="flex items-center justify-between mb-3">
         <span className="text-neutral-200 text-sm font-semibold">{label}</span>
@@ -217,12 +217,12 @@ function RuleComplianceCard({ rule }: { rule: RuleComplianceItem }) {
   return (
     <motion.div
       whileHover={{ y: -2, transition: { duration: 0.15 } }}
-      className={`bg-[#0d0e10] border rounded-2xl p-5 shadow-lg ${
+      className={`metric-card shadow-lg ${
         rule.is_breached
           ? "border-rose-500/40"
           : rule.is_achieved
           ? "border-[#ccff00]/40"
-          : "border-white/[0.08]"
+          : ""
       }`}
     >
       <div className="flex items-center justify-between mb-2">
@@ -360,6 +360,10 @@ export default function TraderDashboard() {
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   const [showPassword, setShowPassword] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [showPayoutModal, setShowPayoutModal] = useState(false);
+  const [payoutAmount, setPayoutAmount] = useState("");
+  const [payoutAddress, setPayoutAddress] = useState("");
+  const [payoutSubmitted, setPayoutSubmitted] = useState(false);
 
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
@@ -553,7 +557,9 @@ export default function TraderDashboard() {
         <DangerZoneBanner dailyUsedPct={dailyLossPct} maxUsedPct={maxDrawdownPct} />
         {/* ── Account header banner with Live Streaming Status ── */}
         <div className="bg-[#0d0e10] border border-white/[0.08] rounded-2xl p-6 shadow-xl relative overflow-hidden">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          {/* Neon glow orb top-right */}
+          <div className="absolute -top-8 -right-8 w-48 h-48 rounded-full bg-[#ccff00]/[0.06] blur-3xl pointer-events-none" />
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 relative z-10">
             <div>
               <div className="flex flex-wrap items-center gap-2.5 mb-2">
                 <span className={`text-xs font-bold px-3 py-1 rounded-full border ${statusBadge(summary.account_status)}`}>
@@ -609,12 +615,12 @@ export default function TraderDashboard() {
                 </Link>
               )}
               {!summary.has_pending_payout && summary.kyc_status === "APPROVED" && (
-                <Link
-                  href="/payouts"
+                <button
+                  onClick={() => { setPayoutSubmitted(false); setPayoutAmount(""); setPayoutAddress(""); setShowPayoutModal(true); }}
                   className="flex items-center gap-1.5 text-xs bg-[#ccff00]/15 text-[#ccff00] border border-[#ccff00]/30 px-3.5 py-2 rounded-xl font-bold hover:bg-[#ccff00]/25 transition"
                 >
                   <CreditCard size={14} /> Request Payout
-                </Link>
+                </button>
               )}
               {summary.has_pending_payout && (
                 <Link
@@ -771,7 +777,7 @@ export default function TraderDashboard() {
         </div>
 
         {/* ── Profit target progress ── */}
-        <div className="bg-[#0d0e10] border border-white/[0.08] rounded-2xl p-5 shadow-lg">
+        <div className={`metric-card shadow-lg ${summary.profit_target_achieved ? "border-[#ccff00]/40" : ""}`}>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Award size={16} className="text-[#ccff00]" />
@@ -804,26 +810,22 @@ export default function TraderDashboard() {
         </div>
 
         {/* ── Navigation Tabs ── */}
-        <div className="flex flex-wrap gap-2 border-b border-white/[0.06] pb-0">
+        <div className="flex flex-wrap gap-2 pb-2 border-b border-white/[0.06]">
           {(
             [
-              { id: "overview", label: "Overview & Charts" },
-              { id: "compliance", label: "Rule Compliance" },
-              { id: "journal", label: "Trading Journal" },
-              { id: "news", label: "Economic Calendar" },
-              { id: "performance", label: "Trade Ledger" },
+              { id: "overview", label: "Overview & Charts", icon: "📊" },
+              { id: "compliance", label: "Rule Compliance", icon: "🛡️" },
+              { id: "journal", label: "Trading Journal", icon: "📓" },
+              { id: "news", label: "Economic Calendar", icon: "📅" },
+              { id: "performance", label: "Trade Ledger", icon: "📈" },
             ] as const
           ).map((t) => (
             <button
               key={t.id}
               onClick={() => setActiveTab(t.id)}
-              className={`px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold rounded-t-xl transition-all capitalize ${
-                activeTab === t.id
-                  ? "bg-[#0d0e10] text-[#ccff00] border-t-2 border-t-[#ccff00] border-x border-x-white/[0.08] -mb-px shadow-sm font-bold"
-                  : "text-neutral-500 hover:text-neutral-300"
-              }`}
+              className={`calculator-tab text-xs sm:text-sm ${activeTab === t.id ? "active" : ""}`}
             >
-              {t.label}
+              <span className="hidden sm:inline mr-1.5">{t.icon}</span>{t.label}
             </button>
           ))}
         </div>
@@ -1078,6 +1080,112 @@ export default function TraderDashboard() {
   return (
     <div className="min-h-screen bg-[#070809] text-white pt-6 pb-16">
       <div className="max-w-6xl mx-auto px-4 py-4">{renderContent()}</div>
+
+      {/* ── Payout Request Modal ── */}
+      <AnimatePresence>
+        {showPayoutModal && (
+          <motion.div
+            key="payout-modal-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[99999] flex items-center justify-center p-4"
+            style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(12px)" }}
+            onClick={() => setShowPayoutModal(false)}
+          >
+            <motion.div
+              key="payout-modal-card"
+              initial={{ opacity: 0, scale: 0.92, y: 24 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 24 }}
+              transition={{ type: "spring", stiffness: 280, damping: 24 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-[#0c0e12] border border-[#ccff00]/25 rounded-3xl p-8 shadow-[0_0_60px_rgba(204,255,0,0.12)] max-w-md w-full relative overflow-hidden"
+            >
+              {/* Glow orb */}
+              <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#ccff00]/10 blur-3xl pointer-events-none" />
+
+              {!payoutSubmitted ? (
+                <>
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-xl bg-[#ccff00]/10 border border-[#ccff00]/30 flex items-center justify-center text-[#ccff00]">
+                      <CreditCard size={18} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Withdraw Profits</p>
+                      <h3 className="text-xl font-black text-white tracking-tight">Request Payout</h3>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs font-bold uppercase tracking-wider text-neutral-400 block mb-1.5">USDT (TRC-20) Wallet Address</label>
+                      <input
+                        type="text"
+                        value={payoutAddress}
+                        onChange={(e) => setPayoutAddress(e.target.value)}
+                        placeholder="T..."
+                        className="w-full bg-[#14161c] border border-white/[0.08] focus:border-[#ccff00]/50 rounded-xl px-4 py-3 text-white font-mono text-sm outline-none transition placeholder-neutral-600"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold uppercase tracking-wider text-neutral-400 block mb-1.5">Payout Amount (USD)</label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 font-bold text-sm">$</span>
+                        <input
+                          type="number"
+                          value={payoutAmount}
+                          onChange={(e) => setPayoutAmount(e.target.value)}
+                          placeholder="0.00"
+                          min="100"
+                          className="w-full bg-[#14161c] border border-white/[0.08] focus:border-[#ccff00]/50 rounded-xl pl-8 pr-4 py-3 text-white font-mono text-sm outline-none transition placeholder-neutral-600"
+                        />
+                      </div>
+                      <p className="text-[11px] text-neutral-500 mt-1.5">Minimum payout: \$100 · Processed within 24–48h</p>
+                    </div>
+
+                    <div className="bg-[#ccff00]/[0.04] border border-[#ccff00]/15 rounded-xl p-3.5 text-xs text-neutral-400 leading-relaxed">
+                      ⚡ Payouts are processed in <span className="text-[#ccff00] font-semibold">USDT (TRC-20)</span>. Ensure your wallet address is correct — transactions are irreversible.
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        if (!payoutAddress || !payoutAmount) return;
+                        setPayoutSubmitted(true);
+                      }}
+                      disabled={!payoutAddress || !payoutAmount}
+                      className="w-full bg-[#ccff00] hover:bg-[#b3e600] disabled:opacity-40 disabled:cursor-not-allowed text-black font-black py-3.5 rounded-xl transition shadow-[0_0_30px_rgba(204,255,0,0.3)] text-sm mt-1"
+                    >
+                      Submit Payout Request →
+                    </button>
+                    <button
+                      onClick={() => setShowPayoutModal(false)}
+                      className="w-full text-neutral-500 hover:text-neutral-300 text-xs py-2 transition"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-4">
+                  <div className="w-16 h-16 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/30 flex items-center justify-center mx-auto mb-5 text-[#ccff00]">
+                    <CheckCircle size={32} />
+                  </div>
+                  <h3 className="text-2xl font-black text-white mb-2">Request Submitted!</h3>
+                  <p className="text-neutral-400 text-sm mb-1">Your payout of <span className="text-[#ccff00] font-bold">\${payoutAmount}</span> USDT is being reviewed.</p>
+                  <p className="text-neutral-500 text-xs mb-6">You will receive a confirmation email within 24–48 hours.</p>
+                  <button
+                    onClick={() => setShowPayoutModal(false)}
+                    className="bg-[#ccff00] hover:bg-[#b3e600] text-black font-bold px-8 py-3 rounded-xl transition text-sm"
+                  >
+                    Done
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

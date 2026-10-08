@@ -94,20 +94,22 @@ function Stat({
   label,
   value,
   icon: Icon,
+  alert = false,
 }: {
   label: string;
   value: string | number;
   icon: React.ElementType;
+  alert?: boolean;
 }) {
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+    <div className={`metric-card ${alert ? "border-amber-500/40" : ""}`}>
       <div className="flex items-center justify-between mb-3">
-        <span className="text-[11px] font-semibold uppercase tracking-widest text-slate-500">
+        <span className="text-[11px] font-semibold uppercase tracking-widest text-neutral-500">
           {label}
         </span>
-        <Icon className="w-4 h-4 text-slate-600" />
+        <Icon className={`w-4 h-4 ${alert ? "text-amber-400" : "text-[#ccff00]/60"}`} />
       </div>
-      <p className="text-2xl font-black text-white">{value}</p>
+      <p className={`text-2xl font-black font-mono ${alert ? "text-amber-400" : "text-white"}`}>{value}</p>
     </div>
   );
 }
@@ -153,15 +155,15 @@ export default function AdminDashboardPage() {
           <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#ccff00] mb-2">
             <ShieldCheck size={12} /> Mission Control
           </div>
-          <h1 className="text-2xl font-extrabold text-white">Platform Administration</h1>
-          <p className="text-slate-500 text-sm mt-1">
+          <h1 className="text-2xl font-black text-white tracking-tight">Platform Administration</h1>
+          <p className="text-neutral-500 text-sm mt-1">
             Challenges · Account provisioning · Compliance · Payouts
           </p>
         </div>
         <button
           onClick={() => token && load(token)}
           disabled={loading}
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition disabled:opacity-40 border border-slate-700 shrink-0"
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#ccff00]/10 hover:bg-[#ccff00]/20 text-[#ccff00] text-xs font-semibold transition disabled:opacity-40 border border-[#ccff00]/20 shrink-0"
         >
           {loading ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
           Refresh
@@ -184,11 +186,13 @@ export default function AdminDashboardPage() {
           label="Pool available"
           value={pool ? `${pool.available_accounts} / ${pool.total_accounts}` : "—"}
           icon={Database}
+          alert={pool?.available_accounts === 0}
         />
         <Stat
           label="Pending payouts"
           value={health?.metrics.pending_payout_requests ?? "—"}
           icon={CreditCard}
+          alert={!!(health && health.metrics.pending_payout_requests > 0)}
         />
       </div>
 
@@ -197,7 +201,7 @@ export default function AdminDashboardPage() {
         <div
           className={`flex items-center gap-2.5 px-4 py-3 rounded-xl border text-sm ${
             health.status === "healthy"
-              ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-400"
+              ? "bg-[#ccff00]/[0.04] border-[#ccff00]/20 text-[#ccff00]"
               : "bg-amber-500/5 border-amber-500/20 text-amber-400"
           }`}
         >
@@ -226,15 +230,15 @@ export default function AdminDashboardPage() {
             <Link
               key={m.href}
               href={m.href}
-              className="group flex flex-col justify-between bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl p-5 transition-all duration-150"
+              className="group bento-card flex flex-col justify-between transition-all duration-200 hover:border-[#ccff00]/30 hover:shadow-[0_0_20px_rgba(204,255,0,0.08)]"
             >
               {/* Top */}
               <div className="flex items-start justify-between mb-4">
-                <div className="p-2.5 rounded-lg bg-slate-800 border border-slate-700">
-                  <Icon className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
+                <div className="p-2.5 rounded-lg bg-[#ccff00]/[0.06] border border-[#ccff00]/10 group-hover:bg-[#ccff00]/10 transition-colors">
+                  <Icon className="w-4 h-4 text-[#ccff00]/60 group-hover:text-[#ccff00] transition-colors" />
                 </div>
                 {m.alert && (
-                  <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 rounded-full animate-pulse">
                     Action needed
                   </span>
                 )}
@@ -245,13 +249,13 @@ export default function AdminDashboardPage() {
                 <h3 className="font-bold text-sm text-white group-hover:text-[#ccff00] transition-colors">
                   {m.title}
                 </h3>
-                <p className="text-xs text-slate-500 mt-1 leading-relaxed">{m.description}</p>
+                <p className="text-xs text-neutral-500 mt-1 leading-relaxed">{m.description}</p>
               </div>
 
               {/* Footer */}
-              <div className="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between">
-                <span className="text-[11px] text-slate-600 font-medium">{m.meta}</span>
-                <ArrowRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-[#ccff00] group-hover:translate-x-0.5 transition-all" />
+              <div className="mt-4 pt-4 border-t border-white/[0.05] flex items-center justify-between">
+                <span className="text-[11px] text-neutral-600 font-medium font-mono">{m.meta}</span>
+                <ArrowRight className="w-3.5 h-3.5 text-neutral-600 group-hover:text-[#ccff00] group-hover:translate-x-0.5 transition-all" />
               </div>
             </Link>
           );

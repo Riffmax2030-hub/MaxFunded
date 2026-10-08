@@ -37,7 +37,7 @@ export const metadata: Metadata = {
       "Pass our institutional evaluation, trade up to $200,000 on MT5, and keep up to 90% of your profits. Instant crypto & bank withdrawals.",
     images: [
       {
-        url: "/og-image.svg",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "MaxFunded Proprietary Trading Firm",
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     title: "MaxFunded — Get Funded. Trade Big. Keep 90%.",
     description:
       "Institutional-grade funded trading accounts up to $200,000. 90% profit split, raw spreads, instant payouts.",
-    images: ["/og-image.svg"],
+    images: ["/og-image.jpg"],
     creator: "@MaxFunded",
   },
   robots: {
