@@ -22,6 +22,8 @@ const TradingViewChart = dynamic(() => import("@/components/TradingViewChart"), 
 const Confetti = dynamic(() => import("react-confetti"), { ssr: false });
 import TradingJournal from "@/components/TradingJournal";
 import EconomicCalendar from "@/components/EconomicCalendar";
+import { BRAND } from "@/lib/branding";
+import { DiscordIcon } from "@/components/SocialIcons";
 import {
 
   TrendingUp,
@@ -606,6 +608,16 @@ export default function TraderDashboard() {
             {/* Quick Actions */}
             <div className="flex flex-wrap items-center gap-3">
               <TraderRankBadge phase={summary.phase} profit={profit} />
+              <a
+                href={BRAND.socials.discord}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-xs bg-[#5865F2]/15 text-[#c2c6fc] border border-[#5865F2]/30 px-3 py-2 rounded-xl font-bold hover:bg-[#5865F2]/25 hover:text-white transition"
+                title="Join Official Discord Trading Floor"
+              >
+                <DiscordIcon className="w-3.5 h-3.5 text-[#858df9]" />
+                <span className="hidden sm:inline">Discord Floor</span>
+              </a>
               {summary.kyc_status !== "APPROVED" && (
                 <Link
                   href="/kyc"

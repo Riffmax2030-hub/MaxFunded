@@ -16,6 +16,8 @@ import {
   ShieldCheck,
   Settings,
 } from "lucide-react";
+import { BRAND } from "@/lib/branding";
+import { DiscordIcon, TelegramIcon } from "@/components/SocialIcons";
 
 
 export default function Navbar() {
@@ -144,6 +146,18 @@ export default function Navbar() {
         {/* TOP RIGHT CORNER: Language Selector + User State */}
         <div className="flex items-center space-x-3 sm:space-x-4 shrink-0">
           
+          {/* Discord Community Link */}
+          <a
+            href={BRAND.socials.discord}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden md:flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-neutral-200 hover:text-white rounded-xl bg-[#5865F2]/15 hover:bg-[#5865F2]/25 border border-[#5865F2]/30 transition shadow-sm"
+            title="Join Official Discord Community"
+          >
+            <DiscordIcon className="w-3.5 h-3.5 text-[#858df9]" />
+            <span className="font-semibold text-xs text-[#c2c6fc]">Discord</span>
+          </a>
+
           {/* Language Selector */}
           <div className="relative">
             <button
@@ -312,6 +326,33 @@ export default function Navbar() {
                 </button>
               </>
             )}
+          </div>
+
+          {/* Mobile Community Links */}
+          <div className="pt-4 border-t border-white/10">
+            <p className="text-[11px] font-bold text-neutral-500 uppercase tracking-wider mb-2">Trader Community</p>
+            <div className="grid grid-cols-2 gap-2">
+              <a
+                href={BRAND.socials.discord}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold transition border border-[#5865F2]/40 bg-[#5865F2]/20 text-[#c2c6fc]"
+              >
+                <DiscordIcon className="w-4 h-4 text-[#858df9]" />
+                <span>Discord Floor</span>
+              </a>
+              <a
+                href={BRAND.socials.telegram}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold transition border border-[#229ED9]/40 bg-[#229ED9]/20 text-[#7bd2f7]"
+              >
+                <TelegramIcon className="w-4 h-4 text-[#229ED9]" />
+                <span>Telegram Desk</span>
+              </a>
+            </div>
           </div>
 
           {/* Mobile Language Switcher */}

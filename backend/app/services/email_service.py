@@ -137,6 +137,12 @@ class EmailService:
         {body_html}
       </div>
       <div class="footer">
+        <div style="margin-bottom: 14px;">
+          <a href="https://discord.gg/maxfunded" style="color: #858df9; margin: 0 10px; font-weight: bold; text-decoration: none; font-size: 13px;">Discord Floor</a> &bull;
+          <a href="https://t.me/maxfunded" style="color: #7bd2f7; margin: 0 10px; font-weight: bold; text-decoration: none; font-size: 13px;">Telegram Desk</a> &bull;
+          <a href="https://x.com/maxfunded" style="color: #ffffff; margin: 0 10px; font-weight: bold; text-decoration: none; font-size: 13px;">X / Twitter</a> &bull;
+          <a href="https://youtube.com/@maxfunded" style="color: #ff4d4d; margin: 0 10px; font-weight: bold; text-decoration: none; font-size: 13px;">YouTube</a>
+        </div>
         <p>&copy; 2026 MaxFunded Proprietary Trading Technologies Ltd. All rights reserved.</p>
         <p>This is an automated operational notification. Never share your master password with anyone.</p>
       </div>

@@ -12,4 +12,12 @@ export const BRAND = {
   parentCompany: "Riffmax Technologies",
   operatingEntity: "MaxFunded Global Ltd.",
   establishedYear: 2026,
+  socials: {
+    discord: "https://discord.gg/maxfunded",
+    telegram: "https://t.me/maxfunded",
+    twitter: "https://x.com/maxfunded",
+    instagram: "https://instagram.com/maxfunded",
+    youtube: "https://youtube.com/@maxfunded",
+    linkedin: "https://linkedin.com/company/maxfunded",
+  },
 };

@@ -1,6 +1,15 @@
 import React from "react";
 import Link from "next/link";
 import Logo from "@/components/Logo";
+import { BRAND } from "@/lib/branding";
+import {
+  DiscordIcon,
+  TelegramIcon,
+  XIcon,
+  InstagramIcon,
+  YoutubeIcon,
+  LinkedinIcon,
+} from "@/components/SocialIcons";
 
 export default function Footer() {
   return (
@@ -15,6 +24,69 @@ export default function Footer() {
             <p className="text-neutral-400 leading-relaxed text-xs">
               Next-generation proprietary trading evaluation firm. Trade simulated institutional capital, pass the objective evaluation, and keep up to 90% of performance rewards.
             </p>
+
+            {/* Official Social Media Channels */}
+            <div className="pt-2">
+              <p className="text-[11px] font-mono uppercase tracking-widest text-neutral-400 mb-2.5">
+                Official Channels
+              </p>
+              <div className="flex items-center gap-2">
+                <a
+                  href={BRAND.socials.discord}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Discord Community"
+                  className="w-8 h-8 rounded-lg bg-white/5 hover:bg-[#5865F2] hover:text-white border border-white/10 flex items-center justify-center text-neutral-400 transition-all hover:scale-105"
+                >
+                  <DiscordIcon className="w-4 h-4" />
+                </a>
+                <a
+                  href={BRAND.socials.telegram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Telegram Channel"
+                  className="w-8 h-8 rounded-lg bg-white/5 hover:bg-[#229ED9] hover:text-white border border-white/10 flex items-center justify-center text-neutral-400 transition-all hover:scale-105"
+                >
+                  <TelegramIcon className="w-4 h-4" />
+                </a>
+                <a
+                  href={BRAND.socials.twitter}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="X (Twitter)"
+                  className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white hover:text-black border border-white/10 flex items-center justify-center text-neutral-400 transition-all hover:scale-105"
+                >
+                  <XIcon className="w-3.5 h-3.5" />
+                </a>
+                <a
+                  href={BRAND.socials.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="w-8 h-8 rounded-lg bg-white/5 hover:bg-[#E4405F] hover:text-white border border-white/10 flex items-center justify-center text-neutral-400 transition-all hover:scale-105"
+                >
+                  <InstagramIcon className="w-4 h-4" />
+                </a>
+                <a
+                  href={BRAND.socials.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="YouTube Channel"
+                  className="w-8 h-8 rounded-lg bg-white/5 hover:bg-[#FF0000] hover:text-white border border-white/10 flex items-center justify-center text-neutral-400 transition-all hover:scale-105"
+                >
+                  <YoutubeIcon className="w-4 h-4" />
+                </a>
+                <a
+                  href={BRAND.socials.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn"
+                  className="w-8 h-8 rounded-lg bg-white/5 hover:bg-[#0A66C2] hover:text-white border border-white/10 flex items-center justify-center text-neutral-400 transition-all hover:scale-105"
+                >
+                  <LinkedinIcon className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
           </div>
 
           {/* Quick links */}

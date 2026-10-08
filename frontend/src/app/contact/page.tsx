@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import { BRAND } from "@/lib/branding";
-import { Mail, Clock, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { Mail, Clock, ShieldCheck, CheckCircle2, MessageCircle } from "lucide-react";
+import {
+  DiscordIcon,
+  TelegramIcon,
+  XIcon,
+  InstagramIcon,
+  YoutubeIcon,
+} from "@/components/SocialIcons";
 
 const topics = [
   "Account Provisioning & Credentials",
@@ -83,6 +90,55 @@ export default function ContactPage() {
             <p className="text-slate-400 text-xs mt-2">
               Identity verification, sanction checks, and corporate documentation.
             </p>
+          </div>
+
+          {/* Official Community Desks */}
+          <div className="bg-slate-900 border border-[#ccff00]/20 rounded-2xl p-6 relative overflow-hidden">
+            <div className="flex items-center gap-3 mb-2">
+              <MessageCircle className="w-5 h-5 text-[#ccff00]" />
+              <h3 className="font-bold text-white text-sm uppercase tracking-wider">Trader Communities & Socials</h3>
+            </div>
+            <p className="text-slate-400 text-xs mb-4">
+              Join active traders on Discord or follow our official social media channels:
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <a
+                href={BRAND.socials.discord}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 p-2.5 rounded-xl bg-[#5865F2]/20 hover:bg-[#5865F2] text-[#858df9] hover:text-white border border-[#5865F2]/30 text-xs font-bold transition"
+              >
+                <DiscordIcon className="w-4 h-4 shrink-0" />
+                <span className="truncate">Discord Server</span>
+              </a>
+              <a
+                href={BRAND.socials.telegram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 p-2.5 rounded-xl bg-[#229ED9]/20 hover:bg-[#229ED9] text-[#7bd2f7] hover:text-white border border-[#229ED9]/30 text-xs font-bold transition"
+              >
+                <TelegramIcon className="w-4 h-4 shrink-0" />
+                <span className="truncate">Telegram Desk</span>
+              </a>
+              <a
+                href={BRAND.socials.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 p-2.5 rounded-xl bg-white/5 hover:bg-white text-neutral-300 hover:text-black border border-white/10 text-xs font-bold transition"
+              >
+                <XIcon className="w-4 h-4 shrink-0" />
+                <span className="truncate">X (Twitter)</span>
+              </a>
+              <a
+                href={BRAND.socials.youtube}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 p-2.5 rounded-xl bg-[#FF0000]/20 hover:bg-[#FF0000] text-red-400 hover:text-white border border-red-500/30 text-xs font-bold transition"
+              >
+                <YoutubeIcon className="w-4 h-4 shrink-0" />
+                <span className="truncate">YouTube Desk</span>
+              </a>
+            </div>
           </div>
         </div>
 

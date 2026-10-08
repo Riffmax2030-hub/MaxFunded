@@ -109,6 +109,50 @@ export default function DiscordCommunityBento() {
         </div>
 
       </div>
+
+      {/* Official Company Social Desks */}
+      <div className="mt-8 max-w-5xl mx-auto p-4 sm:p-5 rounded-2xl bg-[#0b0c10] border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3 text-center sm:text-left">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#ccff00] animate-pulse" />
+          <p className="text-xs text-neutral-300 font-medium">
+            Follow official MaxFunded channels for daily payout receipts, rule updates, and flash challenge giveaways.
+          </p>
+        </div>
+        <div className="flex items-center gap-2.5 shrink-0">
+          <a
+            href="https://discord.gg/maxfunded"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 rounded-lg bg-[#5865F2]/20 hover:bg-[#5865F2] text-[#858df9] hover:text-white border border-[#5865F2]/30 text-xs font-bold transition flex items-center gap-1.5"
+          >
+            <span>Discord</span>
+          </a>
+          <a
+            href="https://t.me/maxfunded"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 rounded-lg bg-[#229ED9]/20 hover:bg-[#229ED9] text-[#7bd2f7] hover:text-white border border-[#229ED9]/30 text-xs font-bold transition flex items-center gap-1.5"
+          >
+            <span>Telegram</span>
+          </a>
+          <a
+            href="https://x.com/maxfunded"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white text-neutral-300 hover:text-black border border-white/10 text-xs font-bold transition flex items-center gap-1.5"
+          >
+            <span>X (Twitter)</span>
+          </a>
+          <a
+            href="https://youtube.com/@maxfunded"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 rounded-lg bg-[#FF0000]/20 hover:bg-[#FF0000] text-red-400 hover:text-white border border-red-500/30 text-xs font-bold transition flex items-center gap-1.5"
+          >
+            <span>YouTube</span>
+          </a>
+        </div>
+      </div>
     </section>
   );
 }
