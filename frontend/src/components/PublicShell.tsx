@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import LiveTicker from "@/components/LiveTicker";
 import ContactWidget from "@/components/ContactWidget";
+import CookieConsentBanner from "@/components/CookieConsentBanner";
 
 export default function PublicShell({
   children,
@@ -29,6 +30,7 @@ export default function PublicShell({
       <main className="flex-grow">{children}</main>
       <Footer />
       <ContactWidget />
+      <CookieConsentBanner />
     </>
   );
 }
