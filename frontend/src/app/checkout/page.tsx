@@ -33,9 +33,13 @@ import {
 import {
   VisaLogo,
   MastercardLogo,
+  WalmartLogo,
   DiscoverLogo,
-  AmexLogo,
   PaypalLogo,
+  BitcoinLogo,
+  EthereumLogo,
+  TetherLogo,
+  BankWireLogo,
 } from "@/components/PaymentLogos";
 
 // ─── Rule Explanations & Tooltips ───────────────────────────────────────────
@@ -100,8 +104,14 @@ function CryptoInstructions({
   return (
     <div className="bg-[#0e1117] border border-[#ccff00]/40 rounded-3xl p-6 sm:p-7 space-y-5 shadow-2xl">
       <div className="flex items-center gap-3">
-        <div className="p-3 rounded-2xl bg-[#ccff00]/10 border border-[#ccff00]/20 text-[#ccff00]">
-          <Bitcoin className="w-6 h-6" />
+        <div className="p-2.5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+          {payment.crypto_currency?.toUpperCase().includes("BTC") ? (
+            <BitcoinLogo className="w-7 h-7" />
+          ) : payment.crypto_currency?.toUpperCase().includes("ETH") ? (
+            <EthereumLogo className="w-7 h-7" />
+          ) : (
+            <TetherLogo className="w-7 h-7" />
+          )}
         </div>
         <div>
           <h3 className="font-extrabold text-white text-lg">Send Crypto Payment</h3>
@@ -160,8 +170,8 @@ function BankTransferInstructions({ payment }: { payment: PaymentInitiateRespons
   return (
     <div className="bg-[#0e1117] border border-white/15 rounded-3xl p-6 sm:p-7 space-y-5 shadow-2xl">
       <div className="flex items-center gap-3">
-        <div className="p-3 rounded-2xl bg-white/5 border border-white/10 text-white">
-          <Building2 className="w-6 h-6 text-[#ccff00]" />
+        <div className="p-2.5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+          <BankWireLogo className="w-7 h-7" />
         </div>
         <div>
           <h3 className="font-extrabold text-white text-lg">Bank Wire Transfer</h3>
@@ -491,19 +501,19 @@ function CheckoutInner() {
                       </div>
                       <p className="text-xs text-neutral-400">One secure card pathway for global debit &amp; credit cards.</p>
                       
-                      {/* Unified Card Logos */}
-                      <div className="flex items-center gap-2 pt-1">
-                        <div className="bg-white/10 border border-white/15 px-2 py-1 rounded-md flex items-center justify-center">
+                      {/* Unified Card Logos: Visa, Mastercard, Walmart, Discover only */}
+                      <div className="flex flex-wrap items-center gap-2 pt-1">
+                        <div className="bg-white/10 border border-white/15 px-2.5 py-1 rounded-md flex items-center justify-center">
                           <VisaLogo className="h-3.5 w-auto" />
                         </div>
-                        <div className="bg-white/10 border border-white/15 px-2 py-1 rounded-md flex items-center justify-center">
+                        <div className="bg-white/10 border border-white/15 px-2.5 py-1 rounded-md flex items-center justify-center">
                           <MastercardLogo className="h-3.5 w-auto" />
                         </div>
-                        <div className="bg-white/10 border border-white/15 px-2 py-1 rounded-md flex items-center justify-center">
-                          <DiscoverLogo className="h-3.5 w-auto" />
+                        <div className="bg-white/10 border border-white/15 px-2.5 py-1 rounded-md flex items-center justify-center">
+                          <WalmartLogo className="h-3.5 w-auto" />
                         </div>
-                        <div className="bg-white/10 border border-white/15 px-2 py-1 rounded-md flex items-center justify-center">
-                          <AmexLogo className="h-3.5 w-auto" />
+                        <div className="bg-white/10 border border-white/15 px-2.5 py-1 rounded-md flex items-center justify-center">
+                          <DiscoverLogo className="h-3.5 w-auto" />
                         </div>
                       </div>
                     </div>
@@ -536,7 +546,7 @@ function CheckoutInner() {
                       </div>
                       <p className="text-xs text-neutral-400">Checkout with your PayPal balance or linked bank account.</p>
                       <div className="pt-1">
-                        <div className="bg-white/10 border border-white/15 px-2.5 py-1 rounded-md inline-flex items-center">
+                        <div className="bg-white/10 border border-white/15 px-3 py-1 rounded-md inline-flex items-center">
                           <PaypalLogo className="h-4 w-auto" />
                         </div>
                       </div>
@@ -551,7 +561,7 @@ function CheckoutInner() {
                     </div>
                   </button>
 
-                  {/* PATHWAY 3: Crypto (USDT, BTC, ETH) */}
+                  {/* PATHWAY 3: Crypto (BTC, ETH, USDT) with Authentic Logos */}
                   <button
                     type="button"
                     onClick={() => setSelectedPathway("crypto")}
@@ -568,11 +578,20 @@ function CheckoutInner() {
                           Zero Fees
                         </span>
                       </div>
-                      <p className="text-xs text-neutral-400">Automated deposit via USDT (TRC20/ERC20), Bitcoin, or Ethereum.</p>
-                      <div className="flex items-center gap-2 text-[11px] font-mono font-bold text-neutral-300 pt-1">
-                        <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">USDT</span>
-                        <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">BTC</span>
-                        <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">ETH</span>
+                      <p className="text-xs text-neutral-400">Automated blockchain deposit via Bitcoin, Ethereum, or Tether USDT.</p>
+                      <div className="flex flex-wrap items-center gap-2 pt-1">
+                        <div className="bg-white/10 border border-white/15 px-2.5 py-1 rounded-md flex items-center gap-1.5">
+                          <BitcoinLogo className="h-4 w-4" />
+                          <span className="text-xs font-bold text-white font-mono">BTC</span>
+                        </div>
+                        <div className="bg-white/10 border border-white/15 px-2.5 py-1 rounded-md flex items-center gap-1.5">
+                          <EthereumLogo className="h-4 w-4" />
+                          <span className="text-xs font-bold text-white font-mono">ETH</span>
+                        </div>
+                        <div className="bg-white/10 border border-white/15 px-2.5 py-1 rounded-md flex items-center gap-1.5">
+                          <TetherLogo className="h-4 w-4" />
+                          <span className="text-xs font-bold text-white font-mono">USDT</span>
+                        </div>
                       </div>
                     </div>
 
@@ -585,7 +604,7 @@ function CheckoutInner() {
                     </div>
                   </button>
 
-                  {/* PATHWAY 4: Bank Transfer / Wire */}
+                  {/* PATHWAY 4: Bank Transfer / Wire with Institutional Logo */}
                   <button
                     type="button"
                     onClick={() => setSelectedPathway("bank_transfer")}
@@ -603,6 +622,12 @@ function CheckoutInner() {
                         </span>
                       </div>
                       <p className="text-xs text-neutral-400">Direct wire transfer to institutional custodian accounts.</p>
+                      <div className="pt-1">
+                        <div className="bg-white/10 border border-white/15 px-2.5 py-1 rounded-md inline-flex items-center gap-2">
+                          <BankWireLogo className="h-4 w-4" />
+                          <span className="text-xs font-bold text-neutral-200 font-mono">SWIFT / SEPA / ACH</span>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="shrink-0 flex items-center">
@@ -613,6 +638,7 @@ function CheckoutInner() {
                       </div>
                     </div>
                   </button>
+
 
                 </div>
 
