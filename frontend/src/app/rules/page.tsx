@@ -31,11 +31,11 @@ export default function RulesPage() {
     },
     {
       objective: "Minimum Trading Days",
-      phase1: "5 Days",
-      phase2: "5 Days",
+      phase1: "0 Days (No Minimum)",
+      phase2: "0 Days (No Minimum)",
       funded: "None",
-      notes: "Execute at least one trade on 5 distinct days.",
-      highlight: false,
+      notes: "Pass as fast as your trading allows. No artificial waiting periods.",
+      highlight: true,
     },
     {
       objective: "Maximum Daily Loss",

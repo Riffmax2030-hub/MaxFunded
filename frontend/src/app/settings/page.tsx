@@ -246,30 +246,31 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#08090b] text-white pt-24 pb-20 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen bg-[#07080a] text-white pt-24 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Ambient Glow */}
+      <div className="glow-orb absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-b from-[#ccff00]/[0.05] to-transparent blur-3xl pointer-events-none -z-10 rounded-full" />
+
+      <div className="max-w-5xl mx-auto relative z-10">
         {/* Header Banner */}
-        <div className="mb-8">
+        <div className="mb-8 border-b border-white/[0.08] pb-6">
           <div className="flex items-center gap-2 mb-2">
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#ccff00]/10 text-[#ccff00] border border-[#ccff00]/20">
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#ccff00]/10 text-[#ccff00] border border-[#ccff00]/25">
               TRADER PROFILE
             </span>
             <span className="text-xs text-neutral-500 font-mono">ROLE: {role}</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">Account Settings</h1>
+          <h1 className="text-3xl sm:text-4xl font-black text-white uppercase tracking-tight">Account Settings</h1>
           <p className="text-sm text-neutral-400 mt-1">
-            Manage your personal profile, security credentials, payout payout rails, and notification rules.
+            Manage your personal profile, security credentials, payout rails, and notification rules.
           </p>
         </div>
 
-        {/* Tab Navigation Pill Bar */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-white/10 mb-8 scrollbar-none">
+        {/* Tab Navigation Pill Bar with Liquid Calculator Tabs */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 scrollbar-none">
           <button
             onClick={() => setActiveTab('profile')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition whitespace-nowrap ${
-              activeTab === 'profile'
-                ? 'bg-[#ccff00] text-black shadow-lg shadow-[#ccff00]/10'
-                : 'text-neutral-400 hover:text-white hover:bg-white/5'
+            className={`calculator-tab flex items-center gap-2 text-xs sm:text-sm font-bold whitespace-nowrap ${
+              activeTab === 'profile' ? 'active' : ''
             }`}
           >
             <User className="w-4 h-4" />
@@ -278,22 +279,18 @@ export default function SettingsPage() {
 
           <button
             onClick={() => setActiveTab('security')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition whitespace-nowrap ${
-              activeTab === 'security'
-                ? 'bg-[#ccff00] text-black shadow-lg shadow-[#ccff00]/10'
-                : 'text-neutral-400 hover:text-white hover:bg-white/5'
+            className={`calculator-tab flex items-center gap-2 text-xs sm:text-sm font-bold whitespace-nowrap ${
+              activeTab === 'security' ? 'active' : ''
             }`}
           >
             <Shield className="w-4 h-4" />
-            Security & 2FA
+            Security &amp; 2FA
           </button>
 
           <button
             onClick={() => setActiveTab('payout')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition whitespace-nowrap ${
-              activeTab === 'payout'
-                ? 'bg-[#ccff00] text-black shadow-lg shadow-[#ccff00]/10'
-                : 'text-neutral-400 hover:text-white hover:bg-white/5'
+            className={`calculator-tab flex items-center gap-2 text-xs sm:text-sm font-bold whitespace-nowrap ${
+              activeTab === 'payout' ? 'active' : ''
             }`}
           >
             <Wallet className="w-4 h-4" />
@@ -302,10 +299,8 @@ export default function SettingsPage() {
 
           <button
             onClick={() => setActiveTab('notifications')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition whitespace-nowrap ${
-              activeTab === 'notifications'
-                ? 'bg-[#ccff00] text-black shadow-lg shadow-[#ccff00]/10'
-                : 'text-neutral-400 hover:text-white hover:bg-white/5'
+            className={`calculator-tab flex items-center gap-2 text-xs sm:text-sm font-bold whitespace-nowrap ${
+              activeTab === 'notifications' ? 'active' : ''
             }`}
           >
             <Bell className="w-4 h-4" />
@@ -317,7 +312,7 @@ export default function SettingsPage() {
         {/* TAB 1: PROFILE INFORMATION */}
         {/* ========================================================================= */}
         {activeTab === 'profile' && (
-          <div className="bg-[#0d0e10] border border-white/10 rounded-2xl p-6 sm:p-8">
+          <div className="bento-card p-6 sm:p-8">
             <h2 className="text-xl font-bold text-white mb-2">Trader Dossier</h2>
             <p className="text-xs text-neutral-400 mb-6">
               Ensure your identity matches your official KYC documentation for frictionless payout disbursements.

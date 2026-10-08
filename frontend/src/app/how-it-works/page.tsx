@@ -21,7 +21,7 @@ const steps = [
     number: "01",
     title: "Choose Your Challenge",
     description:
-      "Select a funded account size from $10,000 to $200,000. Transparent rules — profit targets, drawdown limits, and minimum trading days — all set before you begin.",
+      "Select a funded account size from $10,000 to $200,000. Transparent rules — profit targets, drawdown limits, and 0 minimum trading days — all set before you begin.",
     icon: Target,
     color: "text-[#ccff00]",
     bg: "bg-[#ccff00]/10",
@@ -51,7 +51,7 @@ const steps = [
     number: "04",
     title: "Trade & Hit Your Target",
     description:
-      "Reach the profit target while respecting the daily loss limit and maximum drawdown. Meet the minimum trading days requirement. Performance is monitored in real time.",
+      "Reach the profit target while respecting the daily loss limit and maximum drawdown. Zero minimum trading days — pass whenever you are ready.",
     icon: TrendingUp,
     color: "text-amber-400",
     bg: "bg-amber-400/10",
@@ -94,7 +94,7 @@ const faqs = [
   },
   {
     q: "How long does the evaluation take?",
-    a: "There is no maximum time limit. You must meet the minimum trading days and achieve the profit target. Most traders complete evaluations within 30–90 days.",
+    a: "There is no maximum time limit and zero minimum trading days. As soon as you hit your profit target without breaching drawdown rules, your evaluation passes.",
   },
   {
     q: "What markets can I trade?",

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowLeft, Shield, Cpu, Activity, Zap, Info } from "lucide-react";
 
 const BRAND = "MaxFunded";
 const COMPANY = "MaxFunded Global Ltd.";
@@ -48,101 +49,147 @@ const instruments = [
 
 const conditions = [
   { label: "Trading Platform", value: "MetaTrader 5 (MT5)" },
-  { label: "Execution Model", value: "Market Execution (No Dealing Desk)" },
+  { label: "Execution Model", value: "Market Execution (Direct Tier-1 Liquidity)" },
   { label: "Account Currency", value: "USD" },
   { label: "Minimum Lot Size", value: "0.01 lots" },
   { label: "Maximum Open Positions", value: "Unlimited (subject to margin)" },
   { label: "Hedging", value: "Allowed" },
-  { label: "Expert Advisors (EAs)", value: "Allowed (non-prohibited strategies only)" },
-  { label: "News Trading", value: "Restricted within 2 min of high-impact events" },
-  { label: "Slippage", value: "Market-standard slippage applies" },
+  { label: "Expert Advisors (EAs)", value: "Allowed (Standard non-latency EAs)" },
+  { label: "News Trading", value: "Allowed on all standard challenges" },
+  { label: "Slippage", value: "Real market simulated slippage" },
   { label: "Server Time", value: "UTC+2 / UTC+3 (DST-adjusted)" },
   { label: "Market Hours", value: "Forex: 24/5 | Crypto: 24/7 | Indices: Exchange hours" },
-  { label: "Rollover / Swap", value: "Standard broker swap rates on overnight positions" },
+  { label: "Minimum Trading Days", value: "0 Days (No Minimum Days Required)" },
 ];
-
-const categoryColors: Record<string, string> = {
-  "Forex Majors": "bg-blue-50 text-blue-700 border-blue-200",
-  "Forex Minors": "bg-indigo-50 text-indigo-700 border-indigo-200",
-  "Indices": "bg-purple-50 text-purple-700 border-purple-200",
-  "Commodities": "bg-amber-50 text-amber-700 border-amber-200",
-  "Cryptocurrencies": "bg-orange-50 text-orange-700 border-orange-200",
-};
 
 export default function TradingConditionsPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <div className="border-b border-gray-200 bg-white sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <Link href="/" className="text-sm font-bold text-gray-900 hover:text-black">← {BRAND}</Link>
-          <span className="text-xs text-gray-400">Platform Info</span>
-        </div>
-      </div>
-
-      <div className="bg-gray-50 border-b border-gray-200">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="inline-block bg-black text-white text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded">Platform</span>
+    <div className="min-h-screen bg-[#070809] text-white">
+      {/* Top Navbar Header */}
+      <header className="border-b border-white/10 bg-[#070809]/80 backdrop-blur-md sticky top-0 z-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-sm font-bold text-neutral-300 hover:text-[#ccff00] transition"
+          >
+            <ArrowLeft className="w-4 h-4 text-[#ccff00]" /> Back to MaxFunded
+          </Link>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#ccff00] animate-pulse" />
+            <span className="text-xs font-mono text-neutral-400 uppercase tracking-widest">
+              Live MT5 Specifications
+            </span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2">Trading Conditions</h1>
-          <p className="text-gray-500 text-sm max-w-2xl">
-            Full instrument specifications, leverage limits, execution model, and platform details for all {BRAND} evaluation accounts.
+        </div>
+      </header>
+
+      {/* Hero Banner */}
+      <section className="relative overflow-hidden py-16 px-4 sm:px-6 border-b border-white/5">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-[#ccff00]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="max-w-6xl mx-auto relative z-10 text-center sm:text-left">
+          <div className="inline-flex items-center gap-2 bg-[#ccff00]/10 border border-[#ccff00]/20 text-[#ccff00] text-xs font-mono px-3.5 py-1.5 rounded-full mb-4">
+            <Cpu className="w-3.5 h-3.5" /> INSTITUTIONAL LIQUIDITY FEED
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-black tracking-tight mb-4">
+            Trading <span className="text-[#ccff00]">Conditions</span>
+          </h1>
+          <p className="text-neutral-400 text-base max-w-3xl leading-relaxed">
+            Institutional spreads from 0.0 pips, up to 1:100 leverage, ultra-fast execution on MetaTrader 5, and zero minimum trading days. Everything you need to scale your simulated edge.
           </p>
         </div>
-      </div>
+      </section>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-12">
-
-        {/* General conditions table */}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-12 space-y-12">
+        {/* General conditions bento card */}
         <section>
-          <h2 className="text-lg font-bold text-gray-900 mb-5">General Account Conditions</h2>
-          <div className="border border-gray-200 rounded-xl overflow-hidden">
-            <div className="divide-y divide-gray-100">
-              {conditions.map((row, i) => (
-                <div key={row.label} className={`flex flex-col sm:flex-row sm:items-center px-6 py-3.5 gap-1 ${i % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
-                  <div className="sm:w-1/2 text-sm text-gray-500 font-medium">{row.label}</div>
-                  <div className="sm:w-1/2 text-sm text-gray-900 font-semibold">{row.value}</div>
-                </div>
-              ))}
+          <div className="flex items-center gap-2 mb-4">
+            <Shield className="w-5 h-5 text-[#ccff00]" />
+            <h2 className="text-xl font-bold tracking-tight text-white">General Account Specifications</h2>
+          </div>
+          <div className="bento-card bg-[#0b0c0e] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-white/5">
+              <div className="divide-y divide-white/5">
+                {conditions.slice(0, 6).map((row) => (
+                  <div key={row.label} className="flex items-center justify-between px-6 py-4 hover:bg-white/[0.02] transition">
+                    <span className="text-sm text-neutral-400 font-medium">{row.label}</span>
+                    <span className="text-sm font-semibold text-white font-mono text-right">{row.value}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="divide-y divide-white/5">
+                {conditions.slice(6).map((row) => (
+                  <div key={row.label} className="flex items-center justify-between px-6 py-4 hover:bg-white/[0.02] transition">
+                    <span className="text-sm text-neutral-400 font-medium">{row.label}</span>
+                    <span className={`text-sm font-semibold font-mono text-right ${row.label === "Minimum Trading Days" ? "text-[#ccff00] font-bold" : "text-white"}`}>
+                      {row.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Instruments */}
+        {/* Instruments Breakdown */}
         <section>
-          <h2 className="text-lg font-bold text-gray-900 mb-2">Available Instruments</h2>
-          <p className="text-gray-500 text-sm mb-6">
-            Instrument availability may vary by jurisdiction. Spreads are variable and widen during low-liquidity periods.
+          <div className="flex items-center gap-2 mb-2">
+            <Activity className="w-5 h-5 text-[#ccff00]" />
+            <h2 className="text-xl font-bold tracking-tight text-white">Available Instruments & Margins</h2>
+          </div>
+          <p className="text-neutral-400 text-sm mb-6">
+            All evaluation accounts offer access to major global markets with institutional simulated fills.
           </p>
-          <div className="space-y-5">
+
+          <div className="grid grid-cols-1 gap-5">
             {instruments.map((inst) => (
-              <div key={inst.category} className="border border-gray-200 rounded-xl overflow-hidden">
-                <div className="px-6 py-3.5 border-b border-gray-100 bg-gray-50 flex items-center gap-3">
-                  <h3 className="font-bold text-gray-900 text-sm">{inst.category}</h3>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${categoryColors[inst.category] || "bg-gray-100 text-gray-700 border-gray-200"}`}>
-                    {inst.maxLeverage} max
-                  </span>
+              <div
+                key={inst.category}
+                className="bento-card bg-[#0b0c0e] border border-white/10 rounded-2xl p-6 hover:border-[#ccff00]/30 transition group"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-white/5 gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#ccff00]" />
+                    <h3 className="font-bold text-white text-lg tracking-tight">{inst.category}</h3>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-[#ccff00]/10 text-[#ccff00] border border-[#ccff00]/20 text-xs font-mono font-bold px-3 py-1 rounded-full">
+                      Leverage: {inst.maxLeverage}
+                    </span>
+                  </div>
                 </div>
-                <div className="px-6 py-4">
-                  <div className="flex flex-wrap gap-2 mb-4">
+
+                <div className="py-4">
+                  <span className="text-xs text-neutral-500 uppercase tracking-widest font-mono block mb-2.5">
+                    Tradable Assets
+                  </span>
+                  <div className="flex flex-wrap gap-2">
                     {inst.pairs.map((p) => (
-                      <span key={p} className="bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full border border-gray-200 font-mono">
+                      <span
+                        key={p}
+                        className="bg-white/5 hover:bg-white/10 text-neutral-200 text-xs px-3 py-1 rounded-lg border border-white/10 font-mono transition"
+                      >
                         {p}
                       </span>
                     ))}
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm pt-3 border-t border-gray-100">
-                    {[
-                      { label: "Max Leverage", value: inst.maxLeverage },
-                      { label: "Typical Spread", value: inst.typicalSpread },
-                      { label: "Commission", value: inst.commission },
-                      { label: "Swaps", value: inst.swaps },
-                    ].map(({ label, value }) => (
-                      <div key={label}>
-                        <div className="text-gray-400 text-xs mb-1">{label}</div>
-                        <div className="text-gray-900 font-semibold text-sm">{value}</div>
-                      </div>
-                    ))}
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-white/5 text-sm">
+                  <div>
+                    <div className="text-neutral-500 text-xs font-mono mb-1">Max Leverage</div>
+                    <div className="text-white font-semibold font-mono text-sm">{inst.maxLeverage}</div>
+                  </div>
+                  <div>
+                    <div className="text-neutral-500 text-xs font-mono mb-1">Typical Spread</div>
+                    <div className="text-[#ccff00] font-semibold font-mono text-sm">{inst.typicalSpread}</div>
+                  </div>
+                  <div>
+                    <div className="text-neutral-500 text-xs font-mono mb-1">Commission</div>
+                    <div className="text-white font-semibold font-mono text-sm">{inst.commission}</div>
+                  </div>
+                  <div>
+                    <div className="text-neutral-500 text-xs font-mono mb-1">Overnight Swaps</div>
+                    <div className="text-white font-semibold font-mono text-sm">{inst.swaps}</div>
                   </div>
                 </div>
               </div>
@@ -150,20 +197,32 @@ export default function TradingConditionsPage() {
           </div>
         </section>
 
-        {/* Disclaimer */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-          <p className="text-blue-700 text-xs font-bold uppercase tracking-wider mb-2">Disclaimer</p>
-          <p className="text-blue-900 text-sm leading-relaxed">
-            All trading conditions described apply exclusively to simulated evaluation accounts. Conditions are subject
-            to change without notice. Spreads, leverage, and commissions reflect the simulated environment and may differ
-            from live market conditions. {BRAND} is not a broker and does not hold client funds.
-          </p>
-        </div>
+        {/* Disclaimer / Notice */}
+        <section className="bento-card bg-neutral-900/40 border border-white/10 rounded-2xl p-6 sm:p-8 relative overflow-hidden">
+          <div className="flex items-start gap-3">
+            <Info className="w-5 h-5 text-[#ccff00] flex-shrink-0 mt-0.5" />
+            <div>
+              <h4 className="text-sm font-bold uppercase tracking-wider text-neutral-200 mb-2">
+                Simulated Execution & Risk Notice
+              </h4>
+              <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">
+                All trading activities described apply exclusively to simulated evaluation and performance-based accounts. 
+                {BRAND} is a proprietary trading technology provider and not an investment fund, bank, or live retail broker. 
+                Simulated liquidity models replicate live market volatility, spreads, and market depth without exposing clients to real capital market loss during the evaluation stage.
+              </p>
+            </div>
+          </div>
+        </section>
 
-        <div className="pt-6 border-t border-gray-200 text-xs text-gray-400">
-          <p>&copy; 2025 {COMPANY}. All rights reserved.</p>
+        <div className="pt-8 border-t border-white/10 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500 font-mono">
+          <p>&copy; {new Date().getFullYear()} {COMPANY}. All rights reserved.</p>
+          <div className="flex gap-6">
+            <Link href="/rules" className="hover:text-[#ccff00] transition">Trading Rules</Link>
+            <Link href="/terms" className="hover:text-[#ccff00] transition">Terms of Service</Link>
+            <Link href="/privacy" className="hover:text-[#ccff00] transition">Privacy Policy</Link>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

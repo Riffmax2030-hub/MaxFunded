@@ -31,7 +31,7 @@ const faqCategories = [
     items: [
       {
         q: "How many phases does the evaluation have?",
-        a: `Currently, the standard ${BRAND.name} evaluation is a streamlined single-phase process. You must reach the 10% profit target while adhering to the 5% daily loss and 10% maximum drawdown limits with at least 5 trading days.`,
+        a: `Currently, the standard ${BRAND.name} evaluation is a streamlined single-phase process. You must reach the 10% profit target while adhering to the 5% daily loss and 10% maximum drawdown limits with 0 minimum trading days required.`,
       },
       {
         q: "Can I trade any strategy?",

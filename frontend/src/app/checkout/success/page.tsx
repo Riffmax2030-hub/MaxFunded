@@ -156,45 +156,56 @@ function SuccessContent() {
 
   return (
     /* Payment Completed Screen */
-    <div className="bg-slate-900 border border-emerald-500/30 rounded-2xl p-8 text-center space-y-6 w-full shadow-2xl">
-      <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400">
-        <CheckCircle2 className="w-10 h-10" />
+    <div className="bento-card border border-[#ccff00]/40 p-8 sm:p-10 text-center space-y-6 w-full shadow-[0_0_60px_rgba(204,255,0,0.12)] relative overflow-hidden">
+      {/* Top ambient glow */}
+      <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-[#ccff00] to-transparent" />
+
+      <div className="w-16 h-16 rounded-2xl bg-[#ccff00]/10 border border-[#ccff00]/30 flex items-center justify-center mx-auto text-[#ccff00] shadow-[0_0_25px_rgba(204,255,0,0.25)]">
+        <CheckCircle2 className="w-9 h-9" />
       </div>
 
       <div>
-        <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-400 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-          Payment Confirmed
+        <span className="text-[11px] font-black uppercase tracking-widest text-[#ccff00] px-3.5 py-1 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/25">
+          Payment Confirmed · Instant Provisioning
         </span>
-        <h1 className="text-3xl font-extrabold text-white mt-3">
+        <h1 className="text-3xl sm:text-4xl font-black text-white mt-3 uppercase tracking-tight">
           Evaluation Activated!
         </h1>
-        <p className="text-neutral-400 text-sm mt-2 max-w-md mx-auto leading-relaxed">
-          Your payment of <strong className="text-white">${payment?.amount ? payment.amount.toFixed(2) : "0.00"} {payment?.currency || "USD"}</strong> was received. Your simulated MetaTrader 5 account is ready.
+        <p className="text-neutral-300 text-sm mt-2 max-w-md mx-auto leading-relaxed">
+          Your payment of <strong className="text-[#ccff00] font-mono">${payment?.amount ? payment.amount.toFixed(2) : "0.00"} {payment?.currency || "USD"}</strong> has been cleared. Your institutional MetaTrader 5 account is ready for trading.
         </p>
       </div>
 
-      <div className="bg-slate-950 border border-slate-800 rounded-xl p-5 text-left space-y-3">
-        <div className="flex items-center justify-between text-xs border-b border-slate-800/80 pb-2.5">
-          <span className="text-neutral-400">Environment</span>
-          <span className="font-semibold text-emerald-400">MaxFunded Simulated MT5</span>
+      <div className="bg-[#101217] border border-white/[0.08] rounded-2xl p-5 text-left space-y-3 font-mono text-xs">
+        <div className="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+          <span className="text-neutral-400 font-sans">Trading Platform</span>
+          <span className="font-bold text-white">MetaTrader 5 (MT5 Bridge)</span>
         </div>
-        <div className="flex items-center justify-between text-xs border-b border-slate-800/80 pb-2.5">
-          <span className="text-neutral-400">Payment Gateway</span>
-          <span className="font-bold text-white uppercase">{payment?.provider || "Instant Gateway"}</span>
+        <div className="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+          <span className="text-neutral-400 font-sans">Disbursement Rail</span>
+          <span className="font-bold text-white uppercase">{payment?.provider || "Instant Rails"}</span>
         </div>
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-neutral-400">Status</span>
-          <span className="font-bold text-emerald-400 uppercase">ACTIVE</span>
+        <div className="flex items-center justify-between">
+          <span className="text-neutral-400 font-sans">Account Status</span>
+          <span className="font-black text-[#ccff00] uppercase">ACTIVE &amp; READY</span>
         </div>
       </div>
 
-      <div className="pt-2">
+      <div className="bg-[#ccff00]/[0.04] border border-[#ccff00]/20 rounded-2xl p-4 text-xs text-neutral-300 text-left flex items-start gap-3">
+        <ShieldCheck className="w-5 h-5 text-[#ccff00] shrink-0 mt-0.5" />
+        <div className="leading-relaxed">
+          <span className="font-bold text-white block mb-0.5">MT5 Credentials Dispatched:</span>
+          Your server, login ID, and master trading password have been emailed to your registered email and are available live on your dashboard.
+        </div>
+      </div>
+
+      <div className="pt-2 flex flex-col sm:flex-row gap-3">
         <Link
           href="/dashboard"
-          className="w-full py-4 rounded-xl bg-[#ccff00] hover:bg-[#b3e600] font-black text-base text-black flex items-center justify-center gap-2 transition shadow-lg shadow-[#ccff00]/10"
+          className="btn-neon flex-1 py-4 px-6 rounded-xl bg-[#ccff00] hover:bg-[#b3e600] font-black text-sm uppercase tracking-tight text-black flex items-center justify-center gap-2 transition shadow-neon"
         >
-          <LayoutDashboard className="w-5 h-5" />
-          <span>Go to Trader Analytics Dashboard</span>
+          <LayoutDashboard className="w-4 h-4 stroke-[2.5]" />
+          <span>Open Trader Dashboard →</span>
         </Link>
       </div>
     </div>
