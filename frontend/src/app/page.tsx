@@ -173,16 +173,28 @@ export default function HomePage() {
       {/* 1. HERO SECTION */}
       {/* ========================================================================= */}
       <section className="relative pt-12 sm:pt-16 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center overflow-hidden">
+        {/* Terminal Dot Matrix Grid Overlay */}
+        <div 
+          className="absolute inset-0 pointer-events-none -z-10 opacity-60"
+          style={{
+            backgroundImage: "radial-gradient(rgba(204, 255, 0, 0.12) 1px, transparent 0), radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 0)",
+            backgroundSize: "36px 36px",
+            backgroundPosition: "0 0, 18px 18px",
+            maskImage: "radial-gradient(ellipse at center, black 40%, transparent 80%)",
+            WebkitMaskImage: "radial-gradient(ellipse at center, black 40%, transparent 80%)"
+          }}
+        />
+
         {/* Animated ambient glow orbs */}
         <div className="glow-orb absolute top-[-80px] left-[15%] w-[550px] h-[550px] bg-gradient-to-br from-[#ccff00]/[0.09] to-transparent blur-[120px] pointer-events-none -z-10 rounded-full" />
         <div className="glow-orb-delay absolute top-[-60px] right-[15%] w-[500px] h-[500px] bg-gradient-to-bl from-[#ccff00]/[0.07] to-transparent blur-[100px] pointer-events-none -z-10 rounded-full" />
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[200px] bg-gradient-to-t from-[#ccff00]/[0.04] to-transparent blur-3xl pointer-events-none -z-10" />
 
-        {/* Live Social Proof Badge */}
-        <div className="inline-flex flex-wrap items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-[#111418] border border-white/10 text-xs text-neutral-300 mb-8 select-none shadow-lg">
-          <div className="flex items-center gap-1.5 pr-2 border-r border-white/10">
-            <span className="w-2 h-2 rounded-full bg-[#ccff00] animate-pulse" />
-            <span className="font-bold text-white">$1,489,240+ Paid Out</span>
+        {/* Live Social Proof Badge & Dynamic Payout Pill */}
+        <div className="inline-flex flex-wrap items-center justify-center gap-2.5 px-4 py-1.5 rounded-full bg-[#111418] border border-white/10 text-xs text-neutral-300 mb-8 select-none shadow-lg">
+          <div className="flex items-center gap-1.5 pr-2.5 border-r border-white/10">
+            <span className="w-2 h-2 rounded-full bg-[#ccff00] animate-ping" />
+            <span className="font-mono font-bold text-white">$1,489,240+ Disbursed</span>
           </div>
           <div className="flex items-center gap-1.5 pl-1">
             <span className="font-bold text-white">4.8 / 5</span>
@@ -193,7 +205,7 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-            <span className="font-bold text-neutral-400 text-[11px]">Trustpilot</span>
+            <span className="font-bold text-neutral-400 text-[11px]">Trustpilot Rating</span>
           </div>
         </div>
 
@@ -205,22 +217,22 @@ export default function HomePage() {
 
         {/* Action Verbs & Value Subtitle */}
         <p className="mt-6 text-base sm:text-xl text-neutral-300 max-w-3xl mx-auto font-medium leading-relaxed">
-          Zero personal capital at risk. Trade institutional evaluation capital with raw MT5 spreads,
-          transparent static drawdown rules, and on-demand crypto or bank payouts.
+          Zero personal risk. Trade institutional evaluation capital with raw MT5 spreads,
+          transparent static drawdown rules, and on-demand crypto or direct bank payouts.
         </p>
 
         {/* Key Guarantee Badges */}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs font-bold text-neutral-300">
-          <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 flex items-center gap-1.5">
+          <span className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 flex items-center gap-1.5 hover:border-[#ccff00]/40 transition">
             <Zap className="w-3.5 h-3.5 text-[#ccff00]" /> Zero Time Limits
           </span>
-          <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 flex items-center gap-1.5">
+          <span className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 flex items-center gap-1.5 hover:border-[#ccff00]/40 transition">
             <ShieldCheck className="w-3.5 h-3.5 text-[#ccff00]" /> 100% Refundable Fee
           </span>
-          <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 flex items-center gap-1.5">
+          <span className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 flex items-center gap-1.5 hover:border-[#ccff00]/40 transition">
             <Coins className="w-3.5 h-3.5 text-[#ccff00]" /> Up to 90% Profit Split
           </span>
-          <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 flex items-center gap-1.5">
+          <span className="px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 flex items-center gap-1.5 hover:border-[#ccff00]/40 transition">
             <TrendingUp className="w-3.5 h-3.5 text-[#ccff00]" /> Scale to $1,000,000
           </span>
         </div>
@@ -244,35 +256,42 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {/* 4 Feature Value Pillars */}
-        <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto text-center">
-          <div className="flex flex-col items-center">
-            <div className="w-12 h-12 mb-3 flex items-center justify-center text-[#ccff00]">
-              <GraduationCap className="w-9 h-9 stroke-[2]" />
+        {/* Trust Badges Strip */}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-neutral-500 text-xs font-mono">
+          <span className="flex items-center gap-1.5"><ShieldCheck size={14} className="text-[#ccff00]" /> MT5 Institutional Bridge</span>
+          <span className="flex items-center gap-1.5"><Zap size={14} className="text-[#ccff00]" /> &lt;20ms Execution Speed</span>
+          <span className="flex items-center gap-1.5"><Coins size={14} className="text-[#ccff00]" /> Direct USDT / Wire Payouts</span>
+        </div>
+
+        {/* 4 Feature Value Pillars formatted as Metric Cards */}
+        <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto text-center">
+          <div className="metric-card p-5 flex flex-col items-center">
+            <div className="w-12 h-12 mb-2 flex items-center justify-center text-[#ccff00] rounded-xl bg-[#ccff00]/10 border border-[#ccff00]/20">
+              <GraduationCap className="w-7 h-7 stroke-[2]" />
             </div>
             <div className="font-black text-base text-white">Institutional MT5</div>
             <div className="text-xs text-neutral-400 mt-1">Raw Spreads from 0.0 Pips</div>
           </div>
 
-          <div className="flex flex-col items-center">
-            <div className="w-12 h-12 mb-3 flex items-center justify-center text-[#ccff00]">
-              <Bot className="w-9 h-9 stroke-[2]" />
+          <div className="metric-card p-5 flex flex-col items-center">
+            <div className="w-12 h-12 mb-2 flex items-center justify-center text-[#ccff00] rounded-xl bg-[#ccff00]/10 border border-[#ccff00]/20">
+              <Bot className="w-7 h-7 stroke-[2]" />
             </div>
             <div className="font-black text-base text-white">AI Risk Guard</div>
             <div className="text-xs text-neutral-400 mt-1">Pre-Breach Drawdown Radar</div>
           </div>
 
-          <div className="flex flex-col items-center">
-            <div className="w-12 h-12 mb-3 flex items-center justify-center text-[#ccff00]">
-              <DollarSign className="w-9 h-9 stroke-[2]" />
+          <div className="metric-card p-5 flex flex-col items-center">
+            <div className="w-12 h-12 mb-2 flex items-center justify-center text-[#ccff00] rounded-xl bg-[#ccff00]/10 border border-[#ccff00]/20">
+              <DollarSign className="w-7 h-7 stroke-[2]" />
             </div>
             <div className="font-black text-base text-white">Up to $200,000</div>
             <div className="text-xs text-neutral-400 mt-1">Scale up to $1,000,000 VIP</div>
           </div>
 
-          <div className="flex flex-col items-center">
-            <div className="w-12 h-12 mb-3 flex items-center justify-center text-[#ccff00]">
-              <Coins className="w-9 h-9 stroke-[2]" />
+          <div className="metric-card p-5 flex flex-col items-center">
+            <div className="w-12 h-12 mb-2 flex items-center justify-center text-[#ccff00] rounded-xl bg-[#ccff00]/10 border border-[#ccff00]/20">
+              <Coins className="w-7 h-7 stroke-[2]" />
             </div>
             <div className="font-black text-base text-white">Keep 80% to 90%</div>
             <div className="text-xs text-neutral-400 mt-1">Bi-Weekly USDT or Wire</div>

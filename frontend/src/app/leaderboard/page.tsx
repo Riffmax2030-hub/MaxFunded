@@ -49,62 +49,74 @@ function PodiumCard({
   size: "large" | "small";
 }) {
   const isLarge = size === "large";
-  const rankColors: Record<number, string> = {
-    1: "border-[#ccff00]/60 shadow-[0_0_40px_rgba(204,255,0,0.15)]",
-    2: "border-white/20",
-    3: "border-amber-600/30",
-  };
-  const crownColors: Record<number, string> = {
-    1: "bg-[#ccff00] text-black",
-    2: "bg-slate-600 text-white",
-    3: "bg-amber-700 text-white",
-  };
+  const isFirst = entry.rank === 1;
+  const isSecond = entry.rank === 2;
+  const isThird = entry.rank === 3;
+
+  const cardStyle = isFirst
+    ? "border-[#ccff00]/60 bg-[#0d1014] shadow-[0_0_50px_rgba(204,255,0,0.2)] ring-1 ring-[#ccff00]/30"
+    : isSecond
+    ? "border-slate-500/40 bg-[#0d0e12] shadow-[0_0_30px_rgba(148,163,184,0.1)]"
+    : "border-amber-600/40 bg-[#0f0d10] shadow-[0_0_30px_rgba(217,119,6,0.1)]";
+
+  const crownBadge = isFirst
+    ? "bg-[#ccff00] text-black shadow-[0_0_20px_rgba(204,255,0,0.6)]"
+    : isSecond
+    ? "bg-slate-300 text-slate-900 shadow-[0_0_15px_rgba(203,213,225,0.4)]"
+    : "bg-amber-600 text-white shadow-[0_0_15px_rgba(217,119,6,0.4)]";
 
   return (
     <div
-      className={`flex flex-col items-center gap-3 p-5 rounded-2xl border bg-[#0d0e10] transition ${rankColors[entry.rank] || "border-white/10"} ${isLarge ? "py-8 scale-[1.03] z-10" : ""}`}
+      className={`metric-card flex flex-col items-center gap-3 p-6 rounded-3xl transition-all duration-300 ${cardStyle} ${
+        isLarge ? "py-10 scale-[1.05] z-10 -translate-y-2" : "opacity-95"
+      }`}
     >
-      {/* Rank circle */}
+      {/* Top neon glow bar for #1 */}
+      {isFirst && (
+        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-[#ccff00] to-transparent" />
+      )}
+
+      {/* Rank circle badge */}
       <div
-        className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-base ${crownColors[entry.rank] || "bg-slate-700 text-white"}`}
+        className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-xl transition-transform hover:scale-110 ${crownBadge}`}
       >
-        {entry.rank === 1 ? "🥇" : entry.rank === 2 ? "🥈" : "🥉"}
+        {isFirst ? "🥇" : isSecond ? "🥈" : "🥉"}
       </div>
 
       {/* Trader info */}
       <div className="text-center">
-        <div className="text-lg">
+        <div className="text-2xl filter drop-shadow">
           {countryFlags[entry.country] || "🌍"}
         </div>
-        <div className={`font-black text-white ${isLarge ? "text-lg" : "text-base"}`}>
+        <div className={`font-black text-white tracking-tight mt-1 ${isLarge ? "text-xl" : "text-base"}`}>
           {entry.trader_name}
         </div>
-        <div className="text-xs text-neutral-500">{entry.country_name}</div>
+        <div className="text-[11px] text-neutral-400 font-medium tracking-wide">{entry.country_name}</div>
       </div>
 
-      {/* Profit */}
-      <div className="text-center">
-        <div className={`font-black font-mono ${isLarge ? "text-2xl text-[#ccff00]" : "text-xl text-white"}`}>
+      {/* Profit metrics */}
+      <div className="text-center my-1">
+        <div className={`font-black font-mono tracking-tight ${isLarge ? "text-3xl text-[#ccff00] text-glow" : "text-xl text-white"}`}>
           +${entry.profit_usd.toLocaleString("en-US", { minimumFractionDigits: 2 })}
         </div>
-        <div className="text-xs text-neutral-500">{entry.return_pct.toFixed(2)}% return</div>
+        <div className="text-xs text-emerald-400 font-bold mt-0.5 font-mono">+{entry.return_pct.toFixed(2)}% ROI</div>
       </div>
 
       {/* Badge */}
-      <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${BADGE_STYLES[entry.badge]}`}>
+      <span className={`text-[10px] font-black uppercase px-3 py-1 rounded-full ${BADGE_STYLES[entry.badge]}`}>
         {BADGE_ICONS[entry.badge]} {entry.badge}
       </span>
 
       {/* Account size */}
-      <div className="text-xs text-neutral-400 font-mono bg-white/5 px-2 py-1 rounded-lg">
+      <div className="text-xs text-neutral-300 font-mono bg-white/[0.04] border border-white/[0.08] px-3 py-1 rounded-xl">
         {entry.account_size}
       </div>
 
       {/* Prize */}
       {entry.prize_amount && (
-        <div className="bg-[#ccff00]/10 border border-[#ccff00]/20 rounded-xl px-3 py-1.5 text-center">
-          <div className="text-[9px] text-neutral-400 uppercase tracking-wider">Prize</div>
-          <div className="text-xs font-black text-[#ccff00]">{entry.prize_amount}</div>
+        <div className="w-full bg-[#ccff00]/10 border border-[#ccff00]/25 rounded-2xl p-2.5 text-center mt-1">
+          <div className="text-[9px] text-neutral-400 uppercase tracking-widest font-bold">Prize Allocation</div>
+          <div className="text-sm font-black text-[#ccff00] font-mono">{entry.prize_amount}</div>
         </div>
       )}
     </div>
@@ -138,64 +150,63 @@ export default function LeaderboardPage() {
   return (
     <div className="min-h-screen bg-[#08090b]">
         {/* Hero */}
-        <section className="relative pt-20 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center overflow-hidden">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#ccff00]/[0.05] blur-3xl pointer-events-none -z-10 rounded-full" />
+        <section className="relative pt-16 sm:pt-20 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center overflow-hidden">
+          {/* Ambient Glow Orbs */}
+          <div className="glow-orb absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-b from-[#ccff00]/[0.08] to-transparent blur-3xl pointer-events-none -z-10 rounded-full" />
 
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/20 text-xs text-[#ccff00] font-bold mb-6">
-            <Trophy size={12} />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/25 text-xs text-[#ccff00] font-bold mb-6 select-none shadow-[0_0_20px_rgba(204,255,0,0.15)]">
+            <Trophy size={14} className="text-[#ccff00]" />
             Live Competition Standings
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white mb-4">
-            🏆 Top Funded Traders
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white mb-4 uppercase">
+            Top Funded <span className="text-[#ccff00] neon-glow-text">Traders</span>
           </h1>
-          <p className="text-neutral-400 text-base max-w-xl mx-auto mb-10">
-            Live competition standings — Top 3 traders win monthly cash prizes.
-            <span className="text-[#ccff00] font-semibold"> Can you claim your spot?</span>
+          <p className="text-neutral-400 text-base sm:text-lg max-w-xl mx-auto mb-10 leading-relaxed">
+            Live competition leaderboard — Top verified performers earn monthly prize distributions.
+            <span className="text-[#ccff00] font-semibold"> Can you break into the Top 3?</span>
           </p>
 
-          {/* Stats row */}
+          {/* Stats row with Metric Cards */}
           {data && (
-            <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto mb-10">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mb-10">
               {[
                 {
-                  icon: <Users size={16} className="text-[#ccff00]" />,
-                  label: "Participants",
+                  icon: <Users size={18} className="text-[#ccff00]" />,
+                  label: "Active Participants",
                   value: data.total_participants.toLocaleString(),
                 },
                 {
-                  icon: <DollarSign size={16} className="text-emerald-400" />,
+                  icon: <DollarSign size={18} className="text-emerald-400" />,
                   label: "Payouts Distributed",
                   value: data.total_payouts_distributed,
                 },
                 {
-                  icon: <Clock size={16} className="text-amber-400" />,
-                  label: "Competition Ends In",
-                  value: `${data.competition_ends_in_days} days`,
+                  icon: <Clock size={18} className="text-amber-400" />,
+                  label: "Competition Closes In",
+                  value: `${data.competition_ends_in_days} Days`,
                 },
               ].map((stat) => (
                 <div
                   key={stat.label}
-                  className="bg-[#0d0e10] border border-white/10 rounded-2xl p-4 flex flex-col items-center gap-1.5"
+                  className="metric-card p-5 flex flex-col items-center justify-center gap-1.5"
                 >
-                  {stat.icon}
-                  <div className="text-base sm:text-xl font-black text-white">{stat.value}</div>
-                  <div className="text-[10px] text-neutral-500 uppercase tracking-wide">{stat.label}</div>
+                  <div className="p-2 rounded-xl bg-white/[0.04] mb-1">{stat.icon}</div>
+                  <div className="text-xl sm:text-2xl font-black font-mono text-white tracking-tight">{stat.value}</div>
+                  <div className="text-[10px] text-neutral-400 uppercase tracking-widest font-bold">{stat.label}</div>
                 </div>
               ))}
             </div>
           )}
 
-          {/* Category switcher */}
-          <div className="flex gap-1 bg-[#111418] border border-white/10 rounded-full p-1 mx-auto w-fit">
+          {/* Category switcher with Liquid Calculator Tabs */}
+          <div className="flex flex-wrap gap-2 justify-center mx-auto w-fit p-1.5 bg-[#0b0c10] border border-white/[0.08] rounded-2xl">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setCategory(cat.id)}
-                className={`px-5 py-2 rounded-full text-xs font-bold transition ${
-                  category === cat.id
-                    ? "bg-[#ccff00] text-black"
-                    : "text-neutral-400 hover:text-white"
+                className={`calculator-tab text-xs sm:text-sm font-bold ${
+                  category === cat.id ? "active" : ""
                 }`}
               >
                 {cat.label}
@@ -207,8 +218,9 @@ export default function LeaderboardPage() {
         {/* Content */}
         <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-24">
           {loading && (
-            <div className="flex justify-center items-center py-24">
-              <div className="w-10 h-10 border-2 border-[#ccff00]/30 border-t-[#ccff00] rounded-full animate-spin" />
+            <div className="flex flex-col justify-center items-center py-24 gap-4">
+              <div className="w-10 h-10 border-2 border-[#ccff00]/20 border-t-[#ccff00] rounded-full animate-spin" />
+              <p className="text-xs text-neutral-400 font-mono uppercase tracking-wider">Syncing live standings...</p>
             </div>
           )}
 
@@ -225,8 +237,8 @@ export default function LeaderboardPage() {
             <>
               {/* Podium */}
               {podiumOrder.length === 3 && (
-                <div className="mb-12">
-                  <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto items-end">
+                <div className="mb-14">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto items-end">
                     <PodiumCard entry={podiumOrder[0]} size="small" />
                     <PodiumCard entry={podiumOrder[1]} size="large" />
                     <PodiumCard entry={podiumOrder[2]} size="small" />
@@ -234,63 +246,68 @@ export default function LeaderboardPage() {
                 </div>
               )}
 
-              {/* Full table */}
+              {/* Full table with Bento Glass styling */}
               {rest.length > 0 && (
-                <div className="bg-[#0d0e10] border border-white/10 rounded-2xl overflow-hidden">
-                  <div className="px-6 py-4 border-b border-white/[0.07] flex items-center gap-2">
-                    <Medal size={16} className="text-[#ccff00]" />
-                    <h2 className="text-sm font-bold text-white">Full Rankings</h2>
+                <div className="bento-card overflow-hidden shadow-2xl p-0">
+                  <div className="px-6 py-4 border-b border-white/[0.07] flex items-center justify-between bg-white/[0.02]">
+                    <div className="flex items-center gap-2">
+                      <Medal size={16} className="text-[#ccff00]" />
+                      <h2 className="text-sm font-bold text-white uppercase tracking-wider">All Verified Rankings</h2>
+                    </div>
+                    <span className="text-xs text-neutral-500 font-mono">Updated in real-time</span>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-white/[0.07] text-neutral-500 text-xs uppercase tracking-wider">
-                          <th className="px-6 py-3 text-left">Rank</th>
-                          <th className="px-4 py-3 text-left">Trader</th>
-                          <th className="px-4 py-3 text-left hidden sm:table-cell">Country</th>
-                          <th className="px-4 py-3 text-right hidden md:table-cell">Account</th>
-                          <th className="px-4 py-3 text-right">Profit</th>
-                          <th className="px-4 py-3 text-right hidden md:table-cell">Return</th>
-                          <th className="px-4 py-3 text-right hidden lg:table-cell">Win Rate</th>
-                          <th className="px-4 py-3 text-left hidden sm:table-cell">Badge</th>
+                        <tr className="border-b border-white/[0.06] text-neutral-500 text-[11px] font-bold uppercase tracking-wider bg-white/[0.01]">
+                          <th className="px-6 py-3.5 text-left">Rank</th>
+                          <th className="px-4 py-3.5 text-left">Trader</th>
+                          <th className="px-4 py-3.5 text-left hidden sm:table-cell">Country</th>
+                          <th className="px-4 py-3.5 text-right hidden md:table-cell">Account</th>
+                          <th className="px-4 py-3.5 text-right">Profit</th>
+                          <th className="px-4 py-3.5 text-right hidden md:table-cell">ROI</th>
+                          <th className="px-4 py-3.5 text-right hidden lg:table-cell">Win Rate</th>
+                          <th className="px-4 py-3.5 text-left hidden sm:table-cell">Tier</th>
                         </tr>
                       </thead>
-                      <tbody>
+                      <tbody className="divide-y divide-white/[0.03]">
                         {rest.map((entry, idx) => (
                           <tr
                             key={entry.rank}
-                            className={`border-b border-white/[0.04] transition hover:bg-white/[0.025] ${
-                              idx % 2 === 0 ? "" : "bg-white/[0.015]"
+                            className={`transition-colors hover:bg-white/[0.03] ${
+                              idx % 2 === 0 ? "" : "bg-white/[0.01]"
                             }`}
                           >
                             <td className="px-6 py-4">
-                              <span className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center font-black text-xs text-neutral-300">
-                                {entry.rank}
+                              <span className="w-8 h-8 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center font-black text-xs font-mono text-neutral-300">
+                                #{entry.rank}
                               </span>
                             </td>
                             <td className="px-4 py-4">
-                              <div className="font-semibold text-white">{entry.trader_name}</div>
+                              <div className="font-bold text-white text-sm">{entry.trader_name}</div>
                             </td>
                             <td className="px-4 py-4 hidden sm:table-cell">
                               <span className="text-base">{countryFlags[entry.country] || "🌍"}</span>
-                              <span className="text-xs text-neutral-500 ml-1.5">{entry.country_name}</span>
+                              <span className="text-xs text-neutral-400 font-medium ml-1.5">{entry.country_name}</span>
                             </td>
                             <td className="px-4 py-4 text-right hidden md:table-cell">
-                              <span className="text-xs font-mono text-neutral-400">{entry.account_size}</span>
+                              <span className="text-xs font-mono text-neutral-400 bg-white/[0.03] border border-white/[0.06] px-2 py-0.5 rounded-md">
+                                {entry.account_size}
+                              </span>
                             </td>
                             <td className="px-4 py-4 text-right">
-                              <span className="font-black font-mono text-[#ccff00]">
+                              <span className="font-black font-mono text-[#ccff00] text-sm">
                                 +${entry.profit_usd.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                               </span>
                             </td>
                             <td className="px-4 py-4 text-right hidden md:table-cell">
-                              <span className="text-xs text-emerald-400 font-semibold">+{entry.return_pct.toFixed(2)}%</span>
+                              <span className="text-xs text-emerald-400 font-bold font-mono">+{entry.return_pct.toFixed(2)}%</span>
                             </td>
                             <td className="px-4 py-4 text-right hidden lg:table-cell">
-                              <span className="text-xs text-neutral-300">{entry.win_rate_pct.toFixed(1)}%</span>
+                              <span className="text-xs text-neutral-300 font-mono font-bold">{entry.win_rate_pct.toFixed(1)}%</span>
                             </td>
                             <td className="px-4 py-4 hidden sm:table-cell">
-                              <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${BADGE_STYLES[entry.badge]}`}>
+                              <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full ${BADGE_STYLES[entry.badge]}`}>
                                 {BADGE_ICONS[entry.badge]} {entry.badge}
                               </span>
                             </td>
@@ -303,34 +320,36 @@ export default function LeaderboardPage() {
               )}
 
               {/* Prize pool banner */}
-              <div className="mt-12 bg-[#0d0e10] border border-[#ccff00]/20 rounded-3xl p-8 text-center relative overflow-hidden">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-32 bg-[#ccff00]/[0.04] blur-3xl pointer-events-none" />
-                <Trophy size={32} className="text-[#ccff00] mx-auto mb-4" />
-                <h3 className="text-2xl font-black text-white mb-2">Monthly Prize Pool</h3>
-                <p className="text-neutral-500 text-sm mb-8">
-                  Top traders are rewarded with cash bonuses every month
+              <div className="mt-14 bento-card border border-[#ccff00]/30 rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden shadow-[0_0_60px_rgba(204,255,0,0.08)]">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-36 bg-[#ccff00]/[0.08] blur-3xl pointer-events-none" />
+                <div className="w-14 h-14 rounded-2xl bg-[#ccff00]/10 border border-[#ccff00]/25 flex items-center justify-center mx-auto mb-5 text-[#ccff00]">
+                  <Trophy size={28} />
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-black text-white mb-2 tracking-tight">Monthly Performance Allocation</h3>
+                <p className="text-neutral-400 text-sm max-w-lg mx-auto mb-8">
+                  Verified traders holding top ranks at month close receive direct capital bonuses credited directly to their payout balance.
                 </p>
 
-                <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto mb-8">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-xl mx-auto mb-8">
                   {[
-                    { rank: "1st", prize: "$5,000", icon: "🥇", color: "border-[#ccff00]/40 bg-[#ccff00]/5" },
-                    { rank: "2nd", prize: "$3,000", icon: "🥈", color: "border-white/15 bg-white/3" },
-                    { rank: "3rd", prize: "$1,500", icon: "🥉", color: "border-amber-600/30 bg-amber-500/5" },
+                    { rank: "1st", prize: "$5,000", icon: "🥇", color: "border-[#ccff00]/40 bg-[#ccff00]/[0.04]" },
+                    { rank: "2nd", prize: "$3,000", icon: "🥈", color: "border-slate-500/30 bg-white/[0.02]" },
+                    { rank: "3rd", prize: "$1,500", icon: "🥉", color: "border-amber-600/30 bg-amber-500/[0.04]" },
                   ].map((p) => (
-                    <div key={p.rank} className={`rounded-2xl border p-4 ${p.color}`}>
-                      <div className="text-2xl mb-1">{p.icon}</div>
-                      <div className="text-xs text-neutral-500 uppercase tracking-wide">{p.rank} Place</div>
-                      <div className="text-lg font-black text-white">{p.prize}</div>
+                    <div key={p.rank} className={`rounded-2xl border p-5 ${p.color} transition hover:scale-105`}>
+                      <div className="text-3xl mb-1">{p.icon}</div>
+                      <div className="text-[11px] text-neutral-400 uppercase tracking-widest font-bold">{p.rank} Place</div>
+                      <div className="text-2xl font-black font-mono text-white mt-1">{p.prize}</div>
                     </div>
                   ))}
                 </div>
 
                 <Link
                   href="/challenges"
-                  className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#ccff00] hover:bg-[#b3e600] text-black font-extrabold text-sm uppercase tracking-tight transition"
+                  className="btn-neon inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-[#ccff00] hover:bg-[#b3e600] text-black font-black text-sm uppercase tracking-tight transition shadow-neon"
                 >
                   <Zap size={16} />
-                  Start Your Challenge
+                  Claim Your Trading Account
                   <ChevronRight size={16} className="stroke-[3]" />
                 </Link>
               </div>
