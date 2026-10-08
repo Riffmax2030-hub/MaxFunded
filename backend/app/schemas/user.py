@@ -39,3 +39,9 @@ class AdminUserUpdate(BaseModel):
     is_active: Optional[bool] = None
     role: Optional[str] = None
     kyc_status: Optional[str] = None
+
+
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    country: Optional[str] = None
+    phone: Optional[str] = None

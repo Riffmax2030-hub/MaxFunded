@@ -73,21 +73,21 @@ function SuccessContent() {
   if (loading) {
     return (
       <div className="text-center space-y-4 py-20">
-        <Loader2 className="w-10 h-10 text-brand-500 animate-spin mx-auto" />
-        <p className="text-gray-400 text-sm">Verifying transaction confirmation with payment gateway...</p>
+        <Loader2 className="w-10 h-10 text-[#ccff00] animate-spin mx-auto" />
+        <p className="text-neutral-400 text-sm">Verifying transaction confirmation with payment gateway...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-dark-900 border border-dark-700/60 rounded-2xl p-8 text-center space-y-4 w-full">
-        <AlertCircle className="w-12 h-12 text-red-400 mx-auto" />
-        <h2 className="text-xl font-bold">Transaction Status Inquiry</h2>
-        <p className="text-gray-400 text-sm">{error}</p>
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center space-y-4 w-full shadow-2xl">
+        <AlertCircle className="w-12 h-12 text-rose-400 mx-auto" />
+        <h2 className="text-xl font-bold text-white">Transaction Status Inquiry</h2>
+        <p className="text-neutral-400 text-sm">{error}</p>
         <Link
           href="/dashboard"
-          className="inline-block px-5 py-2.5 bg-brand-600 hover:bg-brand-500 rounded-xl text-sm font-semibold transition"
+          className="inline-block px-5 py-2.5 bg-[#ccff00] hover:bg-[#b3e600] text-black rounded-xl text-sm font-bold transition shadow-lg shadow-[#ccff00]/10"
         >
           Go to Dashboard
         </Link>
@@ -98,38 +98,38 @@ function SuccessContent() {
   if (payment?.status === "AWAITING_CONFIRMATION") {
     return (
       /* Bank Wire Pending Screen */
-      <div className="bg-dark-900 border border-amber-700/40 rounded-2xl p-8 text-center space-y-6 w-full shadow-2xl">
-        <div className="w-16 h-16 rounded-full bg-amber-950 border border-amber-600/50 flex items-center justify-center mx-auto text-amber-400">
+      <div className="bg-slate-900 border border-amber-500/30 rounded-2xl p-8 text-center space-y-6 w-full shadow-2xl">
+        <div className="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400">
           <Clock className="w-8 h-8" />
         </div>
 
         <div>
-          <span className="text-[11px] font-bold uppercase tracking-widest text-amber-400 px-3 py-1 rounded-full bg-amber-950/60 border border-amber-800/40">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-amber-400 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20">
             Wire Transfer Initiated
           </span>
           <h1 className="text-2xl font-extrabold text-white mt-3">
             Awaiting Bank Confirmation
           </h1>
-          <p className="text-gray-400 text-sm mt-2 max-w-md mx-auto">
+          <p className="text-neutral-400 text-sm mt-2 max-w-md mx-auto leading-relaxed">
             Thank you! We have recorded your wire transfer intent. Our finance department will verify receipt in our bank account and activate your evaluation.
           </p>
         </div>
 
         {payment.payment_reference_code && (
-          <div className="bg-dark-950 border border-dark-800 rounded-xl p-4 flex items-center justify-between text-left">
+          <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between text-left">
             <div>
-              <div className="text-[10px] text-gray-500 font-bold uppercase">
+              <div className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">
                 Your Transfer Reference Code
               </div>
-              <div className="font-mono text-base font-extrabold text-emerald-400">
+              <div className="font-mono text-base font-extrabold text-[#ccff00] mt-0.5">
                 {payment.payment_reference_code}
               </div>
             </div>
             <button
               onClick={() => copyRef(payment.payment_reference_code!)}
-              className="p-2 rounded-lg bg-dark-800 hover:bg-dark-700 text-gray-300 text-xs flex items-center space-x-1"
+              className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-neutral-300 text-xs font-semibold flex items-center gap-1.5 transition"
             >
-              <Copy className="w-4 h-4" />
+              <Copy className="w-3.5 h-3.5" />
               <span>{copied ? "Copied" : "Copy"}</span>
             </button>
           </div>
@@ -138,14 +138,14 @@ function SuccessContent() {
         <div className="pt-2 flex flex-col sm:flex-row gap-3">
           <Link
             href="/dashboard"
-            className="flex-1 py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 font-bold text-sm text-white flex items-center justify-center space-x-2 transition"
+            className="flex-1 py-3.5 px-4 rounded-xl bg-[#ccff00] hover:bg-[#b3e600] font-black text-sm text-black flex items-center justify-center gap-2 transition shadow-lg shadow-[#ccff00]/10"
           >
             <LayoutDashboard className="w-4 h-4" />
             <span>Open Dashboard</span>
           </Link>
           <Link
             href="/contact"
-            className="py-3 px-4 rounded-xl bg-dark-800 hover:bg-dark-700 font-semibold text-sm text-gray-300 transition"
+            className="py-3.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 font-semibold text-sm text-neutral-300 transition"
           >
             Contact Support
           </Link>
@@ -156,34 +156,34 @@ function SuccessContent() {
 
   return (
     /* Payment Completed Screen */
-    <div className="bg-dark-900 border border-emerald-700/40 rounded-2xl p-8 text-center space-y-6 w-full shadow-2xl">
-      <div className="w-16 h-16 rounded-full bg-emerald-950 border border-emerald-500/50 flex items-center justify-center mx-auto text-emerald-400">
+    <div className="bg-slate-900 border border-emerald-500/30 rounded-2xl p-8 text-center space-y-6 w-full shadow-2xl">
+      <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400">
         <CheckCircle2 className="w-10 h-10" />
       </div>
 
       <div>
-        <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-400 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-800/40">
+        <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-400 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
           Payment Confirmed
         </span>
         <h1 className="text-3xl font-extrabold text-white mt-3">
           Evaluation Activated!
         </h1>
-        <p className="text-gray-400 text-sm mt-2 max-w-md mx-auto">
-          Your payment of <strong className="text-white">${payment?.amount.toFixed(2)} {payment?.currency}</strong> was received. Your simulated MetaTrader 5 account is ready.
+        <p className="text-neutral-400 text-sm mt-2 max-w-md mx-auto leading-relaxed">
+          Your payment of <strong className="text-white">${payment?.amount ? payment.amount.toFixed(2) : "0.00"} {payment?.currency || "USD"}</strong> was received. Your simulated MetaTrader 5 account is ready.
         </p>
       </div>
 
-      <div className="bg-dark-950 border border-dark-800 rounded-xl p-5 text-left space-y-3">
-        <div className="flex items-center justify-between text-xs border-b border-dark-800 pb-2">
-          <span className="text-gray-400">Environment</span>
+      <div className="bg-slate-950 border border-slate-800 rounded-xl p-5 text-left space-y-3">
+        <div className="flex items-center justify-between text-xs border-b border-slate-800/80 pb-2.5">
+          <span className="text-neutral-400">Environment</span>
           <span className="font-semibold text-emerald-400">MaxFunded Simulated MT5</span>
         </div>
-        <div className="flex items-center justify-between text-xs border-b border-dark-800 pb-2">
-          <span className="text-gray-400">Payment Gateway</span>
+        <div className="flex items-center justify-between text-xs border-b border-slate-800/80 pb-2.5">
+          <span className="text-neutral-400">Payment Gateway</span>
           <span className="font-bold text-white uppercase">{payment?.provider || "Instant Gateway"}</span>
         </div>
         <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-400">Status</span>
+          <span className="text-neutral-400">Status</span>
           <span className="font-bold text-emerald-400 uppercase">ACTIVE</span>
         </div>
       </div>
@@ -191,7 +191,7 @@ function SuccessContent() {
       <div className="pt-2">
         <Link
           href="/dashboard"
-          className="w-full py-4 rounded-xl bg-brand-600 hover:bg-brand-500 font-bold text-base text-white flex items-center justify-center space-x-2 transition shadow-lg shadow-brand-600/30"
+          className="w-full py-4 rounded-xl bg-[#ccff00] hover:bg-[#b3e600] font-black text-base text-black flex items-center justify-center gap-2 transition shadow-lg shadow-[#ccff00]/10"
         >
           <LayoutDashboard className="w-5 h-5" />
           <span>Go to Trader Analytics Dashboard</span>
@@ -203,13 +203,13 @@ function SuccessContent() {
 
 export default function CheckoutSuccessPage() {
   return (
-    <div className="min-h-screen bg-dark-950 text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-[#08090b] text-white flex flex-col justify-between">
       <main className="max-w-2xl mx-auto px-4 py-16 flex-grow w-full flex items-center justify-center">
         <Suspense
           fallback={
             <div className="text-center space-y-4 py-20">
-              <Loader2 className="w-10 h-10 text-brand-500 animate-spin mx-auto" />
-              <p className="text-gray-400 text-sm">Loading checkout status...</p>
+              <Loader2 className="w-10 h-10 text-[#ccff00] animate-spin mx-auto" />
+              <p className="text-neutral-400 text-sm">Loading checkout status...</p>
             </div>
           }
         >

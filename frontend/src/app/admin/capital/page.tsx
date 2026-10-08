@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { Loader2, RefreshCw } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -193,35 +194,28 @@ export default function AdminCapitalPage() {
   if (!token) return null;
 
   return (
-    <div className="min-h-screen bg-dark-950 text-slate-100">
+    <div className="pb-20 px-6 xl:px-10 pt-8 text-slate-100">
       {/* ── Header ── */}
-      <div className="border-b border-dark-800 bg-dark-900">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-white">Company Capital Console</h1>
-            <p className="text-sm text-slate-400 mt-0.5">
-              Internal company capital operations — isolated from retail trader evaluation
-            </p>
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={loadAll}
-              disabled={loading}
-              className="px-4 py-2 text-sm rounded-lg border border-dark-700 bg-dark-800 hover:bg-dark-700 transition-colors disabled:opacity-50"
-            >
-              {loading ? "Refreshing…" : "↻ Refresh"}
-            </button>
-            <button
-              onClick={() => router.push("/admin")}
-              className="px-4 py-2 text-sm rounded-lg border border-dark-700 bg-dark-800 hover:bg-dark-700 transition-colors"
-            >
-              ← Admin Panel
-            </button>
-          </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Capital Allocation Console</h1>
+          <p className="text-sm text-slate-400 mt-0.5">
+            Internal company capital operations — isolated from retail trader evaluation
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <button
+            onClick={loadAll}
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold transition disabled:opacity-40"
+          >
+            {loading ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
+            Refresh
+          </button>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* ── Warning Banner ── */}
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
           <div className="flex items-start gap-3">
@@ -257,7 +251,7 @@ export default function AdminCapitalPage() {
               color: totalRealizedPnl >= 0 ? "text-emerald-400" : "text-red-400",
             },
           ].map((card) => (
-            <div key={card.label} className="rounded-xl border border-dark-700 bg-dark-900 p-4">
+            <div key={card.label} className="rounded-xl border border-slate-700 bg-slate-900 p-4">
               <p className="text-xs text-slate-500 mb-1">{card.label}</p>
               <p className={`text-xl font-bold ${card.color}`}>{card.value}</p>
             </div>
@@ -265,19 +259,19 @@ export default function AdminCapitalPage() {
         </div>
 
         {/* ── Tabs ── */}
-        <div className="flex gap-1 border-b border-dark-800">
+        <div className="flex gap-1 border-b border-slate-800">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key as any)}
               className={`px-4 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
                 activeTab === tab.key
-                  ? "text-white border-b-2 border-blue-500 bg-dark-900"
+                  ? "text-white border-b-2 border-blue-500 bg-slate-900"
                   : "text-slate-400 hover:text-slate-200"
               }`}
             >
               {tab.label}
-              <span className="ml-2 text-xs bg-dark-700 px-1.5 py-0.5 rounded-full">
+              <span className="ml-2 text-xs bg-slate-700 px-1.5 py-0.5 rounded-full">
                 {tab.count}
               </span>
             </button>
@@ -291,9 +285,9 @@ export default function AdminCapitalPage() {
             {brokers.length === 0 ? (
               <p className="text-slate-500 text-sm">No broker accounts registered.</p>
             ) : (
-              <div className="overflow-x-auto rounded-xl border border-dark-700">
+              <div className="overflow-x-auto rounded-xl border border-slate-700">
                 <table className="w-full text-sm">
-                  <thead className="bg-dark-900 text-slate-400 text-xs uppercase tracking-wide">
+                  <thead className="bg-slate-900 text-slate-400 text-xs uppercase tracking-wide">
                     <tr>
                       {["Broker", "Type", "Account #", "Currency", "Balance", "Equity", "Margin Used", "Free Margin", "Status"].map((h) => (
                         <th key={h} className="px-4 py-3 text-left font-medium">
@@ -302,9 +296,9 @@ export default function AdminCapitalPage() {
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-dark-800">
+                  <tbody className="divide-y divide-slate-800">
                     {brokers.map((b) => (
-                      <tr key={b.id} className="hover:bg-dark-900/50 transition-colors">
+                      <tr key={b.id} className="hover:bg-slate-900/50 transition-colors">
                         <td className="px-4 py-3 font-medium text-white">{b.broker_name}</td>
                         <td className="px-4 py-3 text-slate-400 font-mono text-xs">{b.broker_type}</td>
                         <td className="px-4 py-3 text-slate-300 font-mono text-xs">{b.account_number}</td>
@@ -337,18 +331,18 @@ export default function AdminCapitalPage() {
             {leaderboard.length === 0 ? (
               <p className="text-slate-500 text-sm">No signal profiles yet. Profiles are created automatically after simulated trades.</p>
             ) : (
-              <div className="overflow-x-auto rounded-xl border border-dark-700">
+              <div className="overflow-x-auto rounded-xl border border-slate-700">
                 <table className="w-full text-sm">
-                  <thead className="bg-dark-900 text-slate-400 text-xs uppercase tracking-wide">
+                  <thead className="bg-slate-900 text-slate-400 text-xs uppercase tracking-wide">
                     <tr>
                       {["Rank", "Purchase ID", "Score", "Win Rate", "Profit Factor", "Rating", "Trades", "Copy Eligible"].map((h) => (
                         <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-dark-800">
+                  <tbody className="divide-y divide-slate-800">
                     {leaderboard.map((e) => (
-                      <tr key={e.purchase_id} className="hover:bg-dark-900/50 transition-colors">
+                      <tr key={e.purchase_id} className="hover:bg-slate-900/50 transition-colors">
                         <td className="px-4 py-3 font-bold text-slate-300">#{e.rank}</td>
                         <td className="px-4 py-3 font-mono text-xs text-slate-400">{e.purchase_id.slice(0, 12)}…</td>
                         <td className="px-4 py-3">
@@ -407,7 +401,7 @@ export default function AdminCapitalPage() {
                 {strategies.map((s) => (
                   <div
                     key={s.id}
-                    className="rounded-xl border border-dark-700 bg-dark-900 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4"
+                    className="rounded-xl border border-slate-700 bg-slate-900 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4"
                   >
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center gap-3">
@@ -451,25 +445,25 @@ export default function AdminCapitalPage() {
               <p className="text-xs text-slate-500">Real trades executed on company broker accounts using company capital</p>
             </div>
             {executions.length === 0 ? (
-              <div className="rounded-xl border border-dark-700 bg-dark-900/50 p-12 text-center">
+              <div className="rounded-xl border border-slate-700 bg-slate-900/50 p-12 text-center">
                 <p className="text-slate-400 text-sm">No executions yet.</p>
                 <p className="text-slate-500 text-xs mt-1">
                   Shadow copy orders appear here once a trader achieves sufficient signal score.
                 </p>
               </div>
             ) : (
-              <div className="overflow-x-auto rounded-xl border border-dark-700">
+              <div className="overflow-x-auto rounded-xl border border-slate-700">
                 <table className="w-full text-sm">
-                  <thead className="bg-dark-900 text-slate-400 text-xs uppercase tracking-wide">
+                  <thead className="bg-slate-900 text-slate-400 text-xs uppercase tracking-wide">
                     <tr>
                       {["Ticket", "Symbol", "Side", "Lots", "Open Price", "Close Price", "P&L", "Status", "Opened"].map((h) => (
                         <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-dark-800">
+                  <tbody className="divide-y divide-slate-800">
                     {executions.map((ex) => (
-                      <tr key={ex.id} className="hover:bg-dark-900/50 transition-colors">
+                      <tr key={ex.id} className="hover:bg-slate-900/50 transition-colors">
                         <td className="px-4 py-3 font-mono text-xs text-slate-400">{ex.broker_ticket}</td>
                         <td className="px-4 py-3 font-semibold text-slate-200">{ex.symbol}</td>
                         <td className="px-4 py-3">

@@ -155,9 +155,9 @@ export default function KYCPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-dark-950 flex items-center justify-center text-slate-400">
+      <div className="min-h-screen bg-[#08090b] flex items-center justify-center text-slate-400">
         <div className="flex items-center gap-3">
-          <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-[#ccff00] border-t-transparent rounded-full animate-spin" />
           <span>Loading identity compliance status…</span>
         </div>
       </div>
@@ -167,11 +167,11 @@ export default function KYCPage() {
   const kycStatus = summary?.kyc_status || "NOT_SUBMITTED";
 
   return (
-    <div className="min-h-screen bg-dark-950 text-slate-100 py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#08090b] text-slate-100 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-8">
         
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-dark-800 pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
           <div>
             <h1 className="text-2xl font-bold text-white tracking-tight">Identity Verification (KYC / AML)</h1>
             <p className="text-sm text-slate-400 mt-1">
@@ -180,7 +180,7 @@ export default function KYCPage() {
           </div>
           <Link
             href="/dashboard"
-            className="self-start sm:self-auto px-4 py-2 text-sm bg-dark-800 hover:bg-dark-700 text-slate-300 rounded-lg border border-dark-700 transition"
+            className="self-start sm:self-auto px-4 py-2 text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition"
           >
             ← Return to Dashboard
           </Link>
@@ -231,7 +231,7 @@ export default function KYCPage() {
               <p className="text-amber-300/80 text-sm mt-1">
                 Our compliance reviewer requested updated documents:
               </p>
-              <div className="mt-2 p-3 bg-dark-900/80 border border-amber-500/30 rounded text-amber-200 text-sm font-medium">
+              <div className="mt-2 p-3 bg-slate-900/80 border border-amber-500/30 rounded text-amber-200 text-sm font-medium">
                 {summary?.rejection_reason || "Please provide clearer scans of your identification."}
               </div>
             </div>
@@ -246,11 +246,11 @@ export default function KYCPage() {
               <p className="text-red-300/80 text-sm mt-1">
                 Your identity verification submission could not be approved due to compliance or sanctions policy:
               </p>
-              <div className="mt-2 p-3 bg-dark-900/80 border border-red-500/30 rounded text-red-200 text-sm font-medium">
+              <div className="mt-2 p-3 bg-slate-900/80 border border-red-500/30 rounded text-red-200 text-sm font-medium">
                 {summary?.rejection_reason || "Verification requirements not met."}
               </div>
               <p className="text-xs text-slate-400 mt-2">
-                For appeals, please contact <a href="mailto:compliance@maxfunded.com" className="text-primary-400 underline">compliance@maxfunded.com</a>.
+                For appeals, please contact <a href="mailto:compliance@maxfunded.com" className="text-[#ccff00] underline">compliance@maxfunded.com</a>.
               </p>
             </div>
           </div>
@@ -273,9 +273,9 @@ export default function KYCPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             
             {/* Step 1: Personal Identity Details */}
-            <div className="rounded-xl border border-dark-800 bg-dark-900 p-6 space-y-4">
+            <div className="rounded-xl border border-slate-800 bg-slate-900 p-6 space-y-4">
               <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-primary-600/30 text-primary-400 flex items-center justify-center text-xs font-bold">1</span>
+                <span className="w-6 h-6 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/30 text-[#ccff00] flex items-center justify-center text-xs font-bold">1</span>
                 Personal Information (as shown on official government ID)
               </h2>
 
@@ -287,7 +287,7 @@ export default function KYCPage() {
                     required
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00]"
                     placeholder="e.g. Adebayo"
                   />
                 </div>
@@ -298,7 +298,7 @@ export default function KYCPage() {
                     required
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00]"
                     placeholder="e.g. Adeleke"
                   />
                 </div>
@@ -312,7 +312,7 @@ export default function KYCPage() {
                     required
                     value={dob}
                     onChange={(e) => setDob(e.target.value)}
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00]"
                   />
                 </div>
                 <div>
@@ -320,7 +320,7 @@ export default function KYCPage() {
                   <select
                     value={nationality}
                     onChange={(e) => setNationality(e.target.value)}
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00]"
                   >
                     {COUNTRIES.map((c) => (
                       <option key={c.code} value={c.code}>{c.name} ({c.code})</option>
@@ -332,7 +332,7 @@ export default function KYCPage() {
                   <select
                     value={residenceCountry}
                     onChange={(e) => setResidenceCountry(e.target.value)}
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00]"
                   >
                     {COUNTRIES.map((c) => (
                       <option key={c.code} value={c.code}>{c.name} ({c.code})</option>
@@ -349,7 +349,7 @@ export default function KYCPage() {
                     required
                     value={addressLine}
                     onChange={(e) => setAddressLine(e.target.value)}
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00]"
                     placeholder="e.g. 14 Victoria Island Way"
                   />
                 </div>
@@ -360,7 +360,7 @@ export default function KYCPage() {
                     required
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00]"
                     placeholder="e.g. Lagos"
                   />
                 </div>
@@ -368,9 +368,9 @@ export default function KYCPage() {
             </div>
 
             {/* Step 2: Identification Documents */}
-            <div className="rounded-xl border border-dark-800 bg-dark-900 p-6 space-y-4">
+            <div className="rounded-xl border border-slate-800 bg-slate-900 p-6 space-y-4">
               <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-primary-600/30 text-primary-400 flex items-center justify-center text-xs font-bold">2</span>
+                <span className="w-6 h-6 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/30 text-[#ccff00] flex items-center justify-center text-xs font-bold">2</span>
                 Government Issued Photo ID &amp; Proof of Address
               </h2>
 
@@ -380,7 +380,7 @@ export default function KYCPage() {
                   <select
                     value={idType}
                     onChange={(e) => setIdType(e.target.value)}
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00]"
                   >
                     <option value="PASSPORT">International Passport</option>
                     <option value="NATIONAL_ID">National ID / NIN Slip</option>
@@ -394,7 +394,7 @@ export default function KYCPage() {
                     required
                     value={idNumber}
                     onChange={(e) => setIdNumber(e.target.value)}
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00]"
                     placeholder="e.g. A01234567"
                   />
                 </div>
@@ -405,19 +405,19 @@ export default function KYCPage() {
                     required
                     value={idFileName}
                     onChange={(e) => setIdFileName(e.target.value)}
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
                   />
                   <span className="text-[10px] text-slate-500">PDF, JPG, or PNG (Max 15MB)</span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-dark-800">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-800">
                 <div>
                   <label className="block text-xs font-medium text-slate-400 mb-1">Proof of Address Type *</label>
                   <select
                     value={poaType}
                     onChange={(e) => setPoaType(e.target.value)}
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00]"
                   >
                     <option value="UTILITY_BILL">Utility Bill (Electric, Water, Gas)</option>
                     <option value="BANK_STATEMENT">Bank Account Statement</option>
@@ -431,7 +431,7 @@ export default function KYCPage() {
                     required
                     value={poaFileName}
                     onChange={(e) => setPoaFileName(e.target.value)}
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono"
                   />
                   <span className="text-[10px] text-slate-500">Must be dated within the last 90 days</span>
                 </div>
@@ -439,9 +439,9 @@ export default function KYCPage() {
             </div>
 
             {/* Step 3: AML, PEP & Sanctions Compliance Declaration */}
-            <div className="rounded-xl border border-dark-800 bg-dark-900 p-6 space-y-4">
+            <div className="rounded-xl border border-slate-800 bg-slate-900 p-6 space-y-4">
               <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                <span className="w-6 h-6 rounded-full bg-primary-600/30 text-primary-400 flex items-center justify-center text-xs font-bold">3</span>
+                <span className="w-6 h-6 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/30 text-[#ccff00] flex items-center justify-center text-xs font-bold">3</span>
                 AML &amp; Politically Exposed Person (PEP) Declaration
               </h2>
 
@@ -451,7 +451,7 @@ export default function KYCPage() {
                     type="checkbox"
                     checked={isPep}
                     onChange={(e) => setIsPep(e.target.checked)}
-                    className="mt-1 rounded bg-dark-800 border-dark-700 text-primary-600 focus:ring-0"
+                    className="mt-1 rounded bg-slate-800 border-slate-700 text-[#ccff00] focus:ring-0"
                   />
                   <div className="text-xs text-slate-300">
                     <span className="font-semibold text-white">Politically Exposed Person (PEP) Disclosure:</span> Check this box if you, or an immediate family member, hold or have held a prominent public function (e.g. Head of State, Minister, Senior Military Officer, Central Bank Executive).
@@ -464,7 +464,7 @@ export default function KYCPage() {
                     required
                     checked={acceptedDeclarations}
                     onChange={(e) => setAcceptedDeclarations(e.target.checked)}
-                    className="mt-1 rounded bg-dark-800 border-dark-700 text-primary-600 focus:ring-0"
+                    className="mt-1 rounded bg-slate-800 border-slate-700 text-[#ccff00] focus:ring-0"
                   />
                   <div className="text-xs text-slate-300">
                     <span className="font-semibold text-white">Compliance Attestation:</span> I hereby certify that the information and documents provided are genuine, valid, and belong to me. I acknowledge that MaxFunded Global Ltd. Ltd verifies identities in accordance with global Anti-Money Laundering (AML) and Counter-Terrorist Financing (CTF) standards.
@@ -478,11 +478,11 @@ export default function KYCPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-primary-500/20 transition disabled:opacity-50 flex items-center gap-2"
+                className="px-6 py-3 bg-[#ccff00] hover:bg-[#b3e600] text-black font-black rounded-xl shadow-lg shadow-[#ccff00]/10 transition disabled:opacity-50 flex items-center gap-2"
               >
                 {submitting ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
                     <span>Processing Submission…</span>
                   </>
                 ) : (
@@ -495,15 +495,15 @@ export default function KYCPage() {
 
         {/* Existing Documents Dossier List */}
         {dossier && dossier.documents && dossier.documents.length > 0 && (
-          <div className="rounded-xl border border-dark-800 bg-dark-900 p-6 space-y-3">
+          <div className="rounded-xl border border-slate-800 bg-slate-900 p-6 space-y-3">
             <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">
               Cataloged Verification Documents ({dossier.documents.length})
             </h3>
-            <div className="divide-y divide-dark-800 text-xs">
+            <div className="divide-y divide-slate-800 text-xs">
               {dossier.documents.map((doc, idx) => (
                 <div key={idx} className="py-2.5 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="font-mono text-primary-400 font-bold">{doc.document_type}</span>
+                    <span className="font-mono text-[#ccff00] font-bold">{doc.document_type}</span>
                     <span className="text-slate-300">{doc.file_name}</span>
                     {doc.document_number && (
                       <span className="text-slate-500">#{doc.document_number}</span>

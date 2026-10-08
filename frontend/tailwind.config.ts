@@ -39,6 +39,15 @@ const config: Config = {
         'neon-lg': '0 0 45px rgba(204, 255, 0, 0.5)',
         'neon-sm': '0 0 12px rgba(204, 255, 0, 0.25)',
       },
+      keyframes: {
+        marquee: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+      },
+      animation: {
+        marquee: 'marquee 35s linear infinite',
+      },
     },
   },
   plugins: [],

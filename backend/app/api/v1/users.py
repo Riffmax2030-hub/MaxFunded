@@ -8,7 +8,7 @@ from app.core.database import get_db
 from app.core.rbac import get_current_user
 from app.models.user import User
 from app.models.challenge import Challenge, ChallengePurchase
-from app.schemas.user import UserResponse
+from app.schemas.user import UserResponse, UserUpdate
 from app.schemas.challenge import ChallengePurchaseResponse
 
 router = APIRouter()
@@ -16,6 +16,25 @@ router = APIRouter()
 
 @router.get("/me", response_model=UserResponse)
 async def read_user_me(current_user: User = Depends(get_current_user)):
+    return current_user
+
+
+@router.patch("/me", response_model=UserResponse)
+async def update_user_me(
+    user_in: UserUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    if user_in.full_name is not None and user_in.full_name.strip():
+        current_user.full_name = user_in.full_name.strip()
+    if user_in.country is not None and user_in.country.strip():
+        current_user.country = user_in.country.strip().upper()[:2]
+    if user_in.phone is not None:
+        current_user.phone = user_in.phone.strip()
+    
+    db.add(current_user)
+    await db.commit()
+    await db.refresh(current_user)
     return current_user
 
 

@@ -137,8 +137,23 @@ export function useDashboardWebSocket() {
     mounted.current = true;
     connect();
 
+    const handleVisibility = () => {
+      if (document.hidden) {
+        if (wsRef.current) {
+          wsRef.current.onclose = null;
+          wsRef.current.close();
+          setStatus("disconnected");
+        }
+      } else {
+        connect();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+
     return () => {
       mounted.current = false;
+      document.removeEventListener("visibilitychange", handleVisibility);
       if (retryTimer.current) clearTimeout(retryTimer.current);
       if (wsRef.current) {
         wsRef.current.onclose = null; // prevent reconnect on intentional unmount

@@ -37,7 +37,7 @@ class CertificateService:
         prefix = prefix_map.get(cert_type, "CRT")
         year = datetime.now(timezone.utc).year
         random_hex = secrets.token_hex(4).upper()
-        return f"RMF-{prefix}-{year}-{random_hex}"
+        return f"MXF-{prefix}-{year}-{random_hex}"
 
     @classmethod
     def compute_sha256_signature(
@@ -128,6 +128,122 @@ class CertificateService:
         res = await db.execute(stmt)
         return list(res.scalars().all())
 
+    async def get_or_issue_certificate(
+        self,
+        db: AsyncSession,
+        purchase_id: str,
+        cert_type: CertificateType,
+        payout_amount: Optional[Decimal] = None,
+    ) -> Certificate:
+        """
+        Idempotent certificate generation.
+        Returns existing active certificate if already issued for this milestone,
+        or creates, signs, and commits a brand new verifiable certificate.
+        """
+        stmt = (
+            select(Certificate)
+            .where(
+                Certificate.purchase_id == purchase_id,
+                Certificate.certificate_type == cert_type,
+                Certificate.is_revoked == False,
+            )
+        )
+        res = await db.execute(stmt)
+        existing = res.scalar_one_or_none()
+        if existing:
+            return existing
+
+        return await self.issue_certificate(
+            db=db,
+            purchase_id=purchase_id,
+            cert_type=cert_type,
+            payout_amount=payout_amount,
+        )
+
+    async def auto_sync_for_purchase(
+        self,
+        db: AsyncSession,
+        purchase: ChallengePurchase,
+    ) -> List[Certificate]:
+        """
+        Evaluates a challenge purchase and automatically issues earned milestone certificates:
+        - Phase 1 Passed: TARGET_REACHED, PASSED, UNDER_REVIEW, FUNDED, or passed_at set
+        - Phase 2 Passed: PASSED, FUNDED, or PAYOUT_*
+        - Funded Trader: FUNDED or PAYOUT_*
+        """
+        issued: List[Certificate] = []
+        status = str(purchase.status or "").upper()
+        has_passed_target = (
+            status in ("TARGET_REACHED", "PASSED", "UNDER_REVIEW", "FUNDED", "PAYOUT_PENDING", "PAYOUT_APPROVED", "PAYOUT_PAID")
+            or purchase.passed_at is not None
+        )
+
+        if has_passed_target:
+            c1 = await self.get_or_issue_certificate(
+                db=db,
+                purchase_id=purchase.id,
+                cert_type=CertificateType.PHASE_1_PASSED,
+            )
+            issued.append(c1)
+
+        if status in ("PASSED", "FUNDED", "PAYOUT_PENDING", "PAYOUT_APPROVED", "PAYOUT_PAID"):
+            c2 = await self.get_or_issue_certificate(
+                db=db,
+                purchase_id=purchase.id,
+                cert_type=CertificateType.PHASE_2_PASSED,
+            )
+            issued.append(c2)
+
+        if status in ("FUNDED", "PAYOUT_PENDING", "PAYOUT_APPROVED", "PAYOUT_PAID"):
+            c3 = await self.get_or_issue_certificate(
+                db=db,
+                purchase_id=purchase.id,
+                cert_type=CertificateType.FUNDED_TRADER,
+            )
+            issued.append(c3)
+
+        return issued
+
+    async def auto_sync_certificates_for_user(
+        self,
+        db: AsyncSession,
+        user_id: str,
+    ) -> List[Certificate]:
+        """
+        Automatically scans all challenge purchases and completed payouts for a user,
+        minting any missing milestone certificates seamlessly.
+        """
+        stmt = (
+            select(ChallengePurchase)
+            .options(selectinload(ChallengePurchase.challenge))
+            .where(ChallengePurchase.user_id == user_id)
+        )
+        res = await db.execute(stmt)
+        purchases = res.scalars().all()
+
+        for p in purchases:
+            await self.auto_sync_for_purchase(db, p)
+
+        # Also scan paid payouts
+        from app.models.payout import PayoutRequest, PayoutStatus
+        payout_stmt = (
+            select(PayoutRequest)
+            .where(PayoutRequest.user_id == user_id, PayoutRequest.status == PayoutStatus.PAID)
+        )
+        p_res = await db.execute(payout_stmt)
+        paid_payouts = p_res.scalars().all()
+
+        for po in paid_payouts:
+            if po.purchase_id:
+                await self.get_or_issue_certificate(
+                    db=db,
+                    purchase_id=po.purchase_id,
+                    cert_type=CertificateType.PAYOUT_ACHIEVER,
+                    payout_amount=Decimal(str(po.amount)),
+                )
+
+        return await self.get_user_certificates(db, user_id)
+
     async def revoke_certificate(
         self,
         db: AsyncSession,
@@ -150,3 +266,8 @@ class CertificateService:
         await db.commit()
         await db.refresh(cert)
         return cert
+
+
+certificate_service = CertificateService()
+
+

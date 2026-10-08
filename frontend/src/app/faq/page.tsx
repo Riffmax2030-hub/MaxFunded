@@ -108,7 +108,7 @@ export default function FAQPage() {
       {/* Hero */}
       <section className="pt-20 pb-12 px-4 text-center bg-gradient-to-b from-slate-900 to-slate-950">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4 tracking-tight">
-          Frequently Asked <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">Questions</span>
+          Frequently Asked <span className="text-[#ccff00]">Questions</span>
         </h1>
         <p className="text-slate-400 text-lg max-w-2xl mx-auto">
           Everything you need to know about {BRAND.name}, evaluation rules, and trader rewards.
@@ -124,7 +124,7 @@ export default function FAQPage() {
               onClick={() => { setActiveCategory(cat.category); setOpenIndex(null); }}
               className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
                 activeCategory === cat.category
-                  ? "bg-brand-600 text-white shadow-lg shadow-brand-600/30"
+                  ? "bg-[#ccff00] text-black shadow-lg shadow-[#ccff00]/10"
                   : "bg-slate-900 text-slate-400 hover:bg-slate-800 border border-slate-800"
               }`}
             >
@@ -145,7 +145,7 @@ export default function FAQPage() {
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
               >
                 <span className="font-semibold text-white pr-4 text-sm">{item.q}</span>
-                <span className="text-brand-400 text-xl flex-shrink-0 font-mono">
+                <span className="text-[#ccff00] text-xl flex-shrink-0 font-mono">
                   {openIndex === i ? "−" : "+"}
                 </span>
               </button>
@@ -164,7 +164,7 @@ export default function FAQPage() {
         <p className="text-slate-400 mb-4 text-sm">Still have questions?</p>
         <Link
           href="/contact"
-          className="inline-block bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs px-8 py-3 rounded-xl transition shadow-lg shadow-brand-600/20"
+          className="inline-block bg-[#ccff00] hover:bg-[#b3e600] text-black font-black text-xs px-8 py-3 rounded-xl transition shadow-lg shadow-[#ccff00]/10"
         >
           Contact Support Team
         </Link>

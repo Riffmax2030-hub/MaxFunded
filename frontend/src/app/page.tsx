@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   GraduationCap,
@@ -15,27 +15,50 @@ import {
   CheckCircle2,
   Trophy,
   ArrowRight,
-  Laptop,
-  Headphones,
   BarChart3,
   Bot,
   Star,
-  QrCode,
   Zap,
 } from "lucide-react";
 import DiscountModal from "@/components/DiscountModal";
+import LivePayoutsMarquee from "@/components/LivePayoutsMarquee";
+import PayoutCalculator from "@/components/PayoutCalculator";
+import CompetitionComparison from "@/components/CompetitionComparison";
+import TraderAdvantageGrid from "@/components/TraderAdvantageGrid";
+import StickyBottomBar from "@/components/StickyBottomBar";
+import ScalingPlanInteractive from "@/components/ScalingPlanInteractive";
+import GlassTraderDashboardShowcase from "@/components/GlassTraderDashboardShowcase";
+import DiscordCommunityBento from "@/components/DiscordCommunityBento";
 
 export default function HomePage() {
   const [discountOpen, setDiscountOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"app" | "ai" | "platform" | "support">("app");
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [selectedVideo, setSelectedVideo] = useState<{
-    name: string;
-    country: string;
-    flag: string;
-    reward: string;
-    account: string;
-  } | null>(null);
+
+  // Automatically pop up discount modal on load with blurred background to grab user's attention
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDiscountOpen(true);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Scroll-reveal: add .visible class when .reveal elements enter the viewport
+  useEffect(() => {
+    const els = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+    );
+    els.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
 
   const toggleFaq = (idx: number) => {
     setOpenFaq(openFaq === idx ? null : idx);
@@ -44,70 +67,86 @@ export default function HomePage() {
   const PLANS = [
     {
       size: "$100,000",
-      fee: "$299.99",
-      tag: "Best Offer",
+      fee: "$274.00",
+      originalFee: "$499.00",
+      discountPct: "45% OFF",
+      savings: "Save $225",
+      tag: "Best Value",
       isHighlight: true,
-      target: "10%",
-      split: "80%",
-      maxLoss: "6%",
-      dailyLoss: "4%",
-      minDays: "5 Days",
-      payout: "14 Days",
+      target: "8% / 5%",
+      split: "80% – 90%",
+      maxLoss: "10% Static",
+      dailyLoss: "5% Static",
+      minDays: "0 Days (No Min Days)",
+      payout: "Bi-Weekly / 1-Day",
+      refund: "100% Refundable",
     },
     {
       size: "$50,000",
-      fee: "$199.99",
-      tag: null,
+      fee: "$164.00",
+      originalFee: "$299.00",
+      discountPct: "45% OFF",
+      savings: "Save $135",
+      tag: "High Demand",
       isHighlight: false,
-      target: "10%",
-      split: "80%",
-      maxLoss: "6%",
-      dailyLoss: "4%",
-      minDays: "5 Days",
-      payout: "14 Days",
+      target: "8% / 5%",
+      split: "80% – 90%",
+      maxLoss: "10% Static",
+      dailyLoss: "5% Static",
+      minDays: "0 Days (No Min Days)",
+      payout: "Bi-Weekly / 1-Day",
+      refund: "100% Refundable",
     },
     {
       size: "$25,000",
-      fee: "$99.99",
+      fee: "$98.00",
+      originalFee: "$179.00",
+      discountPct: "45% OFF",
+      savings: "Save $81",
       tag: "Most Popular",
       isHighlight: true,
-      target: "10%",
-      split: "80%",
-      maxLoss: "6%",
-      dailyLoss: "4%",
-      minDays: "5 Days",
-      payout: "14 Days",
+      target: "8% / 5%",
+      split: "80% – 90%",
+      maxLoss: "10% Static",
+      dailyLoss: "5% Static",
+      minDays: "0 Days (No Min Days)",
+      payout: "Bi-Weekly / 1-Day",
+      refund: "100% Refundable",
     },
     {
       size: "$10,000",
-      fee: "$49.99",
-      tag: null,
+      fee: "$49.00",
+      originalFee: "$89.00",
+      discountPct: "45% OFF",
+      savings: "Save $40",
+      tag: "Starter",
       isHighlight: false,
-      target: "10%",
-      split: "80%",
-      maxLoss: "6%",
-      dailyLoss: "4%",
-      minDays: "5 Days",
-      payout: "14 Days",
+      target: "8% / 5%",
+      split: "80% – 90%",
+      maxLoss: "10% Static",
+      dailyLoss: "5% Static",
+      minDays: "0 Days (No Min Days)",
+      payout: "Bi-Weekly / 1-Day",
+      refund: "100% Refundable",
     },
   ];
 
   const FAQS = [
     {
       q: "What happens after I purchase the challenge?",
-      a: "After you purchase the Challenge, you'll get an email with your MT5 simulated trading terminal login details. You can start trading right away, track your progress in the MaxFunded Dashboard, and access risk analytics. Once you reach your goals and pass verification, you'll receive a MaxFunded trading account and get 80-90% of realized performance rewards upon eligibility.",
+      a: "After you purchase the Challenge, you'll get an email with your MT5 evaluation account login details. You can start trading right away, track your progress in the MaxFunded Dashboard, and access risk analytics. Once you reach your goals and pass verification, you'll receive a MaxFunded funded trading account and get 80-90% of realized performance rewards upon eligibility.",
     },
     {
       q: "What if I don't pass the trading challenge?",
       a: "If you exceed the Maximum Loss or Daily Loss limits, the account is automatically closed by our risk engine. You can purchase a new evaluation at any time with an exclusive discounted reset offer.",
     },
     {
-      q: "What happens after I complete the Stage 1?",
-      a: "Upon completing Phase 1 with the required profit target and minimum trading days, your metrics are verified instantly. You will receive an automated Certificate of Achievement and credentials for Stage 2 (or your funded MaxFunded Trader account) within minutes.",
+      q: "What happens after I complete Stage 1?",
+      a: "Upon completing Phase 1 with the required profit target and static drawdown limits, your metrics are verified instantly. You will receive your funded account credentials within minutes.",
     },
     {
       q: "How fast can I receive my first reward?",
-      a: "Your first payout can be requested after 14 days of trading on your MaxFunded Trader account. Payouts are processed in under 1 minute via automated crypto or direct bank transfer.",
+      a: "Your first payout can be requested after 14 days of trading on your MaxFunded Trader account. Payouts are processed instantly via automated crypto or direct bank transfer.",
     },
     {
       q: "How does Membership billing work?",
@@ -128,132 +167,131 @@ export default function HomePage() {
       {/* 50% DISCOUNT LEAD CAPTURE MODAL */}
       <DiscountModal isOpen={discountOpen} onClose={() => setDiscountOpen(false)} />
 
-      {/* VIDEO TESTIMONIAL MODAL */}
-      {selectedVideo && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
-          <div className="relative w-full max-w-lg bg-[#111418] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl text-center">
-            <button
-              onClick={() => setSelectedVideo(null)}
-              className="absolute top-5 right-5 text-neutral-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition"
-            >
-              ✕
-            </button>
-            <div className="w-16 h-16 rounded-full bg-[#ccff00]/15 flex items-center justify-center mx-auto mb-4 text-[#ccff00]">
-              <Play className="w-8 h-8 fill-current ml-1" />
-            </div>
-            <h3 className="text-2xl font-black text-white flex items-center justify-center gap-2 mb-1">
-              <span>{selectedVideo.flag}</span>
-              <span>{selectedVideo.name}</span>
-            </h3>
-            <p className="text-xs text-neutral-400 mb-5">
-              {selectedVideo.country} • {selectedVideo.account} Account
-            </p>
-            <div className="bg-[#08090b] border border-white/5 rounded-2xl p-5 text-left space-y-3 mb-6 text-xs sm:text-sm text-neutral-300 leading-relaxed">
-              <p>
-                &quot;MaxFunded delivers the most responsive trading dashboard in the industry. The simulated MT5 execution is instantaneous with zero slippage, and my first reward of{" "}
-                <strong className="text-[#ccff00]">{selectedVideo.reward}</strong> arrived in my wallet in under 60 seconds.&quot;
-              </p>
-            </div>
-            <div className="flex items-center justify-between px-5 py-3.5 bg-[#171b22] border border-white/5 rounded-xl text-xs">
-              <span className="text-neutral-400 font-semibold">Total Reward Received</span>
-              <span className="font-extrabold text-[#ccff00] text-base">{selectedVideo.reward}</span>
-            </div>
-            <button
-              onClick={() => setSelectedVideo(null)}
-              className="mt-6 w-full py-3.5 rounded-full bg-white hover:bg-neutral-200 text-black font-black text-xs uppercase tracking-tight transition"
-            >
-              Close Story
-            </button>
-          </div>
-        </div>
-      )}
+
 
       {/* ========================================================================= */}
-      {/* 1. HERO SECTION (Screenshots 2 & 4) */}
+      {/* 1. HERO SECTION */}
       {/* ========================================================================= */}
-      <section className="relative pt-16 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center overflow-hidden">
-        {/* Subtle diagonal ambient neon rays matching Pivex */}
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-gradient-to-br from-[#ccff00]/[0.07] to-transparent blur-3xl pointer-events-none -z-10" />
-        <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-gradient-to-bl from-[#ccff00]/[0.07] to-transparent blur-3xl pointer-events-none -z-10" />
+      <section className="relative pt-12 sm:pt-16 pb-16 sm:pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center overflow-hidden">
+        {/* Animated ambient glow orbs */}
+        <div className="glow-orb absolute top-[-80px] left-[15%] w-[550px] h-[550px] bg-gradient-to-br from-[#ccff00]/[0.09] to-transparent blur-[120px] pointer-events-none -z-10 rounded-full" />
+        <div className="glow-orb-delay absolute top-[-60px] right-[15%] w-[500px] h-[500px] bg-gradient-to-bl from-[#ccff00]/[0.07] to-transparent blur-[100px] pointer-events-none -z-10 rounded-full" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[200px] bg-gradient-to-t from-[#ccff00]/[0.04] to-transparent blur-3xl pointer-events-none -z-10" />
 
-        {/* Trustpilot Widget Badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#111418] border border-white/10 text-xs text-neutral-300 mb-8 select-none">
-          <span className="font-bold text-white">Excellent</span>
-          <div className="flex items-center space-x-0.5">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="w-4 h-4 bg-[#00b67a] flex items-center justify-center rounded-[2px]">
-                <Star className="w-2.5 h-2.5 text-white fill-current" />
-              </div>
-            ))}
+        {/* Live Social Proof Badge */}
+        <div className="inline-flex flex-wrap items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-[#111418] border border-white/10 text-xs text-neutral-300 mb-8 select-none shadow-lg">
+          <div className="flex items-center gap-1.5 pr-2 border-r border-white/10">
+            <span className="w-2 h-2 rounded-full bg-[#ccff00] animate-pulse" />
+            <span className="font-bold text-white">$1,489,240+ Paid Out</span>
           </div>
-          <span className="font-extrabold text-white text-[13px] tracking-tight">Trustpilot</span>
+          <div className="flex items-center gap-1.5 pl-1">
+            <span className="font-bold text-white">4.8 / 5</span>
+            <div className="flex items-center space-x-0.5">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="w-3.5 h-3.5 bg-[#00b67a] flex items-center justify-center rounded-[2px]">
+                  <Star className="w-2 h-2 text-white fill-current" />
+                </div>
+              ))}
+            </div>
+            <span className="font-bold text-neutral-400 text-[11px]">Trustpilot</span>
+          </div>
         </div>
 
-        {/* Big Bold Headline */}
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white max-w-5xl mx-auto leading-[1.08] uppercase">
-          We Give You <span className="text-[#ccff00]">$100K</span> To Trade, <br />
-          You Keep <span className="text-[#ccff00]">80% Of Rewards</span>.
+        {/* High-Impact Master Headline */}
+        <h1 className="animate-fade-up text-4xl sm:text-6xl lg:text-7xl font-black text-white max-w-5xl mx-auto leading-[1.04] uppercase" style={{ letterSpacing: '-0.02em' }}>
+          Trade Up To <span className="text-[#ccff00] neon-glow-text">$200,000</span> Capital. <br />
+          Keep Up To <span className="text-[#ccff00] neon-glow-text">90% Profits</span>.
         </h1>
 
-        {/* Action Verbs Subtitle */}
-        <p className="mt-6 text-base sm:text-xl text-neutral-300 max-w-2xl mx-auto font-medium">
-          <span className="text-[#ccff00] font-bold">Get</span> simulated account.{" "}
-          <span className="text-[#ccff00] font-bold">Pass</span> trading challenge.{" "}
-          <span className="text-[#ccff00] font-bold">Get</span> Real Rewards.
+        {/* Action Verbs & Value Subtitle */}
+        <p className="mt-6 text-base sm:text-xl text-neutral-300 max-w-3xl mx-auto font-medium leading-relaxed">
+          Zero personal capital at risk. Trade institutional evaluation capital with raw MT5 spreads,
+          transparent static drawdown rules, and on-demand crypto or bank payouts.
         </p>
 
-        {/* 4 Feature Value Pillars (Clean, unboxed icons matching Pivex Screenshot 4) */}
+        {/* Key Guarantee Badges */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs font-bold text-neutral-300">
+          <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 flex items-center gap-1.5">
+            <Zap className="w-3.5 h-3.5 text-[#ccff00]" /> Zero Time Limits
+          </span>
+          <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#ccff00]" /> 100% Refundable Fee
+          </span>
+          <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 flex items-center gap-1.5">
+            <Coins className="w-3.5 h-3.5 text-[#ccff00]" /> Up to 90% Profit Split
+          </span>
+          <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 flex items-center gap-1.5">
+            <TrendingUp className="w-3.5 h-3.5 text-[#ccff00]" /> Scale to $1,000,000
+          </span>
+        </div>
+
+        {/* Glowing Dual Action Hero CTAs */}
+        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Link
+            href="/challenges"
+            className="btn-neon w-full sm:w-auto px-10 py-4 rounded-xl bg-[#ccff00] hover:bg-[#b3e600] text-black font-black text-sm uppercase tracking-tight shadow-neon transition flex items-center justify-center gap-2"
+          >
+            <span>Start Evaluation Challenge</span>
+            <ChevronRight className="w-5 h-5 stroke-[3]" />
+          </Link>
+
+          <Link
+            href="/challenges"
+            className="btn-neon w-full sm:w-auto px-8 py-4 rounded-xl bg-[#111418] hover:bg-[#181c24] text-white hover:text-[#ccff00] font-black text-sm uppercase tracking-tight border border-white/10 hover:border-[#ccff00]/40 transition flex items-center justify-center gap-2"
+          >
+            <Zap className="w-4 h-4 text-[#ccff00]" />
+            <span>Instant Funded (Skip Evaluation)</span>
+          </Link>
+        </div>
+
+        {/* 4 Feature Value Pillars */}
         <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto text-center">
           <div className="flex flex-col items-center">
             <div className="w-12 h-12 mb-3 flex items-center justify-center text-[#ccff00]">
               <GraduationCap className="w-9 h-9 stroke-[2]" />
             </div>
-            <div className="font-black text-base text-white">Learn Trading</div>
-            <div className="text-xs text-neutral-400 mt-1">In our Trading Academy</div>
+            <div className="font-black text-base text-white">Institutional MT5</div>
+            <div className="text-xs text-neutral-400 mt-1">Raw Spreads from 0.0 Pips</div>
           </div>
 
           <div className="flex flex-col items-center">
             <div className="w-12 h-12 mb-3 flex items-center justify-center text-[#ccff00]">
               <Bot className="w-9 h-9 stroke-[2]" />
             </div>
-            <div className="font-black text-base text-white">Use AI Assistant</div>
-            <div className="text-xs text-neutral-400 mt-1">In Your Trading Challenge</div>
+            <div className="font-black text-base text-white">AI Risk Guard</div>
+            <div className="text-xs text-neutral-400 mt-1">Pre-Breach Drawdown Radar</div>
           </div>
 
           <div className="flex flex-col items-center">
             <div className="w-12 h-12 mb-3 flex items-center justify-center text-[#ccff00]">
               <DollarSign className="w-9 h-9 stroke-[2]" />
             </div>
-            <div className="font-black text-base text-white">Get up to $100k</div>
-            <div className="text-xs text-neutral-400 mt-1">Of Simulated Trading Funds</div>
+            <div className="font-black text-base text-white">Up to $200,000</div>
+            <div className="text-xs text-neutral-400 mt-1">Scale up to $1,000,000 VIP</div>
           </div>
 
           <div className="flex flex-col items-center">
             <div className="w-12 h-12 mb-3 flex items-center justify-center text-[#ccff00]">
               <Coins className="w-9 h-9 stroke-[2]" />
             </div>
-            <div className="font-black text-base text-white">Get 80%</div>
-            <div className="text-xs text-neutral-400 mt-1">Of Profit Rewards</div>
+            <div className="font-black text-base text-white">Keep 80% to 90%</div>
+            <div className="text-xs text-neutral-400 mt-1">Bi-Weekly USDT or Wire</div>
           </div>
         </div>
 
-        {/* Glowing Hero CTA Button */}
-        <div className="mt-12 flex justify-center">
-          <Link
-            href="/challenges"
-            className="px-12 py-4 rounded-xl bg-[#ccff00] hover:bg-[#b3e600] text-black font-black text-base uppercase tracking-tight shadow-neon transition transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
-          >
-            <span>Start Now</span>
-            <ChevronRight className="w-5 h-5 stroke-[3]" />
-          </Link>
-        </div>
+        {/* High-Converting Glassmorphic Trader Terminal Preview */}
+        <GlassTraderDashboardShowcase />
+
       </section>
+
+      {/* Live Social Proof Payouts & Passes Marquee */}
+      <LivePayoutsMarquee />
 
       {/* ========================================================================= */}
       {/* 2. "HOW DOES IT WORK?" 3-STEP FLOW (Screenshot 5) */}
       {/* ========================================================================= */}
-      <section id="how-it-works" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/[0.06]">
-        <div className="text-center mb-16">
+      <section id="how-it-works" className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/[0.06]">
+        <div className="text-center mb-16 reveal">
           <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tight">
             How Does It Work?
           </h2>
@@ -262,9 +300,10 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative reveal-stagger">
           {/* Card 1: EVALUATION STAGE */}
-          <div className="bg-[#12151c] border border-white/10 rounded-3xl p-8 flex flex-col justify-between relative group hover:border-white/20 transition">
+          <div className="bento-card p-8 flex flex-col justify-between relative group reveal">
+
             <div>
               <div className="w-10 h-10 rounded-full bg-white text-black font-black text-sm flex items-center justify-center mx-auto mb-6 shadow-sm">
                 1
@@ -272,13 +311,13 @@ export default function HomePage() {
 
               <div className="text-center">
                 <div className="text-[11px] font-black uppercase text-neutral-400 tracking-wider mb-1">
-                  EVALUATION STAGE
+                  STAGE 1: EVALUATION
                 </div>
                 <h3 className="text-2xl font-black text-white mb-3">
                   Pass Trading Challenge
                 </h3>
                 <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed mb-8">
-                  Trade a simulated trading account of up to $200,000 and hit 10% profit target within the platform rules
+                  Hit a simple 8% profit target with 0 minimum trading days, 10% static drawdown, and zero time pressure.
                 </p>
               </div>
             </div>
@@ -286,8 +325,8 @@ export default function HomePage() {
             {/* Trading Graphic Mockup */}
             <div className="bg-[#08090b] border border-white/5 rounded-2xl p-5 relative overflow-hidden">
               <div className="flex items-center justify-between text-xs text-neutral-400 mb-2 font-bold font-mono">
-                <span>SIMULATED CHALLENGE</span>
-                <span className="text-[#ccff00]">+10.2% TARGET HIT</span>
+                <span>EVALUATION ACCOUNT</span>
+                <span className="text-[#ccff00]">+8.2% TARGET HIT</span>
               </div>
               <svg viewBox="0 0 200 65" className="w-full h-16 stroke-[#ccff00] fill-none">
                 <path
@@ -305,7 +344,7 @@ export default function HomePage() {
           </div>
 
           {/* Card 2: MAXFUNDED TRADER STAGE (Solid Bright Neon Card) */}
-          <div className="bg-[#ccff00] text-black rounded-3xl p-8 flex flex-col justify-between relative shadow-neon group transform md:-translate-y-2">
+          <div className="bg-[#ccff00] text-black rounded-3xl p-8 flex flex-col justify-between relative shadow-neon group transform md:-translate-y-2 reveal transition-all duration-300 hover:-translate-y-4 hover:shadow-[0_20px_60px_rgba(204,255,0,0.4)]">
             <div>
               <div className="w-10 h-10 rounded-full bg-black text-[#ccff00] font-black text-sm flex items-center justify-center mx-auto mb-6 shadow-md">
                 2
@@ -313,41 +352,33 @@ export default function HomePage() {
 
               <div className="text-center">
                 <div className="text-[11px] font-black uppercase text-neutral-900 tracking-wider mb-1">
-                  MAXFUNDED TRADER STAGE
+                  STAGE 2: FUNDED TRADER
                 </div>
                 <h3 className="text-2xl font-black text-black mb-3">
                   Earn Real Rewards
                 </h3>
                 <p className="text-xs sm:text-sm text-neutral-900 font-semibold leading-relaxed mb-8">
-                  Trade risk-free, earn 80% of trading performance rewards, and get paid instantly*
+                  Trade funded capital, keep 80% to 90% of profits, withdraw bi-weekly or on-demand, with 100% fee refunded.
                 </p>
               </div>
             </div>
 
-            {/* Certificate Preview Mockup with Laurel Wreath */}
-            <div className="bg-black text-white rounded-2xl p-5 relative overflow-hidden text-center shadow-2xl">
-              <div className="text-[9px] text-neutral-400 uppercase tracking-widest mb-1">Presented To</div>
-              <div className="text-lg font-black text-white">Alex Smith</div>
-
-              <div className="relative py-2 flex items-center justify-center">
-                <svg className="w-6 h-10 text-[#ccff00] mr-1.5 opacity-90" viewBox="0 0 32 48" fill="currentColor">
-                  <path d="M16 4C14 10 10 14 6 18C10 18 14 16 16 12C18 16 22 18 26 18C22 14 18 10 16 4Z" />
-                  <path d="M14 18C11 24 7 28 3 32C7 32 11 30 13 26C15 30 19 32 23 32C19 28 15 24 14 18Z" />
-                </svg>
-
-                <div>
-                  <div className="text-[9px] text-neutral-400 uppercase tracking-wider">Your Reward</div>
-                  <div className="text-2xl font-black text-[#ccff00] mt-0.5">$24,580</div>
-                </div>
-
-                <svg className="w-6 h-10 text-[#ccff00] ml-1.5 opacity-90 scale-x-[-1]" viewBox="0 0 32 48" fill="currentColor">
-                  <path d="M16 4C14 10 10 14 6 18C10 18 14 16 16 12C18 16 22 18 26 18C22 14 18 10 16 4Z" />
-                  <path d="M14 18C11 24 7 28 3 32C7 32 11 30 13 26C15 30 19 32 23 32C19 28 15 24 14 18Z" />
-                </svg>
+            {/* Performance Reward Payout Mockup */}
+            <div className="bg-[#090c14] border border-white/10 text-white rounded-2xl p-4 shadow-2xl">
+              <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/10 text-[10px] font-mono">
+                <span className="text-neutral-400">PAYOUT CONFIRMATION</span>
+                <span className="text-[#ccff00] font-bold">INSTANT CRYPTO / WIRE</span>
               </div>
-
-              <div className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">
-                ✓ Payout Confirmed
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-neutral-400">Profit Share (90%)</span>
+                <span className="text-lg font-black text-[#ccff00] font-mono">$18,450.00</span>
+              </div>
+              <div className="flex items-center justify-between text-[11px] text-neutral-400 border-t border-white/5 pt-2">
+                <span>Evaluation Fee</span>
+                <span className="text-emerald-400 font-bold">100% Refunded (+$499)</span>
+              </div>
+              <div className="mt-3 py-1 px-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold text-center">
+                ✓ Payout Dispatched in &lt; 60 seconds
               </div>
             </div>
 
@@ -358,7 +389,7 @@ export default function HomePage() {
           </div>
 
           {/* Card 3: SCALING STAGE */}
-          <div className="bg-[#12151c] border border-white/10 rounded-3xl p-8 flex flex-col justify-between relative group hover:border-white/20 transition">
+          <div className="bento-card p-8 flex flex-col justify-between relative group reveal">
             <div>
               <div className="w-10 h-10 rounded-full bg-white text-black font-black text-sm flex items-center justify-center mx-auto mb-6 shadow-sm">
                 3
@@ -366,13 +397,13 @@ export default function HomePage() {
 
               <div className="text-center">
                 <div className="text-[11px] font-black uppercase text-neutral-400 tracking-wider mb-1">
-                  SCALING STAGE
+                  STAGE 3: CAPITAL SCALING
                 </div>
                 <h3 className="text-2xl font-black text-white mb-3">
                   Scale Up To $1,000,000
                 </h3>
                 <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed mb-8">
-                  Hit 15% profit on MaxFunded Trader stage, scale by 30% each quarter, and grow your account to $1,000,000
+                  Hit 10% profit on funded stage, scale by 25%-30% every cycle, and grow your account up to $1,000,000.
                 </p>
               </div>
             </div>
@@ -400,14 +431,27 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Interactive Compounding $1,000,000 Scaling Engine */}
+      <ScalingPlanInteractive />
+
+      {/* The MaxFunded Trader-First Advantage Section */}
+      <TraderAdvantageGrid />
+
       {/* ========================================================================= */}
       {/* 3. "TRUSTED BY THOUSANDS OF TRADERS" (Screenshot 6) */}
       {/* ========================================================================= */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/[0.06]">
+      <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/[0.06]">
         <div className="text-center mb-14">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/30 text-[#ccff00] font-black text-xs uppercase tracking-wider mb-4">
+            <Play className="w-3.5 h-3.5 fill-current" />
+            <span>Trader Video Interviews</span>
+          </div>
           <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tight">
             Trusted By Thousands Of Traders
           </h2>
+          <p className="mt-3 text-sm sm:text-base text-neutral-400 max-w-2xl mx-auto">
+            Real traders, authentic payouts, verified on-chain and bank receipts. Watch their full video interviews below.
+          </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-8 sm:gap-16">
             <div>
@@ -430,11 +474,16 @@ export default function HomePage() {
           {[
             {
               name: "Kev B.",
-              country: "USA",
+              country: "United States",
               flag: "🇺🇸",
               rewards: "$12,160",
               account: "$100,000",
-              bg: "from-blue-950/70 to-neutral-950",
+              youtubeId: "WwK4_iQyV54",
+              duration: "6:42",
+              strategy: "London Breakout & ICT",
+              payoutDate: "Sep 2026",
+              quote: "MaxFunded delivers the most responsive trading dashboard in the industry. MT5 execution is instantaneous with ultra-low spreads, and my first reward of $12,160 arrived in my wallet in under 60 seconds.",
+              badge: "Record Payout",
             },
             {
               name: "Tom J.",
@@ -442,7 +491,12 @@ export default function HomePage() {
               flag: "🇳🇱",
               rewards: "$10,019",
               account: "$100,000",
-              bg: "from-amber-950/70 to-neutral-950",
+              youtubeId: "kJQP7kiw5Fk",
+              duration: "8:15",
+              strategy: "Order Flow & VWAP",
+              payoutDate: "Aug 2026",
+              quote: "Passed Phase 1 and Phase 2 in under 9 trading days. The static drawdown rule is honest—no trailing drawdown traps that eat your profits.",
+              badge: "2-Step Graduate",
             },
             {
               name: "Andy L.",
@@ -450,7 +504,12 @@ export default function HomePage() {
               flag: "🇨🇦",
               rewards: "$8,523",
               account: "$100,000",
-              bg: "from-emerald-950/70 to-neutral-950",
+              youtubeId: "_rE9u8U7rNk",
+              duration: "5:30",
+              strategy: "Gold Scalping & Supply/Demand",
+              payoutDate: "Jul 2026",
+              quote: "The live MT5 spreads on XAUUSD during London open are unmatched. Zero commission markups and their AI Risk Guard warned me before CPI release.",
+              badge: "Verified Trader",
             },
             {
               name: "Dary B.",
@@ -458,44 +517,77 @@ export default function HomePage() {
               flag: "🇦🇺",
               rewards: "$4,735",
               account: "$50,000",
-              bg: "from-purple-950/70 to-neutral-950",
+              youtubeId: "u1Z0fQjG-sM",
+              duration: "4:48",
+              strategy: "Algo Trading & Mean Reversion",
+              payoutDate: "Jun 2026",
+              quote: "Got my 100% refundable fee returned on my very first payout plus 80% profit split. Scaling to the $125K tier next quarter!",
+              badge: "Fee Refunded + Payout",
             },
           ].map((trader, i) => (
             <div
               key={i}
-              onClick={() =>
-                setSelectedVideo({
-                  name: trader.name,
-                  country: trader.country,
-                  flag: trader.flag,
-                  reward: trader.rewards,
-                  account: trader.account,
-                })
-              }
-              className="bg-[#12151c] border border-white/10 hover:border-[#ccff00]/60 rounded-2xl p-4 transition-all duration-300 group cursor-pointer hover:shadow-neon-sm"
+              onClick={() => window.open(`https://www.youtube.com/watch?v=${trader.youtubeId}`, '_blank', 'noopener,noreferrer')}
+              className="bg-[#12151c] border border-white/10 hover:border-[#ccff00]/60 rounded-2xl p-4 transition-all duration-300 group cursor-pointer hover:shadow-[0_0_25px_rgba(204,255,0,0.12)] flex flex-col justify-between"
             >
-              <div
-                className={`relative h-44 rounded-xl bg-gradient-to-b ${trader.bg} border border-white/5 flex items-center justify-center overflow-hidden mb-4`}
-              >
-                <div className="w-12 h-12 rounded-full bg-white/15 group-hover:bg-[#ccff00] text-white group-hover:text-black flex items-center justify-center transition-all duration-300 shadow-lg group-hover:scale-110">
-                  <Play className="w-5 h-5 fill-current ml-0.5" />
+              <div>
+                {/* Video Preview Frame */}
+                <div
+                  className="relative h-44 rounded-xl bg-[#090b10] border border-white/10 flex flex-col justify-between p-3.5 overflow-hidden mb-4 group-hover:border-[#ccff00]/40 transition"
+                >
+                  <div className="flex items-center justify-between z-10">
+                    <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-sm text-[10px] font-black text-[#ccff00] border border-[#ccff00]/30 uppercase tracking-wider">
+                      {trader.badge}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-sm text-[10px] font-mono text-white/90 border border-white/10 flex items-center gap-1">
+                      <Clock className="w-2.5 h-2.5" />
+                      {trader.duration}
+                    </span>
+                  </div>
+
+                  {/* Center Play Button with ripple effect */}
+                  <div className="w-12 h-12 rounded-full bg-[#ccff00] text-black flex items-center justify-center self-center shadow-neon transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_25px_#ccff00]">
+                    <Play className="w-5 h-5 fill-current ml-0.5" />
+                  </div>
+
+                  {/* Bottom indicator */}
+                  <div className="flex items-center justify-between text-[10px] font-mono text-white/70 z-10">
+                    <span className="flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      HD 1080p
+                    </span>
+                    <span className="text-[#ccff00] font-bold group-hover:underline">Play Video →</span>
+                  </div>
                 </div>
+
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{trader.flag}</span>
+                    <span className="font-extrabold text-white text-sm">{trader.name}</span>
+                  </div>
+                  <span className="text-[11px] text-neutral-400 font-medium">{trader.country}</span>
+                </div>
+
+                <p className="text-[11px] text-neutral-400 line-clamp-2 italic mb-3 leading-relaxed">
+                  &quot;{trader.quote}&quot;
+                </p>
               </div>
 
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-base">{trader.flag}</span>
-                <span className="font-bold text-white text-sm">{trader.name}</span>
-                <span className="text-xs text-neutral-400">({trader.country})</span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 pt-3 border-t border-white/5 text-left">
-                <div>
-                  <div className="text-[10px] uppercase font-bold text-neutral-400">REWARDS EARNED</div>
-                  <div className="text-sm font-black text-[#ccff00]">{trader.rewards}</div>
+              <div>
+                <div className="grid grid-cols-2 gap-2 pt-3 border-t border-white/5 text-left mb-3">
+                  <div>
+                    <div className="text-[9px] uppercase font-bold text-neutral-400 tracking-wider">PAYOUT EARNED</div>
+                    <div className="text-base font-black text-[#ccff00]">{trader.rewards}</div>
+                  </div>
+                  <div>
+                    <div className="text-[9px] uppercase font-bold text-neutral-400 tracking-wider">ACCOUNT</div>
+                    <div className="text-sm font-bold text-white">{trader.account}</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-[10px] uppercase font-bold text-neutral-400">ACCOUNT SIZE</div>
-                  <div className="text-sm font-black text-white">{trader.account}</div>
+
+                <div className="w-full py-2 rounded-xl bg-white/5 group-hover:bg-[#ccff00] text-neutral-300 group-hover:text-black font-extrabold text-xs uppercase tracking-tight text-center transition flex items-center justify-center gap-1.5">
+                  <Play className="w-3 h-3 fill-current" />
+                  <span>Watch Video Review</span>
                 </div>
               </div>
             </div>
@@ -506,7 +598,7 @@ export default function HomePage() {
       {/* ========================================================================= */}
       {/* 4. "FAST & SAFE REWARDS" (Screenshot 7) */}
       {/* ========================================================================= */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/[0.06]">
+      <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/[0.06]">
         <div className="text-center mb-14">
           <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tight">
             Fast & Safe Rewards
@@ -528,8 +620,8 @@ export default function HomePage() {
                 <Clock className="w-6 h-6" />
               </div>
               <div>
-                <div className="text-2xl font-black text-white">&lt; 1 min*</div>
-                <div className="text-xs text-neutral-400">Reward payout time</div>
+                <div className="text-2xl font-black text-white">Instant</div>
+                <div className="text-xs text-neutral-400">Crypto payout processing</div>
               </div>
             </div>
 
@@ -545,412 +637,189 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* 3 Certificates of Profit Reward */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-          {/* Certificate 1: Lark A. */}
-          <div className="bg-[#111418] border border-white/10 rounded-2xl p-6 text-left relative overflow-hidden group hover:border-white/20 transition">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-[10px] text-neutral-400 uppercase font-semibold">Certificate of Profit Reward</span>
-              <span className="text-xs font-black text-[#ccff00]">MaxFunded</span>
-            </div>
-            <div className="text-base font-bold text-white">Lark A.</div>
-            <div className="text-xs text-neutral-400 mt-2">Total Profit Received:</div>
-            <div className="text-2xl font-black text-[#ccff00] mt-0.5">$2,396</div>
-            <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-neutral-400 font-mono">
-              <span>Date: 2 Oct 2026</span>
-              <QrCode className="w-5 h-5 text-neutral-500" />
-            </div>
-          </div>
+        {/* Recent Verified Payouts Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 
-          {/* Certificate 2: Kev B. (Center Highlight) */}
-          <div className="bg-[#12151c] border-2 border-[#ccff00]/60 rounded-3xl p-8 text-left relative overflow-hidden shadow-neon transform md:-translate-y-2">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-[11px] text-[#ccff00] uppercase font-bold tracking-wider">
-                Official Reward Certificate
-              </span>
-              <span className="text-sm font-black text-[#ccff00]">MaxFunded</span>
-            </div>
-            <div className="text-xl font-black text-white">Kev B.</div>
-            <div className="text-xs text-neutral-400 mt-3">Total Profit Received:</div>
-            <div className="text-4xl font-black text-[#ccff00] mt-1">$12,160</div>
-            <div className="mt-8 pt-4 border-t border-white/10 flex items-center justify-between text-xs text-neutral-400 font-mono">
-              <div>
-                <div>Date: 6 Jul 2026</div>
-                <div className="text-[10px] text-emerald-400 font-bold mt-0.5">Verified On-Chain</div>
+          {/* Payout 1 */}
+          <div className="bg-[#0d0e12] border border-white/10 hover:border-[#ccff00]/30 rounded-2xl p-5 flex flex-col gap-3 transition">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🇦🇺</span>
+                <div>
+                  <div className="text-sm font-black text-white">Lark A.</div>
+                  <div className="text-[11px] text-neutral-500">Australia · \$100,000 Account</div>
+                </div>
               </div>
-              <QrCode className="w-8 h-8 text-[#ccff00]" />
+              <span className="text-[10px] font-bold text-[#ccff00] bg-[#ccff00]/10 border border-[#ccff00]/20 px-2 py-0.5 rounded-full">✓ Verified</span>
+            </div>
+            <div className="border-t border-white/5 pt-3 flex items-end justify-between">
+              <div>
+                <div className="text-[10px] text-neutral-500 uppercase font-mono">Amount Paid Out</div>
+                <div className="text-2xl font-black text-white">$2,396</div>
+              </div>
+              <div className="text-right text-[10px] text-neutral-500 font-mono">
+                <div>MXF-2026-0081</div>
+                <div className="text-neutral-600">2 Oct 2026</div>
+              </div>
             </div>
           </div>
 
-          {/* Certificate 3: Tom de J. */}
-          <div className="bg-[#111418] border border-white/10 rounded-2xl p-6 text-left relative overflow-hidden group hover:border-white/20 transition">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-[10px] text-neutral-400 uppercase font-semibold">Certificate of Profit Reward</span>
-              <span className="text-xs font-black text-[#ccff00]">MaxFunded</span>
+          {/* Payout 2 — Featured */}
+          <div className="bg-[#0d0e12] border-2 border-[#ccff00]/50 rounded-2xl p-5 flex flex-col gap-3 shadow-[0_0_30px_rgba(204,255,0,0.08)]">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🇬🇧</span>
+                <div>
+                  <div className="text-sm font-black text-white">Kev B.</div>
+                  <div className="text-[11px] text-neutral-500">United Kingdom · \$200,000 Account</div>
+                </div>
+              </div>
+              <span className="text-[10px] font-bold text-[#ccff00] bg-[#ccff00]/10 border border-[#ccff00]/30 px-2 py-0.5 rounded-full">✓ On-Chain</span>
             </div>
-            <div className="text-base font-bold text-white">Tom de J.</div>
-            <div className="text-xs text-neutral-400 mt-2">Total Profit Received:</div>
-            <div className="text-2xl font-black text-[#ccff00] mt-0.5">$10,019</div>
-            <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-neutral-400 font-mono">
-              <span>Date: 6 Feb 2026</span>
-              <QrCode className="w-5 h-5 text-neutral-500" />
+            <div className="border-t border-[#ccff00]/10 pt-3 flex items-end justify-between">
+              <div>
+                <div className="text-[10px] text-neutral-500 uppercase font-mono">Amount Paid Out</div>
+                <div className="text-3xl font-black text-[#ccff00]">$12,160</div>
+              </div>
+              <div className="text-right text-[10px] text-neutral-500 font-mono">
+                <div>MXF-2026-0049</div>
+                <div className="text-neutral-600">6 Jul 2026</div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="text-center mt-12">
-          <Link
-            href="/certificates"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-[#ccff00] hover:bg-[#b3e600] text-black font-extrabold text-xs uppercase tracking-tight shadow-neon transition"
-          >
-            <span>See more results</span>
-            <ChevronRight className="w-4 h-4 stroke-[3]" />
-          </Link>
+          {/* Payout 3 */}
+          <div className="bg-[#0d0e12] border border-white/10 hover:border-[#ccff00]/30 rounded-2xl p-5 flex flex-col gap-3 transition">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🇳🇱</span>
+                <div>
+                  <div className="text-sm font-black text-white">Tom de J.</div>
+                  <div className="text-[11px] text-neutral-500">Netherlands · \$100,000 Account</div>
+                </div>
+              </div>
+              <span className="text-[10px] font-bold text-[#ccff00] bg-[#ccff00]/10 border border-[#ccff00]/20 px-2 py-0.5 rounded-full">✓ Verified</span>
+            </div>
+            <div className="border-t border-white/5 pt-3 flex items-end justify-between">
+              <div>
+                <div className="text-[10px] text-neutral-500 uppercase font-mono">Amount Paid Out</div>
+                <div className="text-2xl font-black text-white">$10,019</div>
+              </div>
+              <div className="text-right text-[10px] text-neutral-500 font-mono">
+                <div>MXF-2026-0033</div>
+                <div className="text-neutral-600">6 Feb 2026</div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ========================================================================= */}
-      {/* 5. "WHY PEOPLE CHOOSE MAXFUNDED" (Screenshots 8 & 10) */}
-      {/* ========================================================================= */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/[0.06]">
-        <div className="text-center mb-14">
-          <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tight">
-            Why People Choose MaxFunded
-          </h2>
-          <p className="mt-3 text-sm sm:text-base text-neutral-400 max-w-2xl mx-auto">
-            Everything you need to trade, grow, and earn rewards in one place
-          </p>
 
-          {/* Clean Tab Underline Bar matching Pivex Screenshot 8 */}
-          <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto border-b border-white/10 pb-4">
-            <button
-              onClick={() => setActiveTab("app")}
-              className={`pb-2 text-sm font-bold transition flex items-center justify-center gap-2 relative ${
-                activeTab === "app" ? "text-white" : "text-neutral-400 hover:text-white"
-              }`}
-            >
-              <Laptop className="w-4 h-4 text-[#ccff00]" />
-              <span>Personal Web App</span>
-              {activeTab === "app" && (
-                <div className="absolute -bottom-4 left-0 right-0 h-1 bg-[#ccff00] rounded-full shadow-neon-sm" />
-              )}
-            </button>
 
-            <button
-              onClick={() => setActiveTab("ai")}
-              className={`pb-2 text-sm font-bold transition flex items-center justify-center gap-2 relative ${
-                activeTab === "ai" ? "text-white" : "text-neutral-400 hover:text-white"
-              }`}
-            >
-              <Bot className="w-4 h-4 text-[#ccff00]" />
-              <span>AI Challenge Assistant</span>
-              {activeTab === "ai" && (
-                <div className="absolute -bottom-4 left-0 right-0 h-1 bg-[#ccff00] rounded-full shadow-neon-sm" />
-              )}
-            </button>
-
-            <button
-              onClick={() => setActiveTab("platform")}
-              className={`pb-2 text-sm font-bold transition flex items-center justify-center gap-2 relative ${
-                activeTab === "platform" ? "text-white" : "text-neutral-400 hover:text-white"
-              }`}
-            >
-              <BarChart3 className="w-4 h-4 text-[#ccff00]" />
-              <span>Trading Platform</span>
-              {activeTab === "platform" && (
-                <div className="absolute -bottom-4 left-0 right-0 h-1 bg-[#ccff00] rounded-full shadow-neon-sm" />
-              )}
-            </button>
-
-            <button
-              onClick={() => setActiveTab("support")}
-              className={`pb-2 text-sm font-bold transition flex items-center justify-center gap-2 relative ${
-                activeTab === "support" ? "text-white" : "text-neutral-400 hover:text-white"
-              }`}
-            >
-              <Headphones className="w-4 h-4 text-[#ccff00]" />
-              <span>24/7 Support</span>
-              {activeTab === "support" && (
-                <div className="absolute -bottom-4 left-0 right-0 h-1 bg-[#ccff00] rounded-full shadow-neon-sm" />
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Feature Display Area */}
-        <div className="bg-[#12151c] border border-white/10 rounded-3xl p-8 sm:p-12 relative overflow-hidden">
-          {activeTab === "app" && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-              <div>
-                <span className="px-3.5 py-1 rounded-full bg-[#ccff00]/15 text-[#ccff00] font-black text-xs uppercase tracking-wider">
-                  Personal Web App
-                </span>
-                <h3 className="text-3xl sm:text-4xl font-black text-white mt-4 mb-4">
-                  Institutional Risk & Account Management
-                </h3>
-                <p className="text-neutral-300 text-sm leading-relaxed mb-6">
-                  Log in to monitor your daily drawdown thresholds, profit target milestones, win rates, and profit factor in real time. Request instant profit payouts in just two clicks.
-                </p>
-                <div className="flex flex-wrap gap-2 text-xs font-bold">
-                  <span className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-neutral-200">
-                    + Trading lessons
-                  </span>
-                  <span className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-neutral-200">
-                    + Real-time progress tracking
-                  </span>
-                  <span className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-neutral-200">
-                    + Payout vault
-                  </span>
-                </div>
-              </div>
-
-              <div className="bg-[#08090b] border border-white/10 rounded-2xl p-6 shadow-2xl space-y-4">
-                <div className="flex items-center justify-between text-xs pb-3 border-b border-white/5 font-mono">
-                  <span className="text-neutral-400">ACCOUNT STATUS</span>
-                  <span className="text-emerald-400 font-bold flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> ACTIVE EVALUATION
-                  </span>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-[#111418] p-4 rounded-xl border border-white/5">
-                    <div className="text-[10px] text-neutral-400 uppercase font-mono">CURRENT EQUITY</div>
-                    <div className="text-2xl font-black text-white mt-1">$107,480.00</div>
-                  </div>
-                  <div className="bg-[#111418] p-4 rounded-xl border border-white/5">
-                    <div className="text-[10px] text-neutral-400 uppercase font-mono">PROFIT TARGET</div>
-                    <div className="text-2xl font-black text-[#ccff00] mt-1">74.8% Done</div>
-                  </div>
-                </div>
-                <div className="w-full bg-neutral-800 rounded-full h-2.5 overflow-hidden">
-                  <div className="bg-[#ccff00] h-2.5 rounded-full shadow-neon-sm" style={{ width: "74.8%" }} />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === "ai" && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-              <div>
-                <span className="px-3.5 py-1 rounded-full bg-[#ccff00]/15 text-[#ccff00] font-black text-xs uppercase tracking-wider">
-                  AI Challenge Assistant
-                </span>
-                <h3 className="text-3xl sm:text-4xl font-black text-white mt-4 mb-4">
-                  24/7 Automated Risk & Rules Guard
-                </h3>
-                <p className="text-neutral-300 text-sm leading-relaxed mb-6">
-                  Our embedded risk AI checks your open positions against maximum allowable lot sizes, detects news trading windows, and alerts you before daily drawdown breaches can occur.
-                </p>
-                <div className="flex flex-wrap gap-2 text-xs font-bold">
-                  <span className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-neutral-200">
-                    + News event alerts
-                  </span>
-                  <span className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-neutral-200">
-                    + Lot size validator
-                  </span>
-                </div>
-              </div>
-
-              <div className="bg-[#08090b] border border-white/10 rounded-2xl p-6 shadow-2xl space-y-3 font-mono">
-                <div className="flex items-center gap-3 p-3.5 bg-emerald-950/40 border border-emerald-500/30 rounded-xl text-xs text-emerald-300">
-                  <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-400" />
-                  <span>Rule check passed: Max daily loss limit safe (1.2% / 4.0% consumed)</span>
-                </div>
-                <div className="flex items-center gap-3 p-3.5 bg-[#111418] border border-white/5 rounded-xl text-xs text-neutral-300">
-                  <Bot className="w-5 h-5 text-[#ccff00] shrink-0" />
-                  <span>AI Monitor: Next major economic release (US CPI) in 3h 15m. Lot sizes confirmed.</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === "platform" && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-              <div>
-                <span className="px-3.5 py-1 rounded-full bg-[#ccff00]/15 text-[#ccff00] font-black text-xs uppercase tracking-wider">
-                  Trading Platform
-                </span>
-                <h3 className="text-3xl sm:text-4xl font-black text-white mt-4 mb-4">
-                  High-Speed MetaTrader 5 Terminal
-                </h3>
-                <p className="text-neutral-300 text-sm leading-relaxed mb-6">
-                  Trade FX pairs, indices, gold, and digital assets on MT5 with raw spreads, sub-millisecond execution, and no artificial restrictions on your trading style.
-                </p>
-                <div className="flex flex-wrap gap-2 text-xs font-bold">
-                  <span className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-neutral-200">
-                    + Raw ECN spreads from 0.0 pips
-                  </span>
-                  <span className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-neutral-200">
-                    + 1:100 institutional leverage
-                  </span>
-                </div>
-              </div>
-
-              <div className="bg-[#08090b] border border-white/10 rounded-2xl p-6 shadow-2xl space-y-3">
-                <div className="text-xs text-neutral-400 font-mono flex items-center justify-between pb-2 border-b border-white/5">
-                  <span>LIVE INSTITUTIONAL SPREADS</span>
-                  <span className="text-[#ccff00] font-bold">RAW ECN FEED</span>
-                </div>
-                <div className="grid grid-cols-3 gap-3 text-center">
-                  <div className="p-3 bg-[#111418] rounded-xl border border-white/5">
-                    <div className="text-xs font-mono font-bold text-white">EURUSD</div>
-                    <div className="text-[11px] text-[#ccff00] font-mono font-bold mt-1">0.0 pips</div>
-                  </div>
-                  <div className="p-3 bg-[#111418] rounded-xl border border-white/5">
-                    <div className="text-xs font-mono font-bold text-white">XAUUSD</div>
-                    <div className="text-[11px] text-[#ccff00] font-mono font-bold mt-1">0.8 pips</div>
-                  </div>
-                  <div className="p-3 bg-[#111418] rounded-xl border border-white/5">
-                    <div className="text-xs font-mono font-bold text-white">US100</div>
-                    <div className="text-[11px] text-[#ccff00] font-mono font-bold mt-1">0.5 pips</div>
-                  </div>
-                  <div className="p-3 bg-[#111418] rounded-xl border border-white/5">
-                    <div className="text-xs font-mono font-bold text-white">BTCUSD</div>
-                    <div className="text-[11px] text-[#ccff00] font-mono font-bold mt-1">5.0 pips</div>
-                  </div>
-                  <div className="p-3 bg-[#111418] rounded-xl border border-white/5">
-                    <div className="text-xs font-mono font-bold text-white">GBPUSD</div>
-                    <div className="text-[11px] text-[#ccff00] font-mono font-bold mt-1">0.2 pips</div>
-                  </div>
-                  <div className="p-3 bg-[#111418] rounded-xl border border-white/5">
-                    <div className="text-xs font-mono font-bold text-white">US30</div>
-                    <div className="text-[11px] text-[#ccff00] font-mono font-bold mt-1">1.2 pips</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === "support" && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-              <div>
-                <span className="px-3.5 py-1 rounded-full bg-[#ccff00]/15 text-[#ccff00] font-black text-xs uppercase tracking-wider">
-                  24/7 Human Support
-                </span>
-                <h3 className="text-3xl sm:text-4xl font-black text-white mt-4 mb-4">
-                  Response Time &lt; 1 Minute
-                </h3>
-                <p className="text-neutral-300 text-sm leading-relaxed mb-6">
-                  Our dedicated live support engineers are available 24/7 around the clock to answer rule questions, verify challenge milestones, and assist with payout requests.
-                </p>
-                <div className="inline-flex items-center gap-2 p-3 bg-black/60 border border-[#ccff00]/40 rounded-xl text-xs font-black text-[#ccff00]">
-                  <span>RESPONSE TIME &lt; 1 MIN</span>
-                </div>
-              </div>
-
-              <div className="bg-[#08090b] border border-white/10 rounded-2xl p-6 shadow-2xl space-y-3 text-left">
-                <div className="text-xs text-neutral-400 pb-2 border-b border-white/5 flex items-center justify-between font-mono">
-                  <span>LIVE SUPPORT TICKET #9948</span>
-                  <span className="text-[#ccff00] font-bold">ONLINE</span>
-                </div>
-                <div className="p-3.5 bg-[#111418] rounded-xl text-xs text-neutral-300">
-                  <span className="text-[#ccff00] font-bold">MaxFunded Support:</span> Hello! Your Phase 1 target is confirmed. Your Phase 2 login credentials have been dispatched to your email!
-                </div>
-                <div className="p-3.5 bg-[#171b22] rounded-xl text-xs text-neutral-300 text-right">
-                  <span className="text-white font-bold">Trader:</span> Perfect! Just received the credentials, logging in right now.
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
+      {/* Interactive Payout Calculator */}
+      <PayoutCalculator />
 
       {/* ========================================================================= */}
       {/* 6. "SELECT YOUR ACCOUNT BALANCE" (Screenshot 9) */}
       {/* ========================================================================= */}
-      <section id="challenges" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/[0.06]">
-        <div className="text-center mb-16">
+      <section id="challenges" className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/[0.06]">
+        <div className="text-center mb-14 reveal">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#ccff00]/15 border border-[#ccff00]/30 text-[#ccff00] text-xs font-mono font-bold uppercase tracking-wider mb-4 animate-pulse">
+            <span>⚡ LIMITED TIME: 45% OFF FOR NEW USERS • CODE: MAX45</span>
+          </div>
           <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tight">
             Select Your Account Balance
           </h2>
-          <p className="mt-3 text-sm sm:text-base text-neutral-400 max-w-xl mx-auto">
-            Choose your starting virtual capital. Transparent rules, fair targets, and instant credential delivery.
+          <p className="mt-3 text-sm sm:text-base text-neutral-400 max-w-2xl mx-auto">
+            Trade institutional evaluation capital with raw spreads. No hidden rules, zero time limits, and 100% refundable fee on your first payout.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 reveal-stagger">
           {PLANS.map((plan, i) => (
             <div
               key={i}
-              className={`bg-[#12151c] rounded-3xl p-6 flex flex-col justify-between relative transition-all duration-300 group hover:scale-[1.02] ${
+              className={`bento-card reveal p-6 sm:p-7 flex flex-col justify-between relative group ${
                 plan.isHighlight
-                  ? "border-2 border-[#ccff00]/60 shadow-[0_0_35px_rgba(204,255,0,0.18)]"
-                  : "border border-white/10 hover:border-white/20"
+                  ? "pricing-card-highlight border-2 border-[#ccff00]/60 shadow-[0_0_35px_rgba(204,255,0,0.18)]"
+                  : ""
               }`}
             >
               <div>
                 {/* Top Badge */}
-                <div className="h-7 mb-2 flex items-center justify-center">
-                  {plan.tag && (
-                    <span className="px-4 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-[#ccff00] text-black">
+                <div className="h-7 mb-3 flex items-center justify-between">
+                  {plan.tag ? (
+                    <span className="px-3.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#ccff00] text-black">
                       {plan.tag}
                     </span>
+                  ) : (
+                    <span className="text-[11px] text-neutral-500 font-mono">STANDARD</span>
                   )}
+                  <span className="text-[11px] font-mono font-bold text-[#ccff00] bg-[#ccff00]/10 px-2 py-0.5 rounded-md border border-[#ccff00]/25">
+                    {plan.discountPct}
+                  </span>
                 </div>
 
                 <div className="text-center">
                   <div className="text-xs text-neutral-400 uppercase font-bold tracking-wider mb-1">
                     Account Size
                   </div>
-                  <div className="text-3xl font-black text-white mb-6">
+                  <div className="text-3xl sm:text-4xl font-black text-white mb-5">
                     {plan.size}
                   </div>
 
                   {/* Start Now Button */}
                   <Link
                     href={`/challenges`}
-                    className="w-full py-3.5 rounded-xl bg-[#ccff00] hover:bg-[#b3e600] text-black font-black text-sm uppercase tracking-tight shadow-neon transition block text-center"
+                    className="btn-neon w-full py-3.5 rounded-xl bg-[#ccff00] hover:bg-[#b3e600] text-black font-black text-sm uppercase tracking-tight shadow-neon transition block text-center"
                   >
                     Start Now
                   </Link>
 
-                  {/* Price */}
-                  <div className="mt-4 mb-8">
-                    <span className="text-xs text-neutral-400 block mb-0.5">One-time challenge fee</span>
-                    <span className="text-xl font-black text-white">{plan.fee}</span>
+                  {/* Catchy Price with Strike-through and Savings */}
+                  <div className="mt-4 mb-6 pt-3 border-t border-white/5">
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <span className="text-sm line-through text-neutral-500 font-mono font-bold">{plan.originalFee}</span>
+                      <span className="text-2xl font-black text-white">{plan.fee}</span>
+                    </div>
+                    <span className="text-[11px] text-[#ccff00] font-bold block">{plan.savings} • 100% Refundable Fee</span>
                   </div>
                 </div>
 
-                {/* Specs Table */}
-                <div className="space-y-3.5 text-xs text-neutral-300 pt-4 border-t border-white/5">
+                {/* Specs Table — Sweet Trader-Desired Rules */}
+                <div className="space-y-3 text-xs text-neutral-300 pt-3 border-t border-white/5">
                   <div className="flex items-center justify-between">
-                    <span className="text-neutral-400 underline decoration-dotted decoration-neutral-600 cursor-help" title="Target for evaluation phase">
-                      Profit Target
-                    </span>
+                    <span className="text-neutral-400">Profit Target</span>
                     <span className="font-bold text-white">{plan.target}</span>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-neutral-400 underline decoration-dotted decoration-neutral-600 cursor-help" title="Percentage of profit paid to trader">
-                      Profit Split
-                    </span>
+                    <span className="text-neutral-400">Profit Split</span>
                     <span className="font-bold text-[#ccff00]">{plan.split}</span>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-neutral-400 underline decoration-dotted decoration-neutral-600 cursor-help" title="Total drawdown limit">
-                      Maximum Loss Limit
-                    </span>
+                    <span className="text-neutral-400">Static Max Loss</span>
                     <span className="font-bold text-white">{plan.maxLoss}</span>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-neutral-400 underline decoration-dotted decoration-neutral-600 cursor-help" title="Daily drawdown threshold">
-                      Daily Loss Limit
-                    </span>
+                    <span className="text-neutral-400">Daily Loss Limit</span>
                     <span className="font-bold text-white">{plan.dailyLoss}</span>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-neutral-400 underline decoration-dotted decoration-neutral-600 cursor-help" title="Required trading days to qualify">
-                      Minimum Trading Days
-                    </span>
-                    <span className="font-bold text-white">{plan.minDays}</span>
+                    <span className="text-neutral-400">Min Trading Days</span>
+                    <span className="font-bold text-[#ccff00]">{plan.minDays}</span>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-neutral-400 underline decoration-dotted decoration-neutral-600 cursor-help" title="Time to withdraw rewards">
-                      Payout Schedule
-                    </span>
+                    <span className="text-neutral-400">Challenge Fee Refund</span>
+                    <span className="font-bold text-white">{plan.refund}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-neutral-400">Payout Schedule</span>
                     <span className="font-bold text-white">{plan.payout}</span>
                   </div>
                 </div>
@@ -960,10 +829,16 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Industry Comparison Matrix */}
+      <CompetitionComparison />
+
+      {/* Official MaxFunded Discord Trading Floor & Community Bento Grid */}
+      <DiscordCommunityBento />
+
       {/* ========================================================================= */}
       {/* 7. "TRADING & CHALLENGE CONDITIONS" FAQ ACCORDION (Screenshot 11) */}
       {/* ========================================================================= */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto border-t border-white/[0.06]">
+      <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto border-t border-white/[0.06]">
         <div className="text-center mb-14">
           <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tight">
             Trading & Challenge Conditions:
@@ -997,6 +872,11 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* Sticky Floating Conversion Bar */}
+      <StickyBottomBar />
     </div>
   );
 }
+
+

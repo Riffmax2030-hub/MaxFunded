@@ -1,12 +1,12 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: riffmax-postgres
+    container_name: maxfunded-postgres
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgrespassword
-      POSTGRES_DB: riffmax_prop
+      POSTGRES_DB: maxfunded_prop
     ports:
       - "5432:5432"
     volumes:
@@ -19,7 +19,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: riffmax-redis
+    container_name: maxfunded-redis
     restart: always
     ports:
       - "6379:6379"
@@ -35,27 +35,33 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: riffmax-backend
+    container_name: maxfunded-backend
     restart: always
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+    env_file:
+      - ./backend/.env
     environment:
-      - ENVIRONMENT=development
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgrespassword@postgres:5432/riffmax_prop
-      - DATABASE_URL_SYNC=postgresql://postgres:postgrespassword@postgres:5432/riffmax_prop
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgrespassword@postgres:5432/maxfunded_prop
+      - DATABASE_URL_SYNC=postgresql://postgres:postgrespassword@postgres:5432/maxfunded_prop
       - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=riffmax-super-secret-dev-key-change-in-production-min-32-chars
     ports:
       - "8000:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: riffmax-frontend
+    container_name: maxfunded-frontend
     restart: always
     depends_on:
       - backend

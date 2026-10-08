@@ -147,7 +147,7 @@ export default function AffiliateDashboardPage() {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-semibold uppercase tracking-wider mb-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/30 text-[#ccff00] text-xs font-semibold uppercase tracking-wider mb-2">
                 <Users size={14} /> Partner & Affiliate Network
               </div>
               <h1 className="text-3xl font-extrabold text-white">Affiliate Partner Dashboard</h1>
@@ -167,7 +167,7 @@ export default function AffiliateDashboardPage() {
 
           {loading ? (
             <div className="flex flex-col items-center justify-center p-16 bg-slate-900 border border-slate-800 rounded-2xl">
-              <Loader2 className="animate-spin text-brand-400 mb-4" size={40} />
+              <Loader2 className="animate-spin text-[#ccff00] mb-4" size={40} />
               <p className="text-slate-400 text-sm">Loading your affiliate portal...</p>
             </div>
           ) : error ? (
@@ -185,7 +185,7 @@ export default function AffiliateDashboardPage() {
                       <span className="text-xs uppercase tracking-wider font-semibold text-slate-400">
                         Your Unique Referral Link
                       </span>
-                      <span className="text-xs px-2.5 py-0.5 rounded-full bg-brand-500/20 text-brand-400 border border-brand-500/30 font-bold">
+                      <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#ccff00]/10 text-[#ccff00] border border-[#ccff00]/30 font-bold">
                         {profile.commission_rate}% Commission
                       </span>
                     </div>
@@ -196,7 +196,7 @@ export default function AffiliateDashboardPage() {
                       </div>
                       <button
                         onClick={copyReferralUrl}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold transition"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#ccff00] hover:bg-[#b3e600] text-black text-xs font-bold transition"
                       >
                         {copiedLink ? <CheckCircle2 size={14} /> : <Copy size={14} />}
                         {copiedLink ? "Copied!" : "Copy Link"}
@@ -227,7 +227,7 @@ export default function AffiliateDashboardPage() {
                           </div>
                           <div className="w-full bg-slate-800 rounded-full h-2">
                             <div
-                              className="h-2 rounded-full bg-gradient-to-r from-brand-500 to-amber-400 transition-all duration-500"
+                              className="h-2 rounded-full bg-gradient-to-r from-[#ccff00] to-amber-400 transition-all duration-500"
                               style={{ width: `${prog.percent}%` }}
                             />
                           </div>
@@ -252,7 +252,7 @@ export default function AffiliateDashboardPage() {
 
                 <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
                   <div className="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                    <TrendingUp size={14} className="text-brand-400" /> Total Earned
+                    <TrendingUp size={14} className="text-[#ccff00]" /> Total Earned
                   </div>
                   <div className="text-2xl font-black text-white">
                     ${Number(profile.total_commission_earned).toLocaleString("en-US", { minimumFractionDigits: 2 })}
@@ -319,7 +319,7 @@ export default function AffiliateDashboardPage() {
                             <td className="p-3 text-white font-medium">
                               ${Number(c.purchase_amount).toFixed(2)}
                             </td>
-                            <td className="p-3 text-brand-400 font-semibold">{c.commission_rate}%</td>
+                            <td className="p-3 text-[#ccff00] font-semibold">{c.commission_rate}%</td>
                             <td className="p-3 text-emerald-400 font-bold text-sm">
                               +${Number(c.commission_amount).toFixed(2)}
                             </td>
@@ -436,7 +436,7 @@ export default function AffiliateDashboardPage() {
                     step="0.01"
                     value={payoutAmount}
                     onChange={(e) => setPayoutAmount(parseFloat(e.target.value) || 0)}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-7 pr-3 py-2 text-white font-bold focus:border-brand-500 focus:outline-none"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-7 pr-3 py-2 text-white font-bold focus:border-[#ccff00] focus:outline-none"
                     required
                   />
                 </div>
@@ -447,7 +447,7 @@ export default function AffiliateDashboardPage() {
                 <select
                   value={payoutMethod}
                   onChange={(e) => setPayoutMethod(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:border-brand-500 focus:outline-none"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:border-[#ccff00] focus:outline-none"
                 >
                   <option value="CRYPTO_USDT">USDT (TRC-20 / ERC-20)</option>
                   <option value="BANK_WIRE">Bank Wire (SWIFT / IBAN)</option>
@@ -464,7 +464,7 @@ export default function AffiliateDashboardPage() {
                   placeholder="e.g. USDT address or PayPal email"
                   value={payoutDestination}
                   onChange={(e) => setPayoutDestination(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:border-brand-500 focus:outline-none font-mono"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:border-[#ccff00] focus:outline-none font-mono"
                   required
                 />
               </div>

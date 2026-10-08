@@ -13,10 +13,17 @@ import {
   PerformanceReportData,
   RuleComplianceItem,
 } from "@/lib/api";
+import dynamic from "next/dynamic";
 import { useDashboardWebSocket } from "@/hooks/useDashboardWebSocket";
 import { useAnimatedNumber } from "@/hooks/useAnimatedNumber";
-import InteractiveEquityChart from "@/components/InteractiveEquityChart";
+
+const InteractiveEquityChart = dynamic(() => import("@/components/InteractiveEquityChart"), { ssr: false });
+const TradingViewChart = dynamic(() => import("@/components/TradingViewChart"), { ssr: false });
+const Confetti = dynamic(() => import("react-confetti"), { ssr: false });
+import TradingJournal from "@/components/TradingJournal";
+import EconomicCalendar from "@/components/EconomicCalendar";
 import {
+
   TrendingUp,
   TrendingDown,
   AlertTriangle,
@@ -38,6 +45,11 @@ import {
   Activity,
   Zap,
   Radio,
+  Key,
+  Copy,
+  Eye,
+  EyeOff,
+  Settings,
 } from "lucide-react";
 
 // ──────────────────────────────────────────
@@ -247,6 +259,93 @@ function RuleComplianceCard({ rule }: { rule: RuleComplianceItem }) {
 }
 
 // ──────────────────────────────────────────
+// Trader Rank system
+// ──────────────────────────────────────────
+
+type TraderRankInfo = {
+  label: string;
+  icon: string;
+  color: string;
+  bgColor: string;
+  borderColor: string;
+  barColor: string;
+  xp: number;
+  maxXp: number;
+  nextAt: string;
+};
+
+function getTraderRank(phase: string, profit: number): TraderRankInfo {
+  if (phase === "FUNDED" && profit >= 5000) {
+    return { label: "MASTER", icon: "👑", color: "text-amber-300", bgColor: "bg-amber-500/10", borderColor: "border-amber-500/30", barColor: "bg-amber-400", xp: 1000, maxXp: 1000, nextAt: "Max tier reached" };
+  }
+  if (phase === "FUNDED") {
+    return { label: "ELITE", icon: "⚡", color: "text-violet-400", bgColor: "bg-violet-500/10", borderColor: "border-violet-500/30", barColor: "bg-violet-400", xp: 700, maxXp: 1000, nextAt: `$${(5000 - profit).toLocaleString()} profit to Master` };
+  }
+  if (phase === "PHASE_2") {
+    return { label: "PROFESSIONAL", icon: "🎯", color: "text-sky-400", bgColor: "bg-sky-500/10", borderColor: "border-sky-500/30", barColor: "bg-sky-400", xp: 400, maxXp: 1000, nextAt: "Pass Phase 2 → Elite" };
+  }
+  return { label: "ROOKIE", icon: "🌱", color: "text-[#ccff00]", bgColor: "bg-[#ccff00]/10", borderColor: "border-[#ccff00]/30", barColor: "bg-[#ccff00]", xp: 100, maxXp: 1000, nextAt: "Pass Phase 1 → Professional" };
+}
+
+function TraderRankBadge({ phase, profit }: { phase: string; profit: number }) {
+  const rank = getTraderRank(phase, profit);
+  const pct = Math.round((rank.xp / rank.maxXp) * 100);
+
+  return (
+    <motion.div
+      whileHover={{ y: -2, transition: { duration: 0.15 } }}
+      className={`${rank.bgColor} border ${rank.borderColor} rounded-2xl p-4 shadow-lg flex flex-col gap-2 min-w-[170px]`}
+    >
+      <div className="flex items-center gap-2">
+        <span className="text-xl">{rank.icon}</span>
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Trader Rank</p>
+          <p className={`text-sm font-black ${rank.color} tracking-wide`}>{rank.label}</p>
+        </div>
+      </div>
+      <div>
+        <div className="flex justify-between text-[10px] text-neutral-500 mb-1">
+          <span>{rank.xp} XP</span><span>{rank.maxXp} XP</span>
+        </div>
+        <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden border border-white/5">
+          <motion.div
+            className={`${rank.barColor} h-full rounded-full`}
+            initial={{ width: 0 }}
+            animate={{ width: `${pct}%` }}
+            transition={{ duration: 0.9, ease: "easeOut" }}
+          />
+        </div>
+        <p className="text-[10px] text-neutral-500 mt-1">{rank.nextAt}</p>
+      </div>
+    </motion.div>
+  );
+}
+
+function DangerZoneBanner({ dailyUsedPct, maxUsedPct }: { dailyUsedPct: number; maxUsedPct: number }) {
+  const worstPct = Math.max(dailyUsedPct, maxUsedPct);
+  const which = dailyUsedPct >= maxUsedPct ? "daily loss" : "max drawdown";
+  if (worstPct < 80) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-rose-950/50 border border-rose-500/50 rounded-2xl p-4 flex items-start gap-3"
+    >
+      <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5 animate-pulse" />
+      <div className="flex-1">
+        <p className="text-rose-300 font-bold text-sm">⚠ Danger Zone — Account at Risk</p>
+        <p className="text-rose-400/80 text-xs mt-1 leading-relaxed">
+          Your {which} limit is <strong className="text-rose-300">{worstPct.toFixed(1)}% used</strong>. You are dangerously
+          close to a breach. Consider closing open positions and reducing exposure immediately to protect your account.
+        </p>
+      </div>
+      <div className="shrink-0 text-rose-400 font-black text-xl font-mono">{worstPct.toFixed(0)}%</div>
+    </motion.div>
+  );
+}
+
+// ──────────────────────────────────────────
 // Main page
 // ──────────────────────────────────────────
 
@@ -256,8 +355,17 @@ export default function TraderDashboard() {
   const [performance, setPerformance] = useState<PerformanceReportData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"overview" | "compliance" | "performance">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "compliance" | "journal" | "news" | "performance">("overview");
+  const [chartMode, setChartMode] = useState<"equity" | "candles">("equity");
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
+  const [showPassword, setShowPassword] = useState(false);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  const copyToClipboard = (text: string, field: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(null), 2000);
+  };
 
   // Real-time WebSocket hook
   const { data: wsData, status: wsStatus } = useDashboardWebSocket();
@@ -434,8 +542,15 @@ export default function TraderDashboard() {
     const equityNum = parseFloat(String(summary.current_equity));
     const accountSizeNum = parseFloat(String(summary.account_size)) || 100000;
 
+    const dailyLossPct = Math.abs(((balanceNum - equityNum) / accountSizeNum) * 100);
+    const maxDrawdownPct = Math.abs(((accountSizeNum - equityNum) / accountSizeNum) * 100);
+
     return (
       <div className="space-y-6">
+        {summary.profit_target_achieved && (
+          <Confetti recycle={false} numberOfPieces={350} gravity={0.15} />
+        )}
+        <DangerZoneBanner dailyUsedPct={dailyLossPct} maxUsedPct={maxDrawdownPct} />
         {/* ── Account header banner with Live Streaming Status ── */}
         <div className="bg-[#0d0e10] border border-white/[0.08] rounded-2xl p-6 shadow-xl relative overflow-hidden">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -484,6 +599,7 @@ export default function TraderDashboard() {
 
             {/* Quick Actions */}
             <div className="flex flex-wrap items-center gap-3">
+              <TraderRankBadge phase={summary.phase} profit={profit} />
               {summary.kyc_status !== "APPROVED" && (
                 <Link
                   href="/kyc"
@@ -508,6 +624,13 @@ export default function TraderDashboard() {
                   <Clock size={14} /> Payout Pending
                 </Link>
               )}
+              <Link
+                href="/settings"
+                title="Account Settings"
+                className="flex items-center gap-1.5 text-xs bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-neutral-300 hover:text-white px-3 py-2 rounded-xl transition"
+              >
+                <Settings size={14} /> Settings
+              </Link>
               <button
                 onClick={loadData}
                 title="Refresh Metrics"
@@ -518,6 +641,99 @@ export default function TraderDashboard() {
             </div>
           </div>
         </div>
+
+        {/* ── MT5 Trading Account Credentials Card ── */}
+        {summary.mt5_login && (
+          <div className="bg-[#030712] border border-white/[0.08] border-l-4 border-l-[#ccff00] rounded-2xl p-5 shadow-xl">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[#ccff00] font-bold text-xs uppercase tracking-wider flex items-center gap-1.5">
+                    <Key size={13} /> MetaTrader 5 Account
+                  </span>
+                  <span className="text-neutral-500 text-xs">·</span>
+                  <span className="text-neutral-400 text-xs font-mono">{summary.mt5_server || "RoboForex-Demo"}</span>
+                </div>
+                <p className="text-neutral-400 text-xs">
+                  Connect using these credentials directly on the official MetaTrader 5 app (Windows, Mac, iOS, Android).
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-[#0d0e10] p-3 rounded-xl border border-white/[0.05]">
+                <div>
+                  <span className="text-neutral-500 text-[10px] uppercase font-bold block">Server</span>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="font-mono text-white text-xs font-bold truncate max-w-[110px]" title={summary.mt5_server || "RoboForex-Demo"}>
+                      {summary.mt5_server || "RoboForex-Demo"}
+                    </span>
+                    <button
+                      onClick={() => copyToClipboard(summary.mt5_server || "RoboForex-Demo", "server")}
+                      className="text-neutral-500 hover:text-white transition"
+                      title="Copy Server"
+                    >
+                      {copiedField === "server" ? <CheckCircle size={12} className="text-[#ccff00]" /> : <Copy size={12} />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-neutral-500 text-[10px] uppercase font-bold block">Login ID</span>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="font-mono text-[#ccff00] text-xs font-bold">{summary.mt5_login}</span>
+                    <button
+                      onClick={() => copyToClipboard(summary.mt5_login || "", "login")}
+                      className="text-neutral-500 hover:text-white transition"
+                      title="Copy Login"
+                    >
+                      {copiedField === "login" ? <CheckCircle size={12} className="text-[#ccff00]" /> : <Copy size={12} />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-neutral-500 text-[10px] uppercase font-bold block">Master Password</span>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="font-mono text-white text-xs font-semibold">
+                      {showPassword ? (summary.mt5_password || "••••••••") : "••••••••"}
+                    </span>
+                    <button
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="text-neutral-500 hover:text-white transition"
+                      title={showPassword ? "Hide Password" : "Show Password"}
+                    >
+                      {showPassword ? <EyeOff size={12} /> : <Eye size={12} />}
+                    </button>
+                    {summary.mt5_password && (
+                      <button
+                        onClick={() => copyToClipboard(summary.mt5_password || "", "pass")}
+                        className="text-neutral-500 hover:text-white transition"
+                        title="Copy Password"
+                      >
+                        {copiedField === "pass" ? <CheckCircle size={12} className="text-[#ccff00]" /> : <Copy size={12} />}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-neutral-500 text-[10px] uppercase font-bold block">Investor Pass</span>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="font-mono text-neutral-300 text-xs font-semibold">
+                      {summary.mt5_investor_password || "Inv_ReadOnly"}
+                    </span>
+                    <button
+                      onClick={() => copyToClipboard(summary.mt5_investor_password || "", "inv")}
+                      className="text-neutral-500 hover:text-white transition"
+                      title="Copy Investor Password"
+                    >
+                      {copiedField === "inv" ? <CheckCircle size={12} className="text-[#ccff00]" /> : <Copy size={12} />}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ── Core metrics row with Framer Motion & Number Counters ── */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -588,21 +804,30 @@ export default function TraderDashboard() {
         </div>
 
         {/* ── Navigation Tabs ── */}
-        <div className="flex gap-2 border-b border-white/[0.06] pb-0">
-          {(["overview", "compliance", "performance"] as const).map((tab) => (
+        <div className="flex flex-wrap gap-2 border-b border-white/[0.06] pb-0">
+          {(
+            [
+              { id: "overview", label: "Overview & Charts" },
+              { id: "compliance", label: "Rule Compliance" },
+              { id: "journal", label: "Trading Journal" },
+              { id: "news", label: "Economic Calendar" },
+              { id: "performance", label: "Trade Ledger" },
+            ] as const
+          ).map((t) => (
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-5 py-3 text-sm font-semibold rounded-t-xl transition-all capitalize ${
-                activeTab === tab
-                  ? "bg-[#0d0e10] text-[#ccff00] border-t-2 border-t-[#ccff00] border-x border-x-white/[0.08] -mb-px shadow-sm"
+              key={t.id}
+              onClick={() => setActiveTab(t.id)}
+              className={`px-4 sm:px-5 py-3 text-xs sm:text-sm font-semibold rounded-t-xl transition-all capitalize ${
+                activeTab === t.id
+                  ? "bg-[#0d0e10] text-[#ccff00] border-t-2 border-t-[#ccff00] border-x border-x-white/[0.08] -mb-px shadow-sm font-bold"
                   : "text-neutral-500 hover:text-neutral-300"
               }`}
             >
-              {tab === "overview" ? "Overview & Live Charts" : tab === "compliance" ? "Rule Compliance Matrix" : "Trade Performance"}
+              {t.label}
             </button>
           ))}
         </div>
+
 
         {/* ── Animated Tab Content ── */}
         <AnimatePresence mode="wait">
@@ -629,11 +854,44 @@ export default function TraderDashboard() {
                 />
               </div>
 
-              {/* High-Performance Recharts Equity Curve */}
-              <InteractiveEquityChart
-                points={equityCurve}
-                startingBalance={accountSizeNum}
-              />
+              {/* Chart Switcher & View */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 bg-[#14161a] border border-white/10 p-1 rounded-xl text-xs">
+                    <button
+                      onClick={() => setChartMode("equity")}
+                      className={`px-3 py-1.5 rounded-lg transition font-bold flex items-center gap-1.5 ${
+                        chartMode === "equity"
+                          ? "bg-[#ccff00] text-black shadow-sm"
+                          : "text-neutral-400 hover:text-white"
+                      }`}
+                    >
+                      <Activity size={13} />
+                      <span>Equity Curve</span>
+                    </button>
+                    <button
+                      onClick={() => setChartMode("candles")}
+                      className={`px-3 py-1.5 rounded-lg transition font-bold flex items-center gap-1.5 ${
+                        chartMode === "candles"
+                          ? "bg-[#ccff00] text-black shadow-sm"
+                          : "text-neutral-400 hover:text-white"
+                      }`}
+                    >
+                      <BarChart2 size={13} />
+                      <span>TradingView Candlesticks</span>
+                    </button>
+                  </div>
+                </div>
+
+                {chartMode === "equity" ? (
+                  <InteractiveEquityChart
+                    points={equityCurve}
+                    startingBalance={accountSizeNum}
+                  />
+                ) : (
+                  <TradingViewChart />
+                )}
+              </div>
 
               {/* Trade statistics */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -766,7 +1024,34 @@ export default function TraderDashboard() {
               )}
             </motion.div>
           )}
+
+          {/* Trading Journal Tab */}
+          {activeTab === "journal" && (
+            <motion.div
+              key="journal"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <TradingJournal />
+            </motion.div>
+          )}
+
+          {/* Economic Calendar Tab */}
+          {activeTab === "news" && (
+            <motion.div
+              key="news"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <EconomicCalendar />
+            </motion.div>
+          )}
         </AnimatePresence>
+
 
         {/* ── Footer row ── */}
         <div className="flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-500 pt-4 border-t border-white/[0.05] gap-2">

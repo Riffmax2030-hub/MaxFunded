@@ -9,6 +9,7 @@ from sqlalchemy import (
     DateTime,
     Date,
     Text,
+    func,
 )
 from sqlalchemy.orm import relationship
 from app.models.base import BaseModel
@@ -77,6 +78,29 @@ class BreachLog(BaseModel):
     breached_value = Column(Numeric(18, 4), nullable=False)
     threshold_value = Column(Numeric(18, 4), nullable=False)
     details = Column(Text, nullable=True)
-    timestamp = Column(DateTime(timezone=True), nullable=False)
-
+    timestamp = Column(DateTime(timezone=True), default=func.now(), nullable=False)
     purchase = relationship("ChallengePurchase", back_populates="breach_logs")
+
+
+class MT5AccountPool(BaseModel):
+    __tablename__ = "mt5_account_pool"
+
+    broker_name = Column(String(100), default="RoboForex", nullable=False)
+    server_name = Column(String(100), default="RoboForex-Demo", nullable=False)
+    account_tier = Column(Numeric(18, 2), nullable=False, index=True)  # e.g. 10000, 25000, 50000, 100000, 200000
+    mt5_login = Column(String(64), unique=True, nullable=False, index=True)
+    mt5_password = Column(String(128), nullable=False)
+    mt5_investor_password = Column(String(128), nullable=True)
+    status = Column(String(30), default="AVAILABLE", index=True, nullable=False)  # AVAILABLE, ASSIGNED, BREACHED, PASSED, ARCHIVED
+    assigned_purchase_id = Column(
+        String(36),
+        ForeignKey("challenge_purchases.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    assigned_user_id = Column(
+        String(36),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    assigned_at = Column(DateTime(timezone=True), nullable=True)
+    notes = Column(Text, nullable=True)

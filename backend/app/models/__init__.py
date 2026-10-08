@@ -3,7 +3,7 @@ from app.models.user import User
 from app.models.challenge import Challenge, ChallengeRule, ChallengePurchase, PurchaseStatus
 from app.models.audit import AuditLog
 from app.models.payment import Payment, PaymentProvider, PaymentStatus
-from app.models.trading import Trade, DailySnapshot, BreachLog
+from app.models.trading import Trade, DailySnapshot, BreachLog, MT5AccountPool
 from app.models.company_capital import (
     CompanyBrokerAccount,
     TraderSignalProfile,
@@ -59,6 +59,7 @@ __all__ = [
     "Trade",
     "DailySnapshot",
     "BreachLog",
+    "MT5AccountPool",
     "CompanyBrokerAccount",
     "TraderSignalProfile",
     "CompanyAllocationStrategy",

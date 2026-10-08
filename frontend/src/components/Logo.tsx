@@ -13,91 +13,120 @@ export default function Logo({
   showText = true,
   className = "",
 }: LogoProps) {
-  const iconDimensions = {
-    sm: "w-8 h-8",
-    md: "w-10 h-10",
-    lg: "w-12 h-12",
-    xl: "w-16 h-16",
-  }[size];
+  // SVG dimensions by size
+  const svgSize = { sm: 28, md: 34, lg: 40, xl: 46 }[size];
 
-  const textSizes = {
-    sm: "text-lg",
-    md: "text-xl",
-    lg: "text-2xl",
-    xl: "text-3xl",
-  }[size];
-
-  const subTextSizes = {
-    sm: "text-[7.5px]",
-    md: "text-[9px]",
-    lg: "text-[10px]",
-    xl: "text-[11px]",
+  // Text sizes by size
+  const textStyle = {
+    sm: { fontSize: "16px", letterSpacing: "-0.03em" },
+    md: { fontSize: "20px", letterSpacing: "-0.03em" },
+    lg: { fontSize: "24px", letterSpacing: "-0.03em" },
+    xl: { fontSize: "28px", letterSpacing: "-0.03em" },
   }[size];
 
   return (
-    <div className={`inline-flex items-center space-x-3 select-none ${className}`}>
-      {/* ========================================================================= */}
-      {/* ICONIC PROFITABLE "M" CHART LOGO WITH BREAKOUT ARROW */}
-      {/* ========================================================================= */}
-      <div
-        className={`relative ${iconDimensions} rounded-xl bg-gradient-to-br from-[#ccff00] via-[#a3e635] to-[#4d7c0f] p-[1.5px] shadow-[0_0_18px_rgba(204,255,0,0.25)] transition-transform duration-300 hover:scale-105 shrink-0`}
+    <div
+      className={`inline-flex items-center select-none cursor-pointer group ${className}`}
+      style={{ gap: "10px", fontFamily: "'Space Grotesk', 'Inter', sans-serif" }}
+    >
+      {/* ── Neon Chart / M Mark ── */}
+      <svg
+        width={svgSize}
+        height={svgSize}
+        viewBox="0 0 32 32"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{
+          transition: "transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+          flexShrink: 0,
+        }}
+        className="group-hover:[transform:scale(1.08)_rotate(-3deg)]"
       >
-        <div className="w-full h-full bg-[#08090b] rounded-[10.5px] flex items-center justify-center relative overflow-hidden">
-          {/* Subtle soft green ambient glow behind the chart arrow */}
-          <div className="absolute top-0 right-0 w-8 h-8 bg-[#ccff00]/20 rounded-full blur-md pointer-events-none" />
+        {/* Background glow layer — soft neon green trace */}
+        <path
+          d="M6 24V14L12 20L18 10L24 16V24"
+          stroke="#ccff00"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{
+            filter: "drop-shadow(0px 0px 8px #ccff00)",
+            opacity: 0.55,
+          }}
+        />
+        {/* Main crisp white structural layer */}
+        <path
+          d="M6 24V14L12 20L18 10L24 16V24"
+          stroke="#FFFFFF"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        {/* Upward breakthrough arrow — profit breakout motif */}
+        <path
+          d="M21 9H27V15"
+          stroke="#ccff00"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ filter: "drop-shadow(0px 0px 5px #ccff00)" }}
+        />
+        <path
+          d="M18 10L26 9"
+          stroke="#ccff00"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ filter: "drop-shadow(0px 0px 5px #ccff00)" }}
+        />
+      </svg>
 
-          {/* Clean, Simple, Bold "M" Chart Vector */}
-          <svg
-            viewBox="0 0 36 36"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-[78%] h-[78%] relative z-10"
-          >
-            <defs>
-              <linearGradient id="mChartFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#ccff00" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#ccff00" stopOpacity="0.0" />
-              </linearGradient>
-            </defs>
-
-            {/* Subtle filled area beneath the M chart */}
-            <path
-              d="M6 27L12 13L18 21L26 8V27H6Z"
-              fill="url(#mChartFill)"
-            />
-
-            {/* Bold Profitable "M" Line Chart */}
-            <path
-              d="M6 27L12 13L18 21L27 8"
-              stroke="#ccff00"
-              strokeWidth="3.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-
-            {/* Breakout Arrow Head pointing ↗ */}
-            <path
-              d="M19 8H27V16"
-              stroke="#ccff00"
-              strokeWidth="3.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </div>
-      </div>
-
-      {/* Modern Wordmark */}
+      {/* ── Wordmark ── */}
       {showText && (
-        <div className="flex flex-col leading-none">
-          <div className={`${textSizes} font-black tracking-tight text-white flex items-center`}>
-            MAX<span className="text-[#ccff00] ml-0.5">FUNDED</span>
-          </div>
+        <div
+          className="flex items-center relative"
+          style={{ lineHeight: 1 }}
+        >
+          {/* MAX — ultra bold white */}
           <span
-            className={`${subTextSizes} font-bold uppercase tracking-[0.26em] text-neutral-400 mt-1`}
+            style={{
+              ...textStyle,
+              fontWeight: 800,
+              color: "#FFFFFF",
+            }}
           >
-            Proprietary Firm
+            MAX
           </span>
+
+          {/* FUNDED — neon, slightly lighter weight for contrast */}
+          <span
+            style={{
+              ...textStyle,
+              fontWeight: 500,
+              color: "#ccff00",
+              letterSpacing: "0.02em",
+              textShadow: "0 0 12px rgba(204, 255, 0, 0.5)",
+            }}
+          >
+            FUNDED
+          </span>
+
+          {/* Terminal dot — blinking green beacon */}
+          <span
+            className="animate-pulse"
+            style={{
+              display: "inline-block",
+              width: "5px",
+              height: "5px",
+              background: "#ccff00",
+              borderRadius: "50%",
+              boxShadow: "0 0 8px #ccff00",
+              alignSelf: "flex-end",
+              marginBottom: "3px",
+              marginLeft: "4px",
+              flexShrink: 0,
+            }}
+          />
         </div>
       )}
     </div>

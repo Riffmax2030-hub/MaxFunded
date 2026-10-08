@@ -116,50 +116,29 @@ export default function AdminWebhooksPage() {
 
   return (
     <>
-      <main className="min-h-screen bg-slate-950 text-white pt-24 pb-20 px-4">
+      <main className="pb-20 px-6 xl:px-10 pt-8">
         <div className="max-w-6xl mx-auto space-y-8">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-semibold uppercase tracking-wider mb-2">
-                <Radio size={14} /> Community Real-Time Stream
-              </div>
-              <h1 className="text-3xl font-extrabold text-white">Discord & Telegram Community Webhooks</h1>
-              <p className="text-slate-400 text-sm mt-1">
-                Broadcast live challenge achievements, certificates, payouts, and breach alerts to community channels.
+              <h1 className="text-2xl font-extrabold text-white">Webhooks &amp; Community Alerts</h1>
+              <p className="text-slate-500 text-sm mt-1">
+                Broadcast passes, payouts, and breaches live to Discord or Telegram.
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <Link
-                href="/admin/challenges"
-                className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition"
-              >
-                Challenges
-              </Link>
-              <Link
-                href="/admin/compliance"
-                className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition"
-              >
-                Compliance KYC
-              </Link>
-              <Link
-                href="/admin/payouts"
-                className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition"
-              >
-                Payouts
-              </Link>
               <button
                 onClick={() => setShowModal(true)}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition shadow-lg shadow-purple-600/20"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#ccff00] hover:bg-[#d4ff33] text-black font-bold text-xs transition"
               >
-                <Plus size={16} /> Register Webhook
+                <Plus size={14} /> Register Webhook
               </button>
             </div>
           </div>
 
           {loading ? (
             <div className="flex flex-col items-center justify-center p-16 bg-slate-900 border border-slate-800 rounded-2xl">
-              <Loader2 className="animate-spin text-purple-400 mb-4" size={40} />
+              <Loader2 className="animate-spin text-slate-400 mb-4" size={40} />
               <p className="text-slate-400 text-sm">Loading webhook configs...</p>
             </div>
           ) : error ? (
@@ -169,7 +148,7 @@ export default function AdminWebhooksPage() {
             </div>
           ) : webhooks.length === 0 ? (
             <div className="p-12 bg-slate-900 border border-slate-800 rounded-2xl text-center">
-              <div className="w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto mb-4">
                 <Radio className="text-purple-400" size={32} />
               </div>
               <h2 className="text-xl font-bold text-white mb-2">No Webhooks Registered Yet</h2>
@@ -178,7 +157,7 @@ export default function AdminWebhooksPage() {
               </p>
               <button
                 onClick={() => setShowModal(true)}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-sm transition"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#ccff00] hover:bg-[#d4ff33] text-black font-bold text-sm transition"
               >
                 <Plus size={16} /> Add Your First Webhook
               </button>
@@ -192,7 +171,7 @@ export default function AdminWebhooksPage() {
                 >
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <span className="text-xs font-bold px-2.5 py-1 rounded bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                      <span className="text-xs font-bold px-2.5 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700">
                         {w.target_service}
                       </span>
                       <span className="text-xs text-emerald-400 flex items-center gap-1 font-medium">
@@ -230,7 +209,7 @@ export default function AdminWebhooksPage() {
                       className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition disabled:opacity-50"
                     >
                       {testingId === w.id ? (
-                        <Loader2 size={14} className="animate-spin text-purple-400" />
+                        <Loader2 size={14} className="animate-spin text-slate-400" />
                       ) : (
                         <Send size={14} />
                       )}
@@ -286,7 +265,7 @@ export default function AdminWebhooksPage() {
                   placeholder="e.g. Discord #pass-announcements"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:border-purple-500 focus:outline-none"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:border-[#ccff00] focus:outline-none"
                   required
                 />
               </div>
@@ -296,7 +275,7 @@ export default function AdminWebhooksPage() {
                 <select
                   value={service}
                   onChange={(e) => setService(e.target.value as "DISCORD" | "TELEGRAM" | "GENERIC")}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:border-purple-500 focus:outline-none"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white focus:border-[#ccff00] focus:outline-none"
                 >
                   <option value="DISCORD">Discord Webhook (Rich Embeds)</option>
                   <option value="TELEGRAM">Telegram Bot (Channel / Group)</option>
@@ -311,7 +290,7 @@ export default function AdminWebhooksPage() {
                   placeholder="https://discord.com/api/webhooks/..."
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono focus:border-purple-500 focus:outline-none"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono focus:border-[#ccff00] focus:outline-none"
                   required
                 />
               </div>
@@ -322,7 +301,7 @@ export default function AdminWebhooksPage() {
                   rows={2}
                   value={events}
                   onChange={(e) => setEvents(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono text-[11px] focus:border-purple-500 focus:outline-none"
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono text-[11px] focus:border-[#ccff00] focus:outline-none"
                 />
                 <p className="text-[10px] text-slate-500 mt-1">Comma-separated event names or &apos;ALL&apos;.</p>
               </div>
@@ -338,7 +317,7 @@ export default function AdminWebhooksPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold transition disabled:opacity-50"
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#ccff00] hover:bg-[#d4ff33] text-black font-bold transition disabled:opacity-50"
                 >
                   {submitting ? <Loader2 size={14} className="animate-spin" /> : "Save Webhook"}
                 </button>

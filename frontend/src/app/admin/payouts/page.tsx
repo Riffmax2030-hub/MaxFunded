@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { SkeletonRow } from "@/components/AdminSkeleton";
+import { Loader2, RefreshCw } from "lucide-react";
 import {
   fetchAdminPayoutQueue,
   reviewAdminPayout,
@@ -105,11 +106,11 @@ export default function AdminPayoutsPage() {
     .reduce((acc, curr) => acc + Number(curr.company_fee_amount), 0);
 
   return (
-    <div className="min-h-screen bg-dark-950 text-slate-100 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="pb-20 px-6 xl:px-10 pt-8 text-slate-100">
       <div className="max-w-7xl mx-auto space-y-6">
 
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-dark-800 pb-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
           <div>
             <h1 className="text-2xl font-bold text-white tracking-tight">Finance Payouts Operations Queue</h1>
             <p className="text-sm text-slate-400 mt-1">
@@ -119,22 +120,18 @@ export default function AdminPayoutsPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => loadQueue()}
-              className="px-3 py-1.5 text-xs bg-dark-800 hover:bg-dark-700 text-slate-300 rounded border border-dark-700 transition"
+              disabled={loading}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition disabled:opacity-40"
             >
-              ↻ Refresh Queue
+              {loading ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
+              Refresh Queue
             </button>
-            <Link
-              href="/admin/compliance"
-              className="px-3 py-1.5 text-xs bg-dark-800 hover:bg-dark-700 text-slate-300 rounded border border-dark-700 transition"
-            >
-              Compliance Console →
-            </Link>
           </div>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-          <div className="rounded-xl border border-dark-800 bg-dark-900 p-4">
+          <div className="rounded-xl border border-slate-800 bg-slate-900 p-4">
             <span className="text-xs text-slate-400">Total Requests</span>
             <p className="text-2xl font-bold text-white mt-1">{queue.length}</p>
           </div>
@@ -165,7 +162,7 @@ export default function AdminPayoutsPage() {
         )}
 
         {/* Filter Tabs */}
-        <div className="flex gap-2 border-b border-dark-800 pb-2 overflow-x-auto text-xs font-medium">
+        <div className="flex gap-2 border-b border-slate-800 pb-2 overflow-x-auto text-xs font-medium">
           {[
             { label: "All Requests", val: "" },
             { label: "Requested", val: "REQUESTED" },
@@ -180,7 +177,7 @@ export default function AdminPayoutsPage() {
               className={`px-3 py-1.5 rounded-lg transition ${
                 filter === tab.val
                   ? "bg-primary-600 text-white"
-                  : "bg-dark-900 text-slate-400 hover:text-slate-200"
+                  : "bg-slate-900 text-slate-400 hover:text-slate-200"
               }`}
             >
               {tab.label}
@@ -189,10 +186,10 @@ export default function AdminPayoutsPage() {
         </div>
 
         {/* Payouts Table */}
-        <div className="rounded-xl border border-dark-800 bg-dark-900 overflow-hidden shadow-xl">
+        <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden shadow-xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-dark-800/80 text-slate-400 uppercase tracking-wider font-mono">
+              <thead className="bg-slate-800/80 text-slate-400 uppercase tracking-wider font-mono">
                 <tr>
                   <th className="px-4 py-3">Payout ID</th>
                   <th className="px-4 py-3">Method &amp; Destination</th>
@@ -203,13 +200,11 @@ export default function AdminPayoutsPage() {
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-dark-800 text-slate-300">
+              <tbody className="divide-y divide-slate-800 text-slate-300">
                 {loading ? (
-                  <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
-                      Loading finance queue…
-                    </td>
-                  </tr>
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <SkeletonRow key={i} cols={7} />
+                  ))
                 ) : queue.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
@@ -218,7 +213,7 @@ export default function AdminPayoutsPage() {
                   </tr>
                 ) : (
                   queue.map((item) => (
-                    <tr key={item.id} className="hover:bg-dark-800/50 transition">
+                    <tr key={item.id} className="hover:bg-slate-800/50 transition">
                       <td className="px-4 py-3.5 font-mono text-slate-400">
                         <span className="font-semibold text-white">{item.id.slice(0, 8)}…</span>
                         <div className="text-[10px] text-slate-500 mt-0.5">Acc: {item.purchase_id.slice(0, 8)}</div>
@@ -297,9 +292,9 @@ export default function AdminPayoutsPage() {
         {/* Review & Execute Payout Modal */}
         {selectedPayout && (
           <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-dark-900 border border-dark-800 rounded-2xl max-w-xl w-full p-6 space-y-6 shadow-2xl">
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 space-y-6 shadow-2xl">
               
-              <div className="flex items-center justify-between border-b border-dark-800 pb-4">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                 <div>
                   <h3 className="text-lg font-bold text-white">Disbursement Review &amp; Processing</h3>
                   <p className="text-xs text-slate-400 font-mono">Payout ID: {selectedPayout.id}</p>
@@ -313,7 +308,7 @@ export default function AdminPayoutsPage() {
               </div>
 
               {/* Payout Details Summary */}
-              <div className="grid grid-cols-2 gap-3 text-xs bg-dark-950 p-4 rounded-xl border border-dark-800">
+              <div className="grid grid-cols-2 gap-3 text-xs bg-slate-950 p-4 rounded-xl border border-slate-800">
                 <div>
                   <span className="text-slate-500">Trader Payout Amount (80%):</span>
                   <p className="text-emerald-400 font-mono font-bold text-base mt-0.5">
@@ -336,7 +331,7 @@ export default function AdminPayoutsPage() {
                 </div>
                 <div className="col-span-2">
                   <span className="text-slate-500">Destination Details:</span>
-                  <pre className="mt-1 p-2 bg-dark-900 rounded font-mono text-[10px] text-slate-300 overflow-x-auto">
+                  <pre className="mt-1 p-2 bg-slate-900 rounded font-mono text-[10px] text-slate-300 overflow-x-auto">
                     {JSON.stringify(selectedPayout.payout_details, null, 2)}
                   </pre>
                 </div>
@@ -359,8 +354,8 @@ export default function AdminPayoutsPage() {
                         onClick={() => setReviewStatus(b.status)}
                         className={`p-2 rounded-lg border text-xs font-bold transition text-center ${
                           reviewStatus === b.status
-                            ? "bg-dark-800 border-primary-500 text-primary-400 ring-1 ring-primary-500"
-                            : "border-dark-700 bg-dark-950 text-slate-400 hover:text-slate-200"
+                            ? "bg-slate-800 border-primary-500 text-primary-400 ring-1 ring-primary-500"
+                            : "border-slate-700 bg-slate-950 text-slate-400 hover:text-slate-200"
                         }`}
                       >
                         {b.label}
@@ -380,7 +375,7 @@ export default function AdminPayoutsPage() {
                       value={txRef}
                       onChange={(e) => setTxRef(e.target.value)}
                       placeholder="e.g. 0x39a8f4c1b982ef78423bb09a28c41d7e or SWIFT-REF-90234"
-                      className="w-full bg-dark-950 border border-dark-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-primary-500 font-mono"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-primary-500 font-mono"
                     />
                   </div>
                 )}
@@ -396,7 +391,7 @@ export default function AdminPayoutsPage() {
                       value={rejectionReason}
                       onChange={(e) => setRejectionReason(e.target.value)}
                       placeholder="e.g. Ineligible due to rule breach or copy trading violation."
-                      className="w-full bg-dark-950 border border-dark-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-primary-500"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-primary-500"
                     />
                   </div>
                 )}
@@ -408,7 +403,7 @@ export default function AdminPayoutsPage() {
                     value={adminNotes}
                     onChange={(e) => setAdminNotes(e.target.value)}
                     placeholder="e.g. Processed via Fireblocks treasury wallet."
-                    className="w-full bg-dark-950 border border-dark-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-primary-500"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-primary-500"
                   />
                 </div>
 
@@ -416,7 +411,7 @@ export default function AdminPayoutsPage() {
                   <button
                     type="button"
                     onClick={() => setSelectedPayout(null)}
-                    className="px-4 py-2 bg-dark-800 text-slate-300 text-xs rounded-lg hover:bg-dark-700 transition"
+                    className="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg hover:bg-slate-700 transition"
                   >
                     Cancel
                   </button>

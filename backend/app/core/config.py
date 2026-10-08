@@ -1,6 +1,11 @@
+import os
+from pathlib import Path
 from typing import List, Union
 from pydantic import AnyHttpUrl, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
+_ENV_FILE_PATH = str(_BACKEND_DIR / ".env")
 
 
 class Settings(BaseSettings):
@@ -65,6 +70,27 @@ class Settings(BaseSettings):
     BANK_CURRENCY: str = "USD"
     BANK_INSTRUCTIONS: str = "Include your unique reference code in the transfer memo/description."
 
+    # Transactional Email (SMTP / Brevo / Resend / Google Workspace)
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM_EMAIL: str = "support@maxfunded.com"
+    SMTP_FROM_NAME: str = "MaxFunded Prop Firm"
+    SMTP_TLS: bool = True
+
+    # MT5 Live Bridge
+    # Challenge/evaluation phase server (Phase 1 & 2 accounts)
+    MT5_CHALLENGE_SERVER: str = "MaxFunded-Server1"
+    # Funded live trading server (passed traders only)
+    MT5_LIVE_SERVER: str = "MaxFunded-Live1"
+    MT5_BRIDGE_SECRET: str = "change-me-in-production-32chars"
+    # Real MT5 Manager API connection (leave empty to stay in simulation mode)
+    MT5_MANAGER_HOST: str = ""
+    MT5_MANAGER_PORT: int = 443
+    MT5_MANAGER_LOGIN: int = 0
+    MT5_MANAGER_PASSWORD: str = ""
+
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
@@ -73,8 +99,24 @@ class Settings(BaseSettings):
         "http://127.0.0.1:8000",
     ]
 
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def resolve_database_url(cls, v: str) -> str:
+        if isinstance(v, str) and ("riffmax.db" in v and not v.startswith("sqlite+aiosqlite:////")):
+            db_path = str((_BACKEND_DIR / "riffmax.db").resolve()).replace("\\", "/")
+            return f"sqlite+aiosqlite:///{db_path}"
+        return v
+
+    @field_validator("DATABASE_URL_SYNC", mode="before")
+    @classmethod
+    def resolve_database_url_sync(cls, v: str) -> str:
+        if isinstance(v, str) and ("riffmax.db" in v and not v.startswith("sqlite:////")):
+            db_path = str((_BACKEND_DIR / "riffmax.db").resolve()).replace("\\", "/")
+            return f"sqlite:///{db_path}"
+        return v
+
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(_ENV_FILE_PATH, ".env"),
         env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore"

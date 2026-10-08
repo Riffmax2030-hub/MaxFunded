@@ -173,6 +173,8 @@ export async function initiatePayment(
     currency?: string;
     success_url?: string;
     cancel_url?: string;
+    pay_with_profits?: boolean;
+    addons?: string[];
   },
   token: string
 ): Promise<PaymentInitiateResponse> {
@@ -684,6 +686,10 @@ export interface DashboardSummaryData {
   challenge_start_date: string | null;
   kyc_status: string;
   has_pending_payout: boolean;
+  mt5_server?: string | null;
+  mt5_login?: string | null;
+  mt5_password?: string | null;
+  mt5_investor_password?: string | null;
   rule_compliance: RuleComplianceItem[];
 }
 
@@ -1102,3 +1108,160 @@ export async function fetchAdminAuditLogs(
   }
   return res.json();
 }
+
+// ============================================================
+// MT5 Account Pool Management (Admin)
+// ============================================================
+
+export interface MT5TierAvailability {
+  tier: number;
+  total: number;
+  available: number;
+  assigned: number;
+}
+
+export interface MT5AccountPoolSummary {
+  total_accounts: number;
+  available_accounts: number;
+  assigned_accounts: number;
+  tiers: MT5TierAvailability[];
+}
+
+export interface MT5AccountPoolItem {
+  id: string;
+  broker_name: string;
+  server_name: string;
+  account_tier: number;
+  mt5_login: string;
+  mt5_password: string;
+  mt5_investor_password: string | null;
+  status: "AVAILABLE" | "ASSIGNED" | "BREACHED" | "PASSED" | "ARCHIVED";
+  assigned_purchase_id: string | null;
+  assigned_user_id: string | null;
+  assigned_at: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface MT5AccountPoolCreate {
+  broker_name: string;
+  server_name: string;
+  account_tier: number;
+  mt5_login: string;
+  mt5_password: string;
+  mt5_investor_password?: string;
+  notes?: string;
+}
+
+export async function fetchAdminPoolSummary(token: string): Promise<MT5AccountPoolSummary> {
+  const res = await fetch(`${API_BASE}/admin/account-pool/summary`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error("Failed to load pool summary");
+  return res.json();
+}
+
+export async function fetchAdminPoolAccounts(
+  token: string,
+  statusFilter?: string,
+  tierFilter?: number
+): Promise<MT5AccountPoolItem[]> {
+  const q = new URLSearchParams();
+  if (statusFilter) q.set("status_filter", statusFilter);
+  if (tierFilter !== undefined) q.set("tier_filter", String(tierFilter));
+  const res = await fetch(`${API_BASE}/admin/account-pool?${q.toString()}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error("Failed to load pool accounts");
+  return res.json();
+}
+
+export async function addPoolAccount(
+  token: string,
+  payload: MT5AccountPoolCreate
+): Promise<MT5AccountPoolItem> {
+  const res = await fetch(`${API_BASE}/admin/account-pool`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Failed to add account" }));
+    throw new Error(err.detail || "Failed to add account");
+  }
+  return res.json();
+}
+
+export async function deletePoolAccount(token: string, accountId: string): Promise<{ message: string }> {
+  const res = await fetch(`${API_BASE}/admin/account-pool/${accountId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Failed to delete account" }));
+    throw new Error(err.detail || "Failed to delete account");
+  }
+  return res.json();
+}
+
+export async function adminResendCredentials(
+  token: string,
+  purchaseId: string
+): Promise<{ success: boolean; message: string; mt5_login: string; recipient: string }> {
+  const res = await fetch(`${API_BASE}/admin/resend-credentials/${purchaseId}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Resend failed" }));
+    throw new Error(err.detail || "Resend failed");
+  }
+  return res.json();
+}
+
+
+// ── Leaderboard ────────────────────────────────────────────────────────────────
+
+export interface LeaderboardEntry {
+  rank: number;
+  trader_name: string;
+  country: string;
+  country_name: string;
+  account_size: string;
+  tier_amount: number;
+  profit_usd: number;
+  return_pct: number;
+  win_rate_pct: number;
+  trades_count: number;
+  badge: string;
+  badge_color: string;
+  prize_amount: string | null;
+  phase: string;
+}
+
+export interface LeaderboardData {
+  category: string;
+  total_participants: number;
+  total_payouts_distributed: string;
+  competition_ends_in_days: number;
+  entries: LeaderboardEntry[];
+}
+
+export async function fetchLeaderboard(
+  category: string = "monthly",
+  tier?: number
+): Promise<LeaderboardData> {
+  const params = new URLSearchParams({ category });
+  if (tier) params.append("tier", String(tier));
+  const res = await fetch(`${API_BASE}/leaderboard?${params.toString()}`, {
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error("Failed to fetch leaderboard");
+  return res.json();
+}
+
+// Export alias for fetchNotifications
+export const fetchNotifications = fetchMyNotifications;
+

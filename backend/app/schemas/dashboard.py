@@ -87,6 +87,12 @@ class DashboardSummary(BaseModel):
     kyc_status: str
     has_pending_payout: bool
 
+    # MT5 Account Credentials
+    mt5_server: Optional[str] = None
+    mt5_login: Optional[str] = None
+    mt5_password: Optional[str] = None
+    mt5_investor_password: Optional[str] = None
+
     # Compliance rules
     rule_compliance: List[RuleComplianceItem] = Field(default_factory=list)
 

@@ -14,10 +14,10 @@ export default function ChallengeCard({ challenge }: Props) {
   const handleSelect = () => {
     const session = getSession();
     if (!session) {
-      window.location.href = `/register?redirect=/checkout/${challenge.id}`;
+      window.location.href = `/register?redirect=/checkout?challenge=${challenge.id}`;
       return;
     }
-    window.location.href = `/checkout/${challenge.id}`;
+    window.location.href = `/checkout?challenge=${challenge.id}`;
   };
 
   const startingBalanceNum = Number(challenge.starting_balance).toLocaleString();

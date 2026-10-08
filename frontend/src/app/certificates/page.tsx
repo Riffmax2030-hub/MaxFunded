@@ -9,19 +9,20 @@ import {
   CheckCircle2,
   ExternalLink,
   Copy,
-  Calendar,
   ShieldCheck,
   Loader2,
   ArrowRight,
-  TrendingUp,
   AlertTriangle,
+  X,
 } from "lucide-react";
+import MaxFundedCertificate from "@/components/MaxFundedCertificate";
 
 export default function TraderCertificatesPage() {
   const [certs, setCerts] = useState<CertificateItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [selectedCert, setSelectedCert] = useState<CertificateItem | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -201,12 +202,19 @@ export default function TraderCertificatesPage() {
 
                     {/* Actions */}
                     <div className="flex items-center gap-2 pt-2">
+                      <button
+                        onClick={() => setSelectedCert(c)}
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs transition"
+                      >
+                        <ShieldCheck size={14} /> Preview Charter
+                      </button>
                       <Link
                         href={`/verify/${c.certificate_code}`}
                         target="_blank"
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs transition"
+                        title="Open Public Ledger Verification"
+                        className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition text-xs"
                       >
-                        <ShieldCheck size={14} /> View Certificate <ExternalLink size={12} />
+                        <ExternalLink size={16} />
                       </Link>
                       <button
                         onClick={() => copyVerifyUrl(c.certificate_code)}
@@ -227,6 +235,60 @@ export default function TraderCertificatesPage() {
             </div>
           )}
         </div>
+
+        {/* Certificate Modal */}
+        {selectedCert && (
+          <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+            <div className="relative w-full max-w-4xl bg-slate-950 border border-slate-800 rounded-3xl p-4 sm:p-6 shadow-2xl my-8">
+              {/* Close Button & Actions Header */}
+              <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-800">
+                <div className="flex items-center gap-2 text-sm text-slate-300">
+                  <Award className="text-amber-400" size={18} />
+                  <span className="font-bold text-white">Official Certificate Preview</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={`/verify/${selectedCert.certificate_code}`}
+                    target="_blank"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition"
+                  >
+                    <ExternalLink size={14} /> Public Ledger
+                  </Link>
+                  <button
+                    onClick={() => setSelectedCert(null)}
+                    className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Premium Certificate Component — includes built-in PDF download */}
+              <div className="overflow-x-auto p-2">
+                <MaxFundedCertificate
+                  cert={{
+                    is_valid: !selectedCert.is_revoked,
+                    certificate_code: selectedCert.certificate_code,
+                    certificate_type: selectedCert.certificate_type,
+                    trader_name: selectedCert.trader_name,
+                    challenge_name: selectedCert.challenge_name,
+                    account_size: selectedCert.account_size,
+                    payout_amount: selectedCert.payout_amount,
+                    issued_at: selectedCert.created_at,
+                    sha256_signature: selectedCert.sha256_signature,
+                    is_revoked: selectedCert.is_revoked,
+                    revocation_reason: selectedCert.revocation_reason,
+                    issuer: "MaxFunded",
+                    verification_url:
+                      typeof window !== "undefined"
+                        ? `${window.location.origin}/verify/${selectedCert.certificate_code}`
+                        : "",
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
   );
 }

@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { SkeletonRow } from "@/components/AdminSkeleton";
+import { Loader2, RefreshCw } from "lucide-react";
 import {
   fetchAdminKYCVerifications,
   reviewKYCVerification,
@@ -105,11 +106,11 @@ export default function AdminCompliancePage() {
   const flaggedCount = verifications.filter((v) => v.aml_status === "FLAGGED" || v.aml_status === "HIGH_RISK").length;
 
   return (
-    <div className="min-h-screen bg-dark-950 text-slate-100 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="pb-20 px-6 xl:px-10 pt-8 text-slate-100">
       <div className="max-w-7xl mx-auto space-y-6">
 
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-dark-800 pb-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
           <div>
             <h1 className="text-2xl font-bold text-white tracking-tight">Compliance &amp; KYC Verification Console</h1>
             <p className="text-sm text-slate-400 mt-1">
@@ -119,22 +120,18 @@ export default function AdminCompliancePage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => loadVerifications()}
-              className="px-3 py-1.5 text-xs bg-dark-800 hover:bg-dark-700 text-slate-300 rounded border border-dark-700 transition"
+              disabled={loading}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition disabled:opacity-40"
             >
-              ↻ Refresh Queue
+              {loading ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
+              Refresh Queue
             </button>
-            <Link
-              href="/admin/capital"
-              className="px-3 py-1.5 text-xs bg-dark-800 hover:bg-dark-700 text-slate-300 rounded border border-dark-700 transition"
-            >
-              Company Capital Console →
-            </Link>
           </div>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-          <div className="rounded-xl border border-dark-800 bg-dark-900 p-4">
+          <div className="rounded-xl border border-slate-800 bg-slate-900 p-4">
             <span className="text-xs text-slate-400">Total Dossiers</span>
             <p className="text-2xl font-bold text-white mt-1">{verifications.length}</p>
           </div>
@@ -165,7 +162,7 @@ export default function AdminCompliancePage() {
         )}
 
         {/* Filter Tabs */}
-        <div className="flex gap-2 border-b border-dark-800 pb-2 overflow-x-auto text-xs font-medium">
+        <div className="flex gap-2 border-b border-slate-800 pb-2 overflow-x-auto text-xs font-medium">
           {[
             { label: "All Dossiers", val: "" },
             { label: "Pending Review", val: "PENDING_REVIEW" },
@@ -179,7 +176,7 @@ export default function AdminCompliancePage() {
               className={`px-3 py-1.5 rounded-lg transition ${
                 filter === tab.val
                   ? "bg-primary-600 text-white"
-                  : "bg-dark-900 text-slate-400 hover:text-slate-200"
+                  : "bg-slate-900 text-slate-400 hover:text-slate-200"
               }`}
             >
               {tab.label}
@@ -188,10 +185,10 @@ export default function AdminCompliancePage() {
         </div>
 
         {/* Verifications Table */}
-        <div className="rounded-xl border border-dark-800 bg-dark-900 overflow-hidden shadow-xl">
+        <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden shadow-xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-dark-800/80 text-slate-400 uppercase tracking-wider font-mono">
+              <thead className="bg-slate-800/80 text-slate-400 uppercase tracking-wider font-mono">
                 <tr>
                   <th className="px-4 py-3">Applicant Name</th>
                   <th className="px-4 py-3">Jurisdiction</th>
@@ -202,13 +199,11 @@ export default function AdminCompliancePage() {
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-dark-800 text-slate-300">
+              <tbody className="divide-y divide-slate-800 text-slate-300">
                 {loading ? (
-                  <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
-                      Loading verification queue…
-                    </td>
-                  </tr>
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <SkeletonRow key={i} cols={7} />
+                  ))
                 ) : verifications.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
@@ -217,7 +212,7 @@ export default function AdminCompliancePage() {
                   </tr>
                 ) : (
                   verifications.map((item) => (
-                    <tr key={item.id} className="hover:bg-dark-800/50 transition">
+                    <tr key={item.id} className="hover:bg-slate-800/50 transition">
                       <td className="px-4 py-3.5">
                         <div className="font-semibold text-white">
                           {item.first_name || item.last_name
@@ -287,7 +282,7 @@ export default function AdminCompliancePage() {
                       <td className="px-4 py-3.5 text-right space-x-2">
                         <button
                           onClick={() => handleRescreen(item.id)}
-                          className="px-2 py-1 bg-dark-800 hover:bg-dark-700 text-slate-300 rounded border border-dark-700 text-[10px]"
+                          className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 text-[10px]"
                         >
                           Re-screen
                         </button>
@@ -312,9 +307,9 @@ export default function AdminCompliancePage() {
         {/* Detailed Review Dossier Modal */}
         {selectedDossier && (
           <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-dark-900 border border-dark-800 rounded-2xl max-w-2xl w-full p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-6 shadow-2xl max-h-[90vh] overflow-y-auto">
               
-              <div className="flex items-center justify-between border-b border-dark-800 pb-4">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
                 <div>
                   <h3 className="text-lg font-bold text-white">Compliance Dossier Review</h3>
                   <p className="text-xs text-slate-400 font-mono">Dossier ID: {selectedDossier.id}</p>
@@ -328,7 +323,7 @@ export default function AdminCompliancePage() {
               </div>
 
               {/* Applicant Info Summary */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs bg-dark-950 p-4 rounded-xl border border-dark-800">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs bg-slate-950 p-4 rounded-xl border border-slate-800">
                 <div>
                   <span className="text-slate-500">Applicant:</span>
                   <p className="text-white font-semibold mt-0.5">{selectedDossier.first_name} {selectedDossier.last_name}</p>
@@ -367,7 +362,7 @@ export default function AdminCompliancePage() {
                 ) : (
                   <div className="space-y-1.5 text-xs">
                     {selectedDossier.documents.map((doc, idx) => (
-                      <div key={idx} className="p-3 bg-dark-950 rounded-lg border border-dark-800 flex items-center justify-between">
+                      <div key={idx} className="p-3 bg-slate-950 rounded-lg border border-slate-800 flex items-center justify-between">
                         <div>
                           <span className="font-mono text-primary-400 font-bold">{doc.document_type}</span>
                           <span className="text-slate-300 ml-2">{doc.file_name}</span>
@@ -383,7 +378,7 @@ export default function AdminCompliancePage() {
               </div>
 
               {/* Decision Action Form */}
-              <form onSubmit={handleReviewSubmit} className="space-y-4 border-t border-dark-800 pt-4">
+              <form onSubmit={handleReviewSubmit} className="space-y-4 border-t border-slate-800 pt-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-2">Reviewer Determination *</label>
                   <div className="grid grid-cols-3 gap-3">
@@ -398,8 +393,8 @@ export default function AdminCompliancePage() {
                         onClick={() => setReviewAction(btn.action as any)}
                         className={`p-2.5 rounded-lg border text-xs font-bold transition text-center ${
                           reviewAction === btn.action
-                            ? `bg-dark-800 ${btn.color} ring-1 ring-current`
-                            : "border-dark-700 bg-dark-950 text-slate-400 hover:text-slate-200"
+                            ? `bg-slate-800 ${btn.color} ring-1 ring-current`
+                            : "border-slate-700 bg-slate-950 text-slate-400 hover:text-slate-200"
                         }`}
                       >
                         {btn.label}
@@ -419,7 +414,7 @@ export default function AdminCompliancePage() {
                       value={rejectionReason}
                       onChange={(e) => setRejectionReason(e.target.value)}
                       placeholder="e.g. Passport scan was blurry. Please provide high resolution scan with all 4 corners visible."
-                      className="w-full bg-dark-950 border border-dark-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-primary-500"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-primary-500"
                     />
                   </div>
                 )}
@@ -431,7 +426,7 @@ export default function AdminCompliancePage() {
                     value={reviewerNotes}
                     onChange={(e) => setReviewerNotes(e.target.value)}
                     placeholder="e.g. Checked against OFAC list; no adverse media matches."
-                    className="w-full bg-dark-950 border border-dark-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-primary-500"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-primary-500"
                   />
                 </div>
 
@@ -439,7 +434,7 @@ export default function AdminCompliancePage() {
                   <button
                     type="button"
                     onClick={() => setSelectedDossier(null)}
-                    className="px-4 py-2 bg-dark-800 text-slate-300 text-xs rounded-lg hover:bg-dark-700 transition"
+                    className="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-lg hover:bg-slate-700 transition"
                   >
                     Cancel
                   </button>

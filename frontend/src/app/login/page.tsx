@@ -16,13 +16,14 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+      const cleanEmail = email.trim().toLowerCase();
+      const cleanPassword = password.trim();
       const res = await fetch(`${apiUrl}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: cleanEmail, password: cleanPassword }),
       });
 
       if (!res.ok) {
@@ -84,6 +85,32 @@ export default function LoginPage() {
             </div>
           )}
 
+          {/* Quick Demo Access */}
+          <div className="flex items-center gap-2 mb-4">
+            <button
+              type="button"
+              onClick={() => {
+                setEmail("admin@maxfunded.com");
+                setPassword("Admin123!");
+                setError(null);
+              }}
+              className="flex-1 py-1.5 px-3 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold hover:bg-amber-500/25 transition text-center"
+            >
+              👑 Fill Admin Login
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail("trader@maxfunded.com");
+                setPassword("Trader2026!");
+                setError(null);
+              }}
+              className="flex-1 py-1.5 px-3 rounded-lg bg-[#ccff00]/15 border border-[#ccff00]/30 text-[#ccff00] text-xs font-bold hover:bg-[#ccff00]/25 transition text-center"
+            >
+              🌱 Fill Trader Login
+            </button>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-bold text-neutral-300 mb-1.5">
@@ -100,9 +127,14 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-neutral-300 mb-1.5">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold text-neutral-300">
+                  Password
+                </label>
+                <Link href="/forgot-password" className="text-xs text-[#ccff00] hover:underline font-medium">
+                  Forgot password?
+                </Link>
+              </div>
               <input
                 type="password"
                 required

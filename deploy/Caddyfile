@@ -1,0 +1,47 @@
+# ========================================================
+# MaxFunded Prop Firm - Automated HTTPS Reverse Proxy
+# ========================================================
+# Caddy automatically provisions and renews SSL certificates from Let's Encrypt.
+# Replace {$DOMAIN} with your domain (e.g. maxfunded.com) or your VPS public IP.
+
+{$DOMAIN:localhost} {
+    # Frontend Next.js app
+    reverse_proxy localhost:3000
+
+    # Backend API endpoints
+    handle /api/* {
+        reverse_proxy localhost:8000
+    }
+
+    # Swagger / OpenAPI documentation
+    handle /docs* {
+        reverse_proxy localhost:8000
+    }
+    handle /openapi.json {
+        reverse_proxy localhost:8000
+    }
+
+    # Health check
+    handle /health {
+        reverse_proxy localhost:8000
+    }
+
+    # Security headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+
+    # Gzip / Zstandard compression
+    encode zstd gzip
+
+    # Log to file
+    log {
+        output file /var/log/caddy/maxfunded.log {
+            roll_size 20mb
+            roll_keep 5
+        }
+    }
+}

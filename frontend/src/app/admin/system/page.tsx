@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import {
@@ -158,50 +157,32 @@ export default function AdminSystemPage() {
 
   return (
     <>
-      <main className="min-h-screen bg-slate-950 text-white pt-24 pb-20 px-4">
+      <main className="pb-20 px-6 xl:px-10 pt-8">
         <div className="max-w-7xl mx-auto space-y-8">
 
-          {/* ── Top Header & Navigation ──────────────────────────────────── */}
+          {/* ── Top Header ──────────────────────────────────────────────────── */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-2">
                 <Server size={14} /> Mission Control Diagnostics
               </div>
-              <h1 className="text-3xl font-extrabold text-white">System Health & Immutable Audit Logs</h1>
+              <h1 className="text-3xl font-extrabold text-white">System Health &amp; Immutable Audit Logs</h1>
               <p className="text-slate-400 text-sm mt-1">
                 Real-time operational pulse, database telemetry, and immutable audit logs across administrative actions.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <Link
-                href="/admin/challenges"
-                className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition"
-              >
-                Challenges
-              </Link>
-              <Link
-                href="/admin/compliance"
-                className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition"
-              >
-                Compliance KYC
-              </Link>
-              <Link
-                href="/admin/payouts"
-                className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition"
-              >
-                Payouts
-              </Link>
-              <Link
-                href="/admin/notifications"
-                className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition"
-              >
-                Webhooks
-              </Link>
               <button
                 onClick={() => { loadHealth(); loadLogs(); }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow-lg shadow-emerald-600/20"
+                disabled={healthLoading || logsLoading}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition border border-slate-700 disabled:opacity-40"
               >
-                <RefreshCw size={14} /> Refresh
+                {healthLoading || logsLoading ? (
+                  <Loader2 size={13} className="animate-spin" />
+                ) : (
+                  <RefreshCw size={13} />
+                )}
+                Refresh
               </button>
             </div>
           </div>

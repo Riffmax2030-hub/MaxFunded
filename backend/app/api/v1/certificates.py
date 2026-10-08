@@ -9,8 +9,10 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.core.database import get_db
 from app.core.rbac import get_current_user, require_roles, RoleName
+from app.models.challenge import ChallengePurchase
 from app.models.user import User
 from app.schemas.certificate import (
     CertificateResponse,
@@ -19,6 +21,8 @@ from app.schemas.certificate import (
     CertificateRevokeRequest,
 )
 from app.services.certificate_service import CertificateService
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 router = APIRouter(prefix="/certificates", tags=["Certificates & Verification"])
 cert_service = CertificateService()
@@ -44,7 +48,8 @@ async def verify_certificate_public(
             detail=f"Certificate '{code}' was not found in our verifiable registry.",
         )
 
-    verification_url = f"https://riffmaxfunding.com/verify/{cert.certificate_code}"
+    frontend_base = getattr(settings, "FRONTEND_URL", "https://maxfunded.com")
+    verification_url = f"{frontend_base}/verify/{cert.certificate_code}"
 
     return CertificatePublicVerifyResponse(
         is_valid=not cert.is_revoked,
@@ -58,7 +63,7 @@ async def verify_certificate_public(
         sha256_signature=cert.sha256_signature,
         is_revoked=cert.is_revoked,
         revocation_reason=cert.revocation_reason,
-        issuer="Riffmax Funding",
+        issuer="MaxFunded",
         verification_url=verification_url,
     )
 
@@ -72,8 +77,48 @@ async def get_my_certificates(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Retrieve all issued certificates for the logged-in trader."""
-    return await cert_service.get_user_certificates(db, current_user.id)
+    """Retrieve all issued certificates for the logged-in trader (auto-syncs any newly passed milestones)."""
+    # Auto-mint certificates for any challenges or payouts that have passed
+    return await cert_service.auto_sync_certificates_for_user(db, current_user.id)
+
+
+@router.post(
+    "/auto-generate/{purchase_id}",
+    response_model=List[CertificateResponse],
+    summary="Auto-evaluate and generate certificates for a passed challenge purchase",
+)
+async def auto_generate_certificates_for_purchase(
+    purchase_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Evaluates a specific challenge purchase and automatically issues any earned certificates
+    (e.g., Phase 1 Pass, Phase 2 Pass, Funded Trader).
+    """
+    stmt = (
+        select(ChallengePurchase)
+        .options(selectinload(ChallengePurchase.challenge))
+        .where(ChallengePurchase.id == purchase_id)
+    )
+    res = await db.execute(stmt)
+    purchase = res.scalar_one_or_none()
+    if not purchase:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Challenge purchase not found",
+        )
+
+    # Must be owner or admin
+    is_admin = current_user.role in [RoleName.SUPER_ADMIN, RoleName.TRADING_ADMIN, RoleName.ADMIN]
+    if purchase.user_id != current_user.id and not is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not authorized to generate certificates for this account",
+        )
+
+    certs = await cert_service.auto_sync_for_purchase(db, purchase)
+    return certs
 
 
 @router.post(

@@ -39,5 +39,7 @@ export function clearSession() {
   if (typeof window !== "undefined") {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user_data");
   }
 }

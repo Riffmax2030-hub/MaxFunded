@@ -16,6 +16,7 @@ from app.schemas.payout import (
     AdminPayoutReviewRequest,
 )
 from app.services.kyc_service import kyc_service
+from app.services.email_service import email_service
 
 MIN_PAYOUT_AMOUNT = Decimal("50.00")
 
@@ -197,7 +198,10 @@ class PayoutProcessingService:
         """
         stmt = (
             select(PayoutRequest)
-            .options(selectinload(PayoutRequest.purchase))
+            .options(
+                selectinload(PayoutRequest.purchase),
+                selectinload(PayoutRequest.user),
+            )
             .where(PayoutRequest.id == payout_id)
         )
         res = await db.execute(stmt)
@@ -241,6 +245,29 @@ class PayoutProcessingService:
 
         await db.commit()
         await db.refresh(payout)
+
+        # Dispatches email notification to trader
+        if payout.user:
+            try:
+                trader_name = payout.user.full_name or payout.user.email.split("@")[0]
+                if payload.status in [PayoutStatus.APPROVED, PayoutStatus.PAID]:
+                    await email_service.send_payout_approved_email(
+                        to_email=payout.user.email,
+                        trader_name=trader_name,
+                        amount_usd=float(payout.trader_amount),
+                        method=payout.method.value,
+                        reference=payout.tx_hash_or_reference or str(payout.id)[:8],
+                    )
+                elif payload.status == PayoutStatus.REJECTED:
+                    await email_service.send_payout_rejected_email(
+                        to_email=payout.user.email,
+                        trader_name=trader_name,
+                        amount_usd=float(payout.amount),
+                        reason=payout.rejection_reason or "Verification check failed",
+                    )
+            except Exception:
+                pass
+
         return payout
 
     @classmethod

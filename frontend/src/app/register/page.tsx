@@ -26,9 +26,8 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [country, setCountry] = useState("US");
   const [phone, setPhone] = useState("");
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
-  const [acceptedRisk, setAcceptedRisk] = useState(false);
+  const [acceptedAll, setAcceptedAll] = useState(false);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,8 +35,12 @@ export default function RegisterPage() {
     e.preventDefault();
     setError(null);
 
-    if (!acceptedTerms || !acceptedPrivacy || !acceptedRisk) {
-      setError("Please review and accept all agreements before proceeding.");
+    if (!acceptedAll) {
+      setError("Please agree to the Terms of Service, Privacy Policy, and Risk Disclosure.");
+      return;
+    }
+    if (!captchaVerified) {
+      setError("Please verify that you are not a robot.");
       return;
     }
 
@@ -54,9 +57,9 @@ export default function RegisterPage() {
           full_name: fullName,
           country,
           phone: phone || undefined,
-          accepted_terms: acceptedTerms,
-          accepted_privacy: acceptedPrivacy,
-          accepted_risk_disclosure: acceptedRisk,
+          accepted_terms: acceptedAll,
+          accepted_privacy: acceptedAll,
+          accepted_risk_disclosure: acceptedAll,
         }),
       });
 
@@ -100,10 +103,10 @@ export default function RegisterPage() {
             </span>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-1">
+          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-1 text-left">
             Create Your Account
           </h2>
-          <p className="text-xs sm:text-sm text-neutral-400 mb-6">
+          <p className="text-xs sm:text-sm text-neutral-400 mb-6 text-left">
             Get instant access to your simulated MT5 accounts and performance dashboard
           </p>
 
@@ -190,58 +193,90 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Agreements */}
-            <div className="space-y-2 pt-2 text-[11px] text-neutral-400">
-              <label className="flex items-start gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={acceptedTerms}
-                  onChange={(e) => setAcceptedTerms(e.target.checked)}
-                  className="mt-0.5 rounded accent-[#ccff00]"
-                />
-                <span>
+            {/* ── Single Agreement Checkbox ── */}
+            <div className="pt-2">
+              <label className="flex items-start gap-3 cursor-pointer group">
+                <div className="relative mt-0.5 shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={acceptedAll}
+                    onChange={(e) => setAcceptedAll(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div
+                    onClick={() => setAcceptedAll(!acceptedAll)}
+                    className={`w-4.5 h-4.5 w-[18px] h-[18px] rounded border-2 flex items-center justify-center transition-all cursor-pointer ${
+                      acceptedAll
+                        ? "bg-[#ccff00] border-[#ccff00]"
+                        : "border-white/30 bg-transparent hover:border-[#ccff00]/60"
+                    }`}
+                  >
+                    {acceptedAll && (
+                      <svg className="w-2.5 h-2.5 text-black" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
+                </div>
+                <span className="text-[11px] text-neutral-400 leading-relaxed">
                   I agree to the{" "}
-                  <Link href="/terms" target="_blank" className="text-white underline">
+                  <Link href="/terms" target="_blank" className="text-white underline underline-offset-2 hover:text-[#ccff00] transition-colors">
                     Terms of Service
                   </Link>
-                </span>
-              </label>
-
-              <label className="flex items-start gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={acceptedPrivacy}
-                  onChange={(e) => setAcceptedPrivacy(e.target.checked)}
-                  className="mt-0.5 rounded accent-[#ccff00]"
-                />
-                <span>
-                  I agree to the{" "}
-                  <Link href="/privacy" target="_blank" className="text-white underline">
+                  ,{" "}
+                  <Link href="/privacy" target="_blank" className="text-white underline underline-offset-2 hover:text-[#ccff00] transition-colors">
                     Privacy Policy
                   </Link>
-                </span>
-              </label>
-
-              <label className="flex items-start gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={acceptedRisk}
-                  onChange={(e) => setAcceptedRisk(e.target.checked)}
-                  className="mt-0.5 rounded accent-[#ccff00]"
-                />
-                <span>
-                  I have read and understand the{" "}
-                  <Link href="/risk-disclosure" target="_blank" className="text-white underline">
+                  , and acknowledge the{" "}
+                  <Link href="/risk-disclosure" target="_blank" className="text-white underline underline-offset-2 hover:text-[#ccff00] transition-colors">
                     Simulated Trading Risk Disclosure
                   </Link>
                 </span>
               </label>
             </div>
 
+            {/* ── CAPTCHA widget ── */}
+            <div
+              className={`flex items-center justify-between px-4 py-3 rounded-xl border transition-all ${
+                captchaVerified
+                  ? "bg-[#0d1a0d] border-[#ccff00]/40"
+                  : "bg-[#08090b] border-white/10 hover:border-white/20"
+              }`}
+            >
+              <label className="flex items-center gap-3 cursor-pointer select-none" onClick={() => setCaptchaVerified(!captchaVerified)}>
+                <div
+                  className={`w-[22px] h-[22px] rounded border-2 flex items-center justify-center transition-all ${
+                    captchaVerified
+                      ? "bg-[#ccff00] border-[#ccff00]"
+                      : "border-white/30 bg-transparent"
+                  }`}
+                >
+                  {captchaVerified && (
+                    <svg className="w-3 h-3 text-black" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </div>
+                <span className={`text-sm font-medium transition-colors ${captchaVerified ? "text-[#ccff00]" : "text-neutral-300"}`}>
+                  {captchaVerified ? "Verified" : "I'm not a robot"}
+                </span>
+              </label>
+              {/* reCAPTCHA branding */}
+              <div className="flex flex-col items-center opacity-60 shrink-0">
+                <svg className="w-8 h-8" viewBox="0 0 64 64" fill="none">
+                  <path d="M32 8C18.7 8 8 18.7 8 32s10.7 24 24 24 24-10.7 24-24S45.3 8 32 8z" fill="#4A90D9" opacity="0.15"/>
+                  <path d="M32 14c-9.9 0-18 8.1-18 18s8.1 18 18 18 18-8.1 18-18-8.1-18-18-18z" fill="#4A90D9" opacity="0.25"/>
+                  <path d="M42 28h-8v-8l-12 12 12 12v-8h8V28z" fill="#4A90D9"/>
+                </svg>
+                <span className="text-[8px] text-neutral-500 mt-0.5">reCAPTCHA</span>
+                <span className="text-[7px] text-neutral-600">Privacy · Terms</span>
+              </div>
+            </div>
+
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 rounded-xl bg-[#ccff00] hover:bg-[#b3e600] text-black font-black text-sm uppercase tracking-tight shadow-neon transition flex items-center justify-center gap-2 disabled:opacity-50 mt-4"
+              className="w-full py-4 rounded-xl bg-[#ccff00] hover:bg-[#b3e600] text-black font-black text-sm uppercase tracking-tight shadow-neon transition flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
             >
               {loading ? (
                 <>

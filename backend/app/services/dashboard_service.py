@@ -167,6 +167,10 @@ class DashboardService:
             ),
             kyc_status=user_kyc_status,
             has_pending_payout=pending_payout,
+            mt5_server=purchase.mt5_server,
+            mt5_login=purchase.mt5_login,
+            mt5_password=purchase.mt5_password,
+            mt5_investor_password=purchase.mt5_investor_password,
             rule_compliance=compliance,
         )
 

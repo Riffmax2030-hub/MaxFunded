@@ -16,6 +16,7 @@ from app.models.user import User
 from app.payments.base import PaymentInitResult
 from app.payments.factory import payment_factory
 from app.services.provisioning import provisioning_service
+from app.services.email_service import email_service
 from app.schemas.payment import (
     BankDetailsSchema,
     BankTransferConfirmRequest,
@@ -272,6 +273,26 @@ async def payment_webhook(
             challenge_obj = ch_res.scalar_one_or_none()
             if challenge_obj:
                 await provisioning_service.provision_account(payment.purchase, challenge_obj, db)
+
+                # Fetch trader info and dispatch credentials email
+                user_stmt = select(User).where(User.id == payment.user_id)
+                user_res = await db.execute(user_stmt)
+                trader_user = user_res.scalar_one_or_none()
+                if trader_user:
+                    try:
+                        await email_service.send_credentials_email(
+                            to_email=trader_user.email,
+                            trader_name=trader_user.full_name or trader_user.email.split("@")[0],
+                            challenge_name=challenge_obj.name,
+                            starting_balance=float(challenge_obj.starting_balance),
+                            mt5_login=payment.purchase.mt5_login,
+                            mt5_password=payment.purchase.mt5_password,
+                            mt5_investor_password=payment.purchase.mt5_investor_password or "",
+                            mt5_server=payment.purchase.mt5_server,
+                        )
+                    except Exception as err:
+                        # Email failures should never roll back database transaction
+                        pass
             else:
                 payment.purchase.status = PurchaseStatus.ACTIVE
 
@@ -327,6 +348,25 @@ async def confirm_bank_transfer(
         challenge_obj = ch_res.scalar_one_or_none()
         if challenge_obj:
             await provisioning_service.provision_account(payment.purchase, challenge_obj, db)
+
+            # Fetch trader info and dispatch credentials email
+            user_stmt = select(User).where(User.id == payment.user_id)
+            user_res = await db.execute(user_stmt)
+            trader_user = user_res.scalar_one_or_none()
+            if trader_user:
+                try:
+                    await email_service.send_credentials_email(
+                        to_email=trader_user.email,
+                        trader_name=trader_user.full_name or trader_user.email.split("@")[0],
+                        challenge_name=challenge_obj.name,
+                        starting_balance=float(challenge_obj.starting_balance),
+                        mt5_login=payment.purchase.mt5_login,
+                        mt5_password=payment.purchase.mt5_password,
+                        mt5_investor_password=payment.purchase.mt5_investor_password or "",
+                        mt5_server=payment.purchase.mt5_server,
+                    )
+                except Exception as err:
+                    pass
         else:
             payment.purchase.status = PurchaseStatus.ACTIVE
 

@@ -40,7 +40,7 @@ export default function ContactPage() {
       {/* Hero */}
       <section className="pt-20 pb-12 px-4 text-center bg-gradient-to-b from-slate-900 to-slate-950">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-4 tracking-tight">
-          Contact <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-indigo-400">Support</span>
+          Contact <span className="text-[#ccff00]">Support</span>
         </h1>
         <p className="text-slate-400 text-lg max-w-xl mx-auto">
           Our global operations desk operates 24/7. Average response time is under 2 hours.
@@ -52,10 +52,10 @@ export default function ContactPage() {
         <div className="space-y-6">
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
             <div className="flex items-center gap-3 mb-2">
-              <Mail className="w-5 h-5 text-brand-400" />
+              <Mail className="w-5 h-5 text-[#ccff00]" />
               <h3 className="font-bold text-white text-sm uppercase tracking-wider">Direct Desk Email</h3>
             </div>
-            <p className="text-brand-400 font-semibold font-mono text-sm">{BRAND.supportEmail}</p>
+            <p className="text-[#ccff00] font-semibold font-mono text-sm">{BRAND.supportEmail}</p>
             <p className="text-slate-400 text-xs mt-2">
               For security, always email us from your registered account email address.
             </p>
@@ -118,7 +118,7 @@ export default function ContactPage() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500 transition"
+                  className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#ccff00] transition"
                   placeholder="e.g. John Doe"
                 />
               </div>
@@ -129,7 +129,7 @@ export default function ContactPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500 transition"
+                  className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#ccff00] transition"
                   placeholder="trader@domain.com"
                 />
               </div>
@@ -139,7 +139,7 @@ export default function ContactPage() {
                 <select
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
-                  className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500 transition"
+                  className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#ccff00] transition"
                 >
                   {topics.map((t) => (
                     <option key={t} value={t} className="bg-slate-900 text-white">
@@ -155,14 +155,14 @@ export default function ContactPage() {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   rows={4}
-                  className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-brand-500 resize-none transition"
+                  className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#ccff00] resize-none transition"
                   placeholder="Provide account ID, MT5 login, or issue details..."
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs py-3.5 rounded-xl transition shadow-lg shadow-brand-600/30"
+                className="w-full bg-[#ccff00] hover:bg-[#b3e600] text-black font-black text-xs py-3.5 rounded-xl transition shadow-lg shadow-[#ccff00]/10"
               >
                 Submit Support Ticket
               </button>

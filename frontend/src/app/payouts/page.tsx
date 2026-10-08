@@ -172,9 +172,9 @@ export default function PayoutsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-dark-950 flex items-center justify-center text-slate-400">
+      <div className="min-h-screen bg-[#08090b] flex items-center justify-center text-slate-400">
         <div className="flex items-center gap-3">
-          <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+          <div className="w-5 h-5 border-2 border-[#ccff00] border-t-transparent rounded-full animate-spin" />
           <span>Loading profit payouts portal…</span>
         </div>
       </div>
@@ -182,11 +182,11 @@ export default function PayoutsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-950 text-slate-100 py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#08090b] text-slate-100 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto space-y-8">
         
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-dark-800 pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
           <div>
             <h1 className="text-2xl font-bold text-white tracking-tight">Trader Profit Withdrawals</h1>
             <p className="text-sm text-slate-400 mt-1">
@@ -195,7 +195,7 @@ export default function PayoutsPage() {
           </div>
           <Link
             href="/dashboard"
-            className="self-start sm:self-auto px-4 py-2 text-sm bg-dark-800 hover:bg-dark-700 text-slate-300 rounded-lg border border-dark-700 transition"
+            className="self-start sm:self-auto px-4 py-2 text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition"
           >
             ← Return to Dashboard
           </Link>
@@ -238,7 +238,7 @@ export default function PayoutsPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
           {/* Account Selector Card */}
-          <div className="md:col-span-1 rounded-xl border border-dark-800 bg-dark-900 p-5 space-y-4">
+          <div className="md:col-span-1 rounded-xl border border-slate-800 bg-slate-900 p-5 space-y-4">
             <h3 className="text-sm font-semibold text-white uppercase tracking-wider">Trading Account</h3>
             
             {accounts.length === 0 ? (
@@ -251,8 +251,8 @@ export default function PayoutsPage() {
                     onClick={() => handleAccountChange(acc.purchase_id)}
                     className={`w-full text-left p-3 rounded-lg border transition ${
                       selectedAccountId === acc.purchase_id
-                        ? "bg-dark-800 border-primary-500/60 ring-1 ring-primary-500/30"
-                        : "bg-dark-950 border-dark-800 hover:border-dark-700"
+                        ? "bg-slate-800 border-[#ccff00]/60 ring-1 ring-[#ccff00]/30"
+                        : "bg-slate-950 border-slate-800 hover:border-slate-700"
                     }`}
                   >
                     <div className="font-medium text-xs text-white">{acc.challenge_name}</div>
@@ -269,7 +269,7 @@ export default function PayoutsPage() {
           </div>
 
           {/* Profit Split Breakdown Card */}
-          <div className="md:col-span-2 rounded-xl border border-dark-800 bg-dark-900 p-5 space-y-4">
+          <div className="md:col-span-2 rounded-xl border border-slate-800 bg-slate-900 p-5 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-white uppercase tracking-wider">Profit Split Calculator (80/20)</h3>
               {eligibility?.is_eligible ? (
@@ -285,19 +285,19 @@ export default function PayoutsPage() {
 
             {eligibility ? (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                <div className="bg-dark-950 p-3 rounded-lg border border-dark-800">
+                <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
                   <span className="text-[11px] text-slate-400">Starting Balance</span>
                   <p className="text-sm font-mono font-bold text-white mt-1">
                     ${eligibility.starting_balance.toLocaleString()}
                   </p>
                 </div>
-                <div className="bg-dark-950 p-3 rounded-lg border border-dark-800">
+                <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
                   <span className="text-[11px] text-slate-400">Current Balance</span>
                   <p className="text-sm font-mono font-bold text-white mt-1">
                     ${eligibility.current_balance.toLocaleString()}
                   </p>
                 </div>
-                <div className="bg-dark-950 p-3 rounded-lg border border-dark-800">
+                <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
                   <span className="text-[11px] text-slate-400">Net Profit</span>
                   <p className={`text-sm font-mono font-bold mt-1 ${eligibility.gross_profit > 0 ? "text-emerald-400" : "text-slate-400"}`}>
                     +${eligibility.gross_profit.toLocaleString()}
@@ -315,7 +315,7 @@ export default function PayoutsPage() {
             )}
 
             {eligibility && !eligibility.is_eligible && (
-              <div className="p-3 bg-dark-950 rounded-lg border border-dark-800 text-xs text-slate-400 space-y-1">
+              <div className="p-3 bg-slate-950 rounded-lg border border-slate-800 text-xs text-slate-400 space-y-1">
                 <span className="text-amber-400 font-semibold">Conditions Required:</span>
                 <ul className="list-disc pl-4 space-y-0.5 text-[11px]">
                   {eligibility.ineligibility_reasons.map((r, i) => (
@@ -328,7 +328,7 @@ export default function PayoutsPage() {
         </div>
 
         {/* Withdrawal Request Form */}
-        <div className="rounded-xl border border-dark-800 bg-dark-900 p-6 space-y-6">
+        <div className="rounded-xl border border-slate-800 bg-slate-900 p-6 space-y-6">
           <h2 className="text-lg font-bold text-white">Submit Withdrawal Request</h2>
 
           <form onSubmit={handleSubmitPayout} className="space-y-6">
@@ -350,8 +350,8 @@ export default function PayoutsPage() {
                     onClick={() => setMethod(m.id)}
                     className={`p-3 rounded-lg border text-left transition ${
                       method === m.id
-                        ? "bg-dark-800 border-primary-500 ring-1 ring-primary-500"
-                        : "bg-dark-950 border-dark-800 hover:border-dark-700 text-slate-400"
+                        ? "bg-slate-800 border-[#ccff00] ring-1 ring-[#ccff00]"
+                        : "bg-slate-950 border-slate-800 hover:border-slate-700 text-slate-400"
                     }`}
                   >
                     <div className="text-xs font-bold text-white">{m.label}</div>
@@ -376,13 +376,13 @@ export default function PayoutsPage() {
                     value={withdrawAmount}
                     onChange={(e) => setWithdrawAmount(e.target.value)}
                     placeholder="Min $50.00"
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500 font-mono"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00] font-mono"
                   />
                   {eligibility && eligibility.gross_profit > 0 && (
                     <button
                       type="button"
                       onClick={() => setWithdrawAmount(String(eligibility.gross_profit))}
-                      className="absolute right-2 top-2 text-[10px] bg-dark-700 hover:bg-dark-600 px-2 py-0.5 rounded text-primary-400 font-bold"
+                      className="absolute right-2 top-2 text-[10px] bg-slate-700 hover:bg-slate-600 px-2 py-0.5 rounded text-[#ccff00] font-bold"
                     >
                       MAX (${eligibility.gross_profit.toLocaleString()})
                     </button>
@@ -391,7 +391,7 @@ export default function PayoutsPage() {
               </div>
 
               {/* Dynamic Estimated Net Trader Receipt */}
-              <div className="bg-dark-950 border border-dark-800 rounded-lg p-3 flex items-center justify-between">
+              <div className="bg-slate-950 border border-slate-800 rounded-lg p-3 flex items-center justify-between">
                 <div>
                   <span className="text-[11px] text-slate-400">Estimated Net Payout (80%)</span>
                   <p className="text-lg font-mono font-bold text-emerald-400 mt-0.5">
@@ -419,7 +419,7 @@ export default function PayoutsPage() {
                   value={cryptoAddress}
                   onChange={(e) => setCryptoAddress(e.target.value)}
                   placeholder={method === "CRYPTO_USDT_TRC20" ? "e.g. TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t" : "e.g. 0xdAC17F958D2ee523a2206206994597C13D831ec7"}
-                  className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500 font-mono"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00] font-mono"
                 />
               </div>
             )}
@@ -434,7 +434,7 @@ export default function PayoutsPage() {
                     value={bankName}
                     onChange={(e) => setBankName(e.target.value)}
                     placeholder="e.g. Zenith Bank, GTBank, Access"
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00]"
                   />
                 </div>
                 <div>
@@ -446,7 +446,7 @@ export default function PayoutsPage() {
                     value={accountNumber}
                     onChange={(e) => setAccountNumber(e.target.value)}
                     placeholder="e.g. 0123456789"
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500 font-mono"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00] font-mono"
                   />
                 </div>
                 <div>
@@ -457,7 +457,7 @@ export default function PayoutsPage() {
                     value={accountName}
                     onChange={(e) => setAccountName(e.target.value)}
                     placeholder="Must match KYC legal name"
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00]"
                   />
                 </div>
               </div>
@@ -473,7 +473,7 @@ export default function PayoutsPage() {
                     value={iban}
                     onChange={(e) => setIban(e.target.value)}
                     placeholder="e.g. GB82WEST12345678901234"
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500 font-mono"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00] font-mono"
                   />
                 </div>
                 <div>
@@ -484,7 +484,7 @@ export default function PayoutsPage() {
                     value={swift}
                     onChange={(e) => setSwift(e.target.value)}
                     placeholder="e.g. WESTGB2L"
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500 font-mono"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00] font-mono"
                   />
                 </div>
                 <div>
@@ -495,7 +495,7 @@ export default function PayoutsPage() {
                     value={bankName}
                     onChange={(e) => setBankName(e.target.value)}
                     placeholder="e.g. Barclays Bank UK"
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00]"
                   />
                 </div>
                 <div>
@@ -506,7 +506,7 @@ export default function PayoutsPage() {
                     value={accountName}
                     onChange={(e) => setAccountName(e.target.value)}
                     placeholder="Must match KYC legal name"
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500"
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00]"
                   />
                 </div>
               </div>
@@ -521,7 +521,7 @@ export default function PayoutsPage() {
                   value={paypalEmail}
                   onChange={(e) => setPaypalEmail(e.target.value)}
                   placeholder="e.g. trader@example.com"
-                  className="w-full bg-dark-800 border border-dark-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary-500"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#ccff00]"
                 />
               </div>
             )}
@@ -531,11 +531,11 @@ export default function PayoutsPage() {
               <button
                 type="submit"
                 disabled={actionLoading || !eligibility?.is_eligible}
-                className="px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white font-bold rounded-lg shadow-lg hover:shadow-primary-500/20 transition disabled:opacity-40 flex items-center gap-2"
+                className="px-6 py-3 bg-[#ccff00] hover:bg-[#b3e600] text-black font-black rounded-xl shadow-lg shadow-[#ccff00]/10 transition disabled:opacity-40 flex items-center gap-2"
               >
                 {actionLoading ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
                     <span>Processing Request…</span>
                   </>
                 ) : (
@@ -547,7 +547,7 @@ export default function PayoutsPage() {
         </div>
 
         {/* Historical Payouts Table */}
-        <div className="rounded-xl border border-dark-800 bg-dark-900 p-6 space-y-4">
+        <div className="rounded-xl border border-slate-800 bg-slate-900 p-6 space-y-4">
           <h3 className="text-sm font-semibold text-white uppercase tracking-wider">
             Disbursement History ({history.length})
           </h3>
@@ -557,7 +557,7 @@ export default function PayoutsPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-dark-800/80 text-slate-400 uppercase tracking-wider font-mono">
+                <thead className="bg-slate-800/80 text-slate-400 uppercase tracking-wider font-mono">
                   <tr>
                     <th className="px-4 py-2.5">Date</th>
                     <th className="px-4 py-2.5">Method</th>
@@ -568,9 +568,9 @@ export default function PayoutsPage() {
                     <th className="px-4 py-2.5 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-dark-800 text-slate-300">
+                <tbody className="divide-y divide-slate-800 text-slate-300">
                   {history.map((item) => (
-                    <tr key={item.id} className="hover:bg-dark-800/50 transition">
+                    <tr key={item.id} className="hover:bg-slate-800/50 transition">
                       <td className="px-4 py-3 font-mono text-slate-400">
                         {new Date(item.requested_at).toLocaleDateString()}
                       </td>

@@ -6,7 +6,9 @@ Endpoints for trader profit withdrawals, KYC enforcement, multi-method rails
 Finance Administrator approval queues.
 """
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,6 +25,7 @@ from app.schemas.payout import (
 from app.services.payout_service import payout_service
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 
 # ─────────────────────────────────────────────────────────────
@@ -56,7 +59,9 @@ async def check_payout_eligibility(
     status_code=status.HTTP_201_CREATED,
     summary="Request a profit share payout",
 )
+@limiter.limit("5/minute")
 async def request_payout(
+    request: Request,
     payload: PayoutRequestCreate,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

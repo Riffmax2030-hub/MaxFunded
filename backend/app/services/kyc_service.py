@@ -20,6 +20,7 @@ from app.schemas.kyc import (
     KYCSubmissionRequest,
     AdminKYCReviewRequest,
 )
+from app.services.email_service import email_service
 
 # OFAC & FATF High-Risk Jurisdictions
 SANCTIONED_COUNTRIES = {
@@ -267,6 +268,24 @@ class KYCComplianceService:
         db.add(audit)
 
         await db.commit()
+
+        # Dispatches email notification to trader
+        if target_user:
+            try:
+                trader_name = target_user.full_name or target_user.email.split("@")[0]
+                if payload.status == KYCStatus.APPROVED:
+                    await email_service.send_kyc_approved_email(
+                        to_email=target_user.email,
+                        trader_name=trader_name,
+                    )
+                elif payload.status in (KYCStatus.REJECTED, KYCStatus.REQUIRES_RETRY):
+                    await email_service.send_kyc_rejected_email(
+                        to_email=target_user.email,
+                        trader_name=trader_name,
+                        reason=verification.rejection_reason or "Document verification check failed",
+                    )
+            except Exception:
+                pass
 
         # Eagerly reload with documents to prevent async lazy-load serialization errors
         reload_stmt = (

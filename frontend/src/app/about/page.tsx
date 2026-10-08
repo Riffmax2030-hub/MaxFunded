@@ -97,13 +97,13 @@ export default function AboutPage() {
           </h1>
 
           <p className="text-neutral-300 text-lg sm:text-xl leading-relaxed max-w-3xl mx-auto font-medium">
-            At MaxFunded, we believe that trading should be accessible, fair, and rewarding - no matter your background or experience level.
+            At MaxFunded, we believe that trading should be accessible, fair, and rewarding, no matter your background or experience level.
           </p>
 
           {/* 3 Core Highlight Pillars */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-12 max-w-3xl mx-auto">
             <div className="bg-[#0e1014] border border-white/[0.08] rounded-2xl p-6 shadow-xl text-center">
-              <p className="text-3xl sm:text-4xl font-black text-[#ccff00]">80% - 90%</p>
+              <p className="text-3xl sm:text-4xl font-black text-[#ccff00]">80% to 90%</p>
               <p className="text-neutral-400 text-sm font-semibold mt-1">Profit Share for Traders</p>
             </div>
             <div className="bg-[#0e1014] border border-white/[0.08] rounded-2xl p-6 shadow-xl text-center">

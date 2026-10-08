@@ -3,64 +3,80 @@
 @tailwind utilities;
 
 :root {
-  --background: #08090b;
-  --foreground: #f3f4f6;
+  --bg-main: #060709;
+  --bg-surface: #0e1117;
+  --bg-card: #121620;
+  --neon-green: #ccff00;
+  --neon-green-glow: rgba(204, 255, 0, 0.35);
+  --text-primary: #ffffff;
+  --text-muted: #8e929e;
+  --border-color: rgba(255, 255, 255, 0.07);
+  --border-glow: rgba(204, 255, 0, 0.3);
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  color: var(--text-primary);
+  background-color: var(--bg-main);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Subtle Matrix Grid Pattern */
+/* ── High-Tech Terminal Grid & Dot Matrix Textures ────────────────────────── */
 .bg-grid-pattern {
-  background-size: 32px 32px;
+  background-size: 36px 36px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
 }
 
-.bg-grid-dots {
+.bg-dot-matrix {
   background-size: 24px 24px;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
 }
 
-/* Custom scrollbar */
+/* ── Glassmorphism & Bento Card Utilities ─────────────────────────────────── */
+.glass-panel {
+  background: rgba(14, 17, 23, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-color);
+  border-radius: 18px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-panel:hover {
+  border-color: var(--border-glow);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(204, 255, 0, 0.08);
+  transform: translateY(-3px);
+}
+
+/* ── Neon Glow Utilities ─────────────────────────────────────────────────── */
+.neon-glow-text {
+  text-shadow: 0 0 12px var(--neon-green-glow);
+}
+
+.neon-glow-box {
+  box-shadow: 0 0 25px var(--neon-green-glow);
+}
+
+/* ── Custom Scrollbar ────────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #08090b;
+  background: #060709;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1c222d;
+  background: #181d26;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2d3748;
+  background: #273040;
 }
 
-/* Soft glow pulse animation */
-@keyframes neon-pulse {
-  0%, 100% {
-    opacity: 0.8;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.03);
-  }
-}
-
-.animate-neon-pulse {
-  animation: neon-pulse 3s infinite ease-in-out;
-}
-
-/* Continuous right-to-left marquee ticker */
+/* ── Continuous right-to-left marquee ticker ─────────────────────────────── */
 @keyframes marquee-scroll {
   0% {
     transform: translateX(0%);
@@ -73,9 +89,270 @@ body {
 .animate-marquee {
   display: flex;
   width: max-content;
-  animation: marquee-scroll 30s linear infinite;
+  animation: marquee-scroll 32s linear infinite;
 }
 
 .animate-marquee:hover {
   animation-play-state: paused;
+}
+
+/* ── Google Translate Clean-Up ───────────────────────────────────────────── */
+.goog-te-banner-frame {
+  display: none !important;
+}
+body {
+  top: 0px !important;
+}
+.goog-tooltip,
+.goog-tooltip:hover,
+#goog-gt-tt,
+.goog-te-balloon-frame {
+  display: none !important;
+}
+.goog-text-highlight {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.skiptranslate > iframe {
+  display: none !important;
+}
+
+/* ── Premium Micro-Interactions & Scroll Animations ─────────────────────── */
+
+/* Scroll-reveal: elements fade + rise in when they enter the viewport */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger children sequentially */
+.reveal-stagger > *:nth-child(1) { transition-delay: 0ms; }
+.reveal-stagger > *:nth-child(2) { transition-delay: 80ms; }
+.reveal-stagger > *:nth-child(3) { transition-delay: 160ms; }
+.reveal-stagger > *:nth-child(4) { transition-delay: 240ms; }
+.reveal-stagger > *:nth-child(5) { transition-delay: 320ms; }
+
+/* Bento card hover: subtle 3D lift tilt */
+.bento-card {
+  background: rgba(18, 21, 28, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.35s ease,
+              box-shadow 0.35s ease;
+  will-change: transform;
+}
+.bento-card:hover {
+  transform: translateY(-5px) scale(1.012);
+  border-color: rgba(204, 255, 0, 0.28);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.65),
+    0 0 30px rgba(204, 255, 0, 0.1);
+}
+
+/* Pricing card highlighted: neon pulse ring on hover */
+.pricing-card-highlight {
+  position: relative;
+  isolation: isolate;
+}
+.pricing-card-highlight::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 26px;
+  background: conic-gradient(
+    from 0deg,
+    rgba(204, 255, 0, 0) 0deg,
+    rgba(204, 255, 0, 0.55) 90deg,
+    rgba(204, 255, 0, 0) 180deg,
+    rgba(204, 255, 0, 0.55) 270deg,
+    rgba(204, 255, 0, 0) 360deg
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: -1;
+  animation: spin-border 4s linear infinite;
+}
+.pricing-card-highlight:hover::before {
+  opacity: 1;
+}
+
+@keyframes spin-border {
+  to { transform: rotate(360deg); }
+}
+
+/* CTA button premium press effect */
+.btn-neon {
+  position: relative;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.18s ease;
+  will-change: transform;
+}
+.btn-neon:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(204, 255, 0, 0.38);
+}
+.btn-neon:active {
+  transform: translateY(0px) scale(0.97);
+  box-shadow: 0 2px 10px rgba(204, 255, 0, 0.2);
+}
+
+/* Section header fade-up animation */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Neon shimmer sweep on metric cards */
+@keyframes shimmer-sweep {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+.metric-shimmer {
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(204, 255, 0, 0.08) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-sweep 3.5s linear infinite;
+}
+
+/* Floating ambient pulse for hero glow orbs */
+@keyframes float-glow {
+  0%, 100% { transform: translateY(0px) scale(1);   opacity: 0.7; }
+  50%       { transform: translateY(-18px) scale(1.06); opacity: 1; }
+}
+.glow-orb {
+  animation: float-glow 6s ease-in-out infinite;
+}
+.glow-orb-delay {
+  animation: float-glow 6s ease-in-out 3s infinite;
+}
+
+/* ── Calculator Polish & Bento Rules Grid ───────────────────────────────── */
+.calculator-section {
+  background-color: #060608;
+  background-image: 
+    radial-gradient(rgba(204, 255, 0, 0.15) 1px, transparent 0),
+    radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 0);
+  background-size: 40px 40px;
+  background-position: 0 0, 20px 20px;
+}
+
+.calculator-tab {
+  background: #0e0f14;
+  color: #8E929E;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.calculator-tab:hover {
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Ultra-Polish Active State */
+.calculator-tab.active {
+  background: rgba(204, 255, 0, 0.04);
+  color: #FFFFFF;
+  border-color: #ccff00;
+  box-shadow: 0 0 20px rgba(204, 255, 0, 0.18), 
+              inset 0 0 12px rgba(204, 255, 0, 0.05);
+  text-shadow: 0 0 8px rgba(204, 255, 0, 0.3);
+}
+
+/* Data counting / fade-and-shift animation */
+@keyframes metric-shift {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-metric-shift {
+  animation: metric-shift 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Bento Rules Box Metric Card */
+.metric-card {
+  background: #0e0f14;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s ease,
+              box-shadow 0.3s ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(204, 255, 0, 0.3);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(204, 255, 0, 0.08);
+}
+
+/* Sleek neon accent bar line at top edge */
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ccff00, transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.metric-card:hover::before {
+  opacity: 1;
+}
+
+/* Glowing FAQ Dropdown Card */
+.faq-glowing-card {
+  background: #0e0f14;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.faq-glowing-card:hover {
+  border-color: rgba(204, 255, 0, 0.25);
+  box-shadow: 0 0 25px rgba(204, 255, 0, 0.06);
+}
+
+.faq-glowing-card.active {
+  border-color: rgba(204, 255, 0, 0.45);
+  box-shadow: 0 0 30px rgba(204, 255, 0, 0.12), inset 0 0 15px rgba(204, 255, 0, 0.03);
 }

@@ -10,8 +10,10 @@ class PaymentInitiateRequest(BaseModel):
     currency: Optional[str] = "USD"
     success_url: Optional[str] = None
     cancel_url: Optional[str] = None
+    pay_with_profits: Optional[bool] = False
+    addons: Optional[List[str]] = None
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, extra="ignore")
 
 
 class BankDetailsSchema(BaseModel):

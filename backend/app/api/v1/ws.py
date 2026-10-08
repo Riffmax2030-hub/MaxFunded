@@ -32,7 +32,7 @@ router = APIRouter(prefix="/ws", tags=["WebSocket Real-time"])
 
 _svc = DashboardService()
 
-PUSH_INTERVAL = 5  # seconds between each push
+PUSH_INTERVAL = 10  # seconds between each push (optimized for battery and CPU)
 
 
 def _decimal_serializer(obj):
