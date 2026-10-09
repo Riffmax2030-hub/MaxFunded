@@ -62,8 +62,8 @@ export default function ChallengeCard({ challenge }: Props) {
     >
       {/* Centered Top Badge Banner (PIVEX Style) */}
       {topPill && (
-        <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-20">
-          <span className="px-5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-[#ccff00] text-black shadow-lg shadow-[#ccff00]/20 whitespace-nowrap block">
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
+          <span className="px-5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-[#ccff00] text-black shadow-lg shadow-[#ccff00]/20 whitespace-nowrap block">
             {topPill}
           </span>
         </div>
@@ -72,7 +72,7 @@ export default function ChallengeCard({ challenge }: Props) {
       <div>
         {/* Header Block */}
         <div className="text-center pt-2 mb-6">
-          <div className="text-xs text-neutral-400 uppercase font-bold tracking-widest mb-1.5">
+          <div className="text-sm text-neutral-300 uppercase font-bold tracking-widest mb-2">
             Account Size
           </div>
           <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-white font-mono tracking-tight mb-5">
@@ -82,147 +82,147 @@ export default function ChallengeCard({ challenge }: Props) {
           {/* Large Solid Start Now Button (PIVEX Style) */}
           <button
             onClick={handleSelect}
-            className="w-full py-4 rounded-2xl bg-[#ccff00] hover:bg-[#b8e600] text-black font-black text-sm uppercase tracking-tight shadow-[0_0_25px_rgba(204,255,0,0.25)] hover:shadow-[0_0_35px_rgba(204,255,0,0.4)] transition-all flex items-center justify-center gap-2 transform active:scale-[0.98]"
+            className="w-full py-4 rounded-2xl bg-[#ccff00] hover:bg-[#b8e600] text-black font-black text-base uppercase tracking-tight shadow-[0_0_25px_rgba(204,255,0,0.25)] hover:shadow-[0_0_35px_rgba(204,255,0,0.4)] transition-all flex items-center justify-center gap-2 transform active:scale-[0.98]"
           >
             <span>Start Now</span>
-            <ArrowRight className="w-4 h-4 stroke-[3]" />
+            <ArrowRight className="w-5 h-5 stroke-[3]" />
           </button>
 
           {/* Pricing area */}
           <div className="mt-5 pt-4 border-t border-white/[0.08]">
-            <div className="text-[11px] uppercase tracking-wider font-mono text-neutral-400 mb-1">
+            <div className="text-xs uppercase tracking-wider font-mono text-neutral-300 mb-1 font-semibold">
               One-Time Evaluation Fee
             </div>
             <div className="flex items-center justify-center gap-2.5">
-              <span className="text-neutral-500 line-through text-base font-mono font-semibold">
+              <span className="text-neutral-500 line-through text-lg font-mono font-semibold">
                 ${rawOriginalPrice.toFixed(0)}.00
               </span>
-              <span className="text-2xl sm:text-3xl font-black text-white font-mono">
+              <span className="text-3xl font-black text-white font-mono">
                 ${discountedPrice}.00
               </span>
             </div>
-            <div className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-mono font-bold text-[#ccff00]">
-              <Sparkles className="w-3.5 h-3.5" />
+            <div className="mt-2 inline-flex items-center gap-1.5 text-sm font-mono font-bold text-[#ccff00]">
+              <Sparkles className="w-4 h-4" />
               <span>Save ${savings} • Code: MAX45</span>
             </div>
           </div>
         </div>
 
         {/* Elongated Specs & Rules Table with 100% White Uniform Values */}
-        <div className="space-y-0 divide-y divide-white/[0.07] pt-2 border-t border-white/[0.08] text-xs sm:text-sm">
+        <div className="space-y-0 divide-y divide-white/[0.08] pt-2 border-t border-white/[0.08] text-sm sm:text-base">
           {/* Profit Target */}
-          <div className="flex items-center justify-between py-3">
+          <div className="flex items-center justify-between py-3.5">
             <span
-              className="text-neutral-300 font-medium underline decoration-dotted decoration-neutral-500 cursor-help"
+              className="text-neutral-200 font-medium underline decoration-dotted decoration-neutral-500 cursor-help"
               title="Target needed to qualify for funding"
             >
               Profit Target
             </span>
-            <span className="font-bold text-white font-mono">
+            <span className="font-black text-white font-mono">
               {profitTargetPct}% (${profitTargetAmt.toLocaleString()})
             </span>
           </div>
 
           {/* Potential Profit */}
-          <div className="flex items-center justify-between py-3">
+          <div className="flex items-center justify-between py-3.5">
             <span
-              className="text-neutral-300 font-medium underline decoration-dotted decoration-neutral-500 cursor-help"
+              className="text-neutral-200 font-medium underline decoration-dotted decoration-neutral-500 cursor-help"
               title="Potential performance rewards achievable upon hitting target"
             >
               Potential Profit
             </span>
-            <span className="font-bold text-white font-mono">
+            <span className="font-black text-white font-mono">
               ${profitTargetAmt.toLocaleString()} (Up to ${potentialTraderReward.toLocaleString()})
             </span>
           </div>
 
           {/* Profit Split */}
-          <div className="flex items-center justify-between py-3">
+          <div className="flex items-center justify-between py-3.5">
             <span
-              className="text-neutral-300 font-medium underline decoration-dotted decoration-neutral-500 cursor-help"
+              className="text-neutral-200 font-medium underline decoration-dotted decoration-neutral-500 cursor-help"
               title="Trader share of realized performance rewards"
             >
               Profit Split
             </span>
-            <span className="font-bold text-white font-mono">
+            <span className="font-black text-white font-mono">
               80% – 90%
             </span>
           </div>
 
           {/* Maximum Loss Limit */}
-          <div className="flex items-center justify-between py-3">
+          <div className="flex items-center justify-between py-3.5">
             <span
-              className="text-neutral-300 font-medium underline decoration-dotted decoration-neutral-500 cursor-help"
+              className="text-neutral-200 font-medium underline decoration-dotted decoration-neutral-500 cursor-help"
               title="Static Maximum overall loss limit"
             >
               Maximum Loss Limit
             </span>
-            <span className="font-bold text-white font-mono">
+            <span className="font-black text-white font-mono">
               {maxLossPct}% Static (${maxLossAmt.toLocaleString()})
             </span>
           </div>
 
           {/* Daily Loss Limit */}
-          <div className="flex items-center justify-between py-3">
+          <div className="flex items-center justify-between py-3.5">
             <span
-              className="text-neutral-300 font-medium underline decoration-dotted decoration-neutral-500 cursor-help"
+              className="text-neutral-200 font-medium underline decoration-dotted decoration-neutral-500 cursor-help"
               title="Maximum daily floating or closed loss allowed"
             >
               Daily Loss Limit
             </span>
-            <span className="font-bold text-white font-mono">
+            <span className="font-black text-white font-mono">
               {dailyLossPct}% Static (${dailyLossAmt.toLocaleString()})
             </span>
           </div>
 
           {/* Minimum Trading Days */}
-          <div className="flex items-center justify-between py-3">
+          <div className="flex items-center justify-between py-3.5">
             <span
-              className="text-neutral-300 font-medium underline decoration-dotted decoration-neutral-500 cursor-help"
+              className="text-neutral-200 font-medium underline decoration-dotted decoration-neutral-500 cursor-help"
               title="Minimum days required before passing evaluation"
             >
               Minimum Trading Days
             </span>
-            <span className="font-bold text-white font-mono">
+            <span className="font-black text-white font-mono">
               0 Days (No Min Days)
             </span>
           </div>
 
           {/* Evaluation Fee Refund */}
-          <div className="flex items-center justify-between py-3">
+          <div className="flex items-center justify-between py-3.5">
             <span
-              className="text-neutral-300 font-medium underline decoration-dotted decoration-neutral-500 cursor-help"
+              className="text-neutral-200 font-medium underline decoration-dotted decoration-neutral-500 cursor-help"
               title="100% reimbursed on first payout"
             >
               Evaluation Fee
             </span>
-            <span className="font-bold text-white font-mono">
+            <span className="font-black text-white font-mono">
               100% Refundable
             </span>
           </div>
 
           {/* Payout Schedule */}
-          <div className="flex items-center justify-between py-3">
+          <div className="flex items-center justify-between py-3.5">
             <span
-              className="text-neutral-300 font-medium underline decoration-dotted decoration-neutral-500 cursor-help"
+              className="text-neutral-200 font-medium underline decoration-dotted decoration-neutral-500 cursor-help"
               title="Payout eligibility and turnaround timeframe"
             >
               Payout Schedule
             </span>
-            <span className="font-bold text-white font-mono">
+            <span className="font-black text-white font-mono">
               Bi-Weekly / 1-Day Express
             </span>
           </div>
 
           {/* Leverage */}
-          <div className="flex items-center justify-between py-3">
+          <div className="flex items-center justify-between py-3.5">
             <span
-              className="text-neutral-300 font-medium underline decoration-dotted decoration-neutral-500 cursor-help"
+              className="text-neutral-200 font-medium underline decoration-dotted decoration-neutral-500 cursor-help"
               title="Maximum trade leverage on MT5"
             >
               Leverage
             </span>
-            <span className="font-bold text-white font-mono">
+            <span className="font-black text-white font-mono">
               1:100
             </span>
           </div>

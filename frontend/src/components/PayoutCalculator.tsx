@@ -95,11 +95,11 @@ export default function PayoutCalculator() {
               {/* 1. Account Size Selector with Liquid Active State Glow */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <label className="text-xs font-black uppercase tracking-wider text-neutral-300 flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-[#ccff00]/20 text-[#ccff00] text-[10px] flex items-center justify-center font-mono font-black">1</span>
+                  <label className="text-sm font-black uppercase tracking-wider text-neutral-200 flex items-center gap-2.5">
+                    <span className="w-6 h-6 rounded-full bg-[#ccff00]/20 text-[#ccff00] text-xs flex items-center justify-center font-mono font-black">1</span>
                     Select Evaluation Capital
                   </label>
-                  <span className="text-xs font-bold text-[#ccff00] font-mono">
+                  <span className="text-sm font-bold text-[#ccff00] font-mono">
                     ${selectedTier.size.toLocaleString()} Funded Tier
                   </span>
                 </div>
@@ -112,8 +112,8 @@ export default function PayoutCalculator() {
                         onClick={() => setSelectedTier(tier)}
                         className={`calculator-tab p-3 text-center ${isActive ? "active" : ""}`}
                       >
-                        <div className="text-xs sm:text-sm font-black">{tier.label}</div>
-                        <div className="text-[10px] text-neutral-400 mt-0.5">${tier.price}</div>
+                        <div className="text-sm sm:text-base font-black">{tier.label}</div>
+                        <div className="text-xs text-neutral-300 font-medium mt-0.5">${tier.price}</div>
                       </button>
                     );
                   })}
@@ -123,11 +123,11 @@ export default function PayoutCalculator() {
               {/* 2. Monthly Return Slider + Quick Presets */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <label className="text-xs font-black uppercase tracking-wider text-neutral-300 flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full bg-[#ccff00]/20 text-[#ccff00] text-[10px] flex items-center justify-center font-mono font-black">2</span>
+                  <label className="text-sm font-black uppercase tracking-wider text-neutral-200 flex items-center gap-2.5">
+                    <span className="w-6 h-6 rounded-full bg-[#ccff00]/20 text-[#ccff00] text-xs flex items-center justify-center font-mono font-black">2</span>
                     Monthly Profit Performance
                   </label>
-                  <span className="text-sm font-black text-[#ccff00] font-mono px-3 py-1 rounded-lg bg-[#ccff00]/10 border border-[#ccff00]/30 shadow-[0_0_15px_rgba(204,255,0,0.1)]">
+                  <span className="text-base font-black text-[#ccff00] font-mono px-3.5 py-1.5 rounded-lg bg-[#ccff00]/10 border border-[#ccff00]/30 shadow-[0_0_15px_rgba(204,255,0,0.1)]">
                     +{returnPct}% Profit Target
                   </span>
                 </div>
@@ -145,16 +145,16 @@ export default function PayoutCalculator() {
 
                 {/* Quick Presets */}
                 <div className="flex items-center justify-between mt-3 gap-2">
-                  <span className="text-[11px] text-neutral-400 font-semibold">Performance Presets:</span>
-                  <div className="flex gap-1.5">
+                  <span className="text-xs sm:text-sm text-neutral-300 font-semibold">Performance Presets:</span>
+                  <div className="flex gap-2">
                     {RETURN_PRESETS.map((preset) => (
                       <button
                         key={preset}
                         onClick={() => setReturnPct(preset)}
-                        className={`px-3 py-1 rounded-lg text-xs font-bold transition border ${
+                        className={`px-3.5 py-1.5 rounded-lg text-sm font-bold transition border ${
                           returnPct === preset
                             ? "bg-[#ccff00] text-black border-[#ccff00] shadow-[0_0_12px_rgba(204,255,0,0.3)] font-black"
-                            : "bg-white/5 text-neutral-400 border-white/10 hover:text-white hover:border-white/20"
+                            : "bg-white/5 text-neutral-300 border-white/10 hover:text-white hover:border-white/20"
                         }`}
                       >
                         {preset}%
@@ -167,13 +167,13 @@ export default function PayoutCalculator() {
               {/* 3. Profit Split Toggle */}
               <div className="flex flex-wrap items-center justify-between pt-4 border-t border-white/[0.08] gap-3">
                 <div>
-                  <span className="text-xs font-bold text-white block">Performance Profit Split</span>
-                  <span className="text-[11px] text-neutral-400">Standard 80% vs Scaled 90% VIP</span>
+                  <span className="text-sm font-bold text-white block">Performance Profit Split</span>
+                  <span className="text-xs sm:text-sm text-neutral-300">Standard 80% vs Scaled 90% VIP</span>
                 </div>
                 <div className="flex gap-1.5 p-1 rounded-xl bg-black/40 border border-white/10">
                   <button
                     onClick={() => setSplitPct(80)}
-                    className={`calculator-tab px-4 py-1.5 text-xs font-bold ${
+                    className={`calculator-tab px-4 py-2 text-sm font-bold ${
                       splitPct === 80 ? "active" : ""
                     }`}
                   >
@@ -181,11 +181,11 @@ export default function PayoutCalculator() {
                   </button>
                   <button
                     onClick={() => setSplitPct(90)}
-                    className={`calculator-tab px-4 py-1.5 text-xs font-bold flex items-center gap-1 ${
+                    className={`calculator-tab px-4 py-2 text-sm font-bold flex items-center gap-1.5 ${
                       splitPct === 90 ? "active" : ""
                     }`}
                   >
-                    <Sparkles size={11} className="text-[#ccff00]" />
+                    <Sparkles size={13} className="text-[#ccff00]" />
                     90% Scale
                   </button>
                 </div>
@@ -194,7 +194,7 @@ export default function PayoutCalculator() {
 
             {/* Result Card Column (5 cols) with Animated Shift */}
             <div className="lg:col-span-5 bg-[#0f1218] border-2 border-[#ccff00]/50 rounded-3xl p-6 sm:p-8 text-center relative shadow-[0_0_45px_rgba(204,255,0,0.14)]">
-              <div className="text-[10px] uppercase font-black tracking-widest text-neutral-400 mb-1">
+              <div className="text-xs uppercase font-black tracking-widest text-neutral-300 mb-1">
                 Estimated Monthly Reward Payout
               </div>
               
@@ -206,34 +206,34 @@ export default function PayoutCalculator() {
                 ${traderPayout.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
 
-              <p className="text-xs text-neutral-400 mb-6">
+              <p className="text-sm text-neutral-300 mb-6">
                 Withdrawn directly via USDT or Bank Wire on-demand
               </p>
 
               {/* Metric Breakdown Rows with Animated Key Shift */}
               <div
                 key={`metrics-${selectedTier.size}-${returnPct}-${splitPct}`}
-                className="animate-metric-shift space-y-2.5 text-xs border-y border-white/10 py-4 mb-6"
+                className="animate-metric-shift space-y-3 text-sm sm:text-base border-y border-white/10 py-4 mb-6"
               >
-                <div className="flex justify-between items-center text-neutral-300">
+                <div className="flex justify-between items-center text-neutral-200">
                   <span>Gross Trading Gain ({returnPct}%):</span>
                   <span className="font-mono font-bold text-white">
                     +${grossProfit.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                   </span>
                 </div>
-                <div className="flex justify-between items-center text-neutral-300">
+                <div className="flex justify-between items-center text-neutral-200">
                   <span>Trader Take-Home ({splitPct}%):</span>
-                  <span className="font-mono font-bold text-[#ccff00]">
+                  <span className="font-mono font-black text-[#ccff00]">
                     ${traderPayout.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                   </span>
                 </div>
-                <div className="flex justify-between items-center text-neutral-300">
+                <div className="flex justify-between items-center text-neutral-200">
                   <span>One-Time Evaluation Fee:</span>
-                  <span className="font-mono text-neutral-300">
-                    ${selectedTier.price} <span className="text-[10px] text-emerald-400 font-bold">(100% Refundable)</span>
+                  <span className="font-mono text-neutral-200">
+                    ${selectedTier.price} <span className="text-xs text-emerald-400 font-bold">(100% Refundable)</span>
                   </span>
                 </div>
-                <div className="flex justify-between items-center text-neutral-300">
+                <div className="flex justify-between items-center text-neutral-200">
                   <span>Fee Return on 1st Payout:</span>
                   <span className="font-mono font-black text-[#ccff00]">
                     +{roiPct}% Return
@@ -244,14 +244,14 @@ export default function PayoutCalculator() {
               {/* CTA Button */}
               <Link
                 href="/challenges"
-                className="btn-neon w-full py-3.5 px-6 rounded-2xl bg-[#ccff00] hover:bg-[#b3e600] text-black font-black text-xs sm:text-sm uppercase tracking-tight shadow-neon transition flex items-center justify-center gap-2"
+                className="btn-neon w-full py-4 px-6 rounded-2xl bg-[#ccff00] hover:bg-[#b3e600] text-black font-black text-sm sm:text-base uppercase tracking-tight shadow-neon transition flex items-center justify-center gap-2"
               >
                 <span>Get Your {selectedTier.label} Account</span>
-                <ArrowRight size={16} className="stroke-[3]" />
+                <ArrowRight size={18} className="stroke-[3]" />
               </Link>
 
-              <div className="flex items-center justify-center gap-2 mt-4 text-[10px] text-neutral-400">
-                <CheckCircle2 size={12} className="text-[#ccff00]" />
+              <div className="flex items-center justify-center gap-2 mt-4 text-xs sm:text-sm text-neutral-300">
+                <CheckCircle2 size={14} className="text-[#ccff00]" />
                 <span>100% fee refunded with your first profit payout</span>
               </div>
             </div>

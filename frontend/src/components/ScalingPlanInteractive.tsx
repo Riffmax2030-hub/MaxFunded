@@ -117,14 +117,14 @@ export default function ScalingPlanInteractive() {
   return (
     <section id="scaling-plan" className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/[0.06]">
       <div className="text-center mb-16">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/20 text-[11px] font-black text-[#ccff00] uppercase tracking-wider mb-3">
-          <Sparkles className="w-3.5 h-3.5" />
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/20 text-xs font-black text-[#ccff00] uppercase tracking-wider mb-3">
+          <Sparkles className="w-4 h-4" />
           Interactive Scaling Engine
         </div>
         <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tight">
           Scale Up To <span className="text-[#ccff00]">$1,000,000</span> Capital.
         </h2>
-        <p className="mt-4 text-sm sm:text-base text-neutral-400 max-w-2xl mx-auto">
+        <p className="mt-4 text-base sm:text-lg text-neutral-300 max-w-2xl mx-auto font-normal">
           Prove consistency on our funded accounts and we automatically inject 25% to 75% more capital every 3 months.
           Calculate your compounded earning curve below.
         </p>
@@ -136,12 +136,12 @@ export default function ScalingPlanInteractive() {
 
         {/* Level Step Selector Bar */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-3 text-xs text-neutral-400">
-            <span className="font-bold uppercase tracking-wider text-neutral-300">Compounding Tier Progression</span>
-            <span className="font-mono text-[#ccff00]">STAGE {currentTier.level} OF 7</span>
+          <div className="flex items-center justify-between mb-3 text-sm text-neutral-300">
+            <span className="font-bold uppercase tracking-wider text-neutral-200">Compounding Tier Progression</span>
+            <span className="font-mono text-[#ccff00] font-bold">STAGE {currentTier.level} OF 7</span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
             {TIERS.map((tier, idx) => {
               const isActive = idx === selectedIdx;
               const isPast = idx < selectedIdx;
@@ -149,7 +149,7 @@ export default function ScalingPlanInteractive() {
                 <button
                   key={tier.level}
                   onClick={() => setSelectedIdx(idx)}
-                  className={`p-3 rounded-2xl border text-left transition-all duration-200 relative ${
+                  className={`p-3.5 rounded-2xl border text-left transition-all duration-200 relative ${
                     isActive
                       ? 'bg-[#ccff00] text-black border-[#ccff00] shadow-[0_0_20px_rgba(204,255,0,0.3)] scale-[1.03] z-10'
                       : isPast
@@ -158,17 +158,17 @@ export default function ScalingPlanInteractive() {
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className={`text-[10px] font-black uppercase ${isActive ? 'text-black' : 'text-neutral-500'}`}>
+                    <span className={`text-xs font-black uppercase ${isActive ? 'text-black' : 'text-neutral-400'}`}>
                       Lvl {tier.level}
                     </span>
                     {tier.level === 7 && (
-                      <Trophy className={`w-3 h-3 ${isActive ? 'text-black' : 'text-amber-400'}`} />
+                      <Trophy className={`w-3.5 h-3.5 ${isActive ? 'text-black' : 'text-amber-400'}`} />
                     )}
                   </div>
-                  <div className={`text-base font-black tracking-tight ${isActive ? 'text-black' : 'text-white'}`}>
+                  <div className={`text-base sm:text-lg font-black tracking-tight ${isActive ? 'text-black' : 'text-white'}`}>
                     {tier.capitalLabel}
                   </div>
-                  <div className={`text-[10px] mt-0.5 font-semibold truncate ${isActive ? 'text-neutral-900' : 'text-neutral-500'}`}>
+                  <div className={`text-xs mt-0.5 font-bold truncate ${isActive ? 'text-neutral-900' : 'text-neutral-400'}`}>
                     {tier.profitSplit}% Split
                   </div>
                 </button>
@@ -181,23 +181,23 @@ export default function ScalingPlanInteractive() {
         <div className="bg-[#08090c] border border-white/5 rounded-2xl p-6 sm:p-8 mb-8 relative">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6 pb-6 border-b border-white/5">
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[11px] font-mono text-neutral-400 uppercase">{currentTier.quarter}</span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-[#ccff00]/15 text-[#ccff00]">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-xs font-mono text-neutral-300 uppercase font-bold">{currentTier.quarter}</span>
+                <span className="px-2.5 py-0.5 rounded text-xs font-black uppercase bg-[#ccff00]/15 text-[#ccff00]">
                   ACTIVE LEVEL
                 </span>
               </div>
               <h3 className="text-3xl sm:text-4xl font-black text-white flex items-baseline gap-3">
                 <span>{currentTier.capitalLabel}</span>
-                <span className="text-xs text-neutral-500 font-normal">Simulated Institutional Capital</span>
+                <span className="text-xs sm:text-sm text-neutral-400 font-normal">Simulated Institutional Capital</span>
               </h3>
             </div>
 
             {/* Simulated Gain Percentage Slider */}
             <div className="bg-[#12161f] border border-white/10 rounded-2xl p-4 sm:w-80">
-              <div className="flex items-center justify-between text-xs mb-2">
-                <span className="text-neutral-400 font-semibold">Simulated Monthly Gain:</span>
-                <span className="font-mono font-black text-[#ccff00] text-sm">{targetGainPct}%</span>
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span className="text-neutral-300 font-semibold">Simulated Monthly Gain:</span>
+                <span className="font-mono font-black text-[#ccff00] text-base">{targetGainPct}%</span>
               </div>
               <input
                 type="range"
@@ -208,7 +208,7 @@ export default function ScalingPlanInteractive() {
                 onChange={(e) => setTargetGainPct(Number(e.target.value))}
                 className="w-full accent-[#ccff00] cursor-pointer"
               />
-              <div className="flex justify-between text-[10px] text-neutral-500 font-mono mt-1">
+              <div className="flex justify-between text-xs text-neutral-400 font-mono mt-1">
                 <span>3% Conservative</span>
                 <span>8% Average</span>
                 <span>15% Aggressive</span>
@@ -228,8 +228,8 @@ export default function ScalingPlanInteractive() {
                   className="flex-1 flex flex-col items-center justify-end h-full group cursor-pointer"
                 >
                   <div
-                    className={`text-[10px] font-mono font-bold mb-2 transition-all ${
-                      isSelected ? 'text-[#ccff00] scale-110 font-black' : 'text-neutral-500 opacity-60'
+                    className={`text-xs font-mono font-bold mb-2 transition-all ${
+                      isSelected ? 'text-[#ccff00] scale-110 font-black' : 'text-neutral-400 opacity-70'
                     }`}
                   >
                     {t.capitalLabel}
@@ -251,8 +251,8 @@ export default function ScalingPlanInteractive() {
                   </div>
 
                   <span
-                    className={`text-[9px] uppercase tracking-wider font-bold mt-2 truncate w-full text-center ${
-                      isSelected ? 'text-[#ccff00]' : 'text-neutral-600'
+                    className={`text-xs uppercase tracking-wider font-bold mt-2 truncate w-full text-center ${
+                      isSelected ? 'text-[#ccff00]' : 'text-neutral-500'
                     }`}
                   >
                     Lvl {t.level}
@@ -265,47 +265,47 @@ export default function ScalingPlanInteractive() {
 
         {/* 3 Value Output Columns */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          <div className="bg-[#12161f] border border-white/5 rounded-2xl p-5">
-            <span className="text-[11px] uppercase font-bold text-neutral-400 tracking-wider">
+          <div className="bg-[#12161f] border border-white/5 rounded-2xl p-6">
+            <span className="text-xs uppercase font-bold text-neutral-300 tracking-wider">
               YOUR PROJECTED MONTHLY REWARD ({currentTier.profitSplit}% SPLIT)
             </span>
-            <div className="text-3xl sm:text-4xl font-black text-[#ccff00] font-mono mt-1">
+            <div className="text-3xl sm:text-4xl font-black text-[#ccff00] font-mono mt-1.5">
               ${traderTakeHome.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
             </div>
-            <p className="text-xs text-neutral-400 mt-2">
+            <p className="text-xs sm:text-sm text-neutral-300 mt-2.5">
               Based on {targetGainPct}% monthly performance (${monthlyProfitGross.toLocaleString('en-US')} gross gain).
             </p>
           </div>
 
-          <div className="bg-[#12161f] border border-white/5 rounded-2xl p-5">
-            <span className="text-[11px] uppercase font-bold text-neutral-400 tracking-wider">
+          <div className="bg-[#12161f] border border-white/5 rounded-2xl p-6">
+            <span className="text-xs uppercase font-bold text-neutral-300 tracking-wider">
               RISK SAFEGUARDS ALLOCATED
             </span>
-            <div className="space-y-1.5 mt-2 text-xs">
+            <div className="space-y-2 mt-2.5 text-sm">
               <div className="flex justify-between">
-                <span className="text-neutral-400">Max Drawdown Room:</span>
-                <span className="font-bold text-white font-mono">{currentTier.drawdownBuffer}</span>
+                <span className="text-neutral-300">Max Drawdown Room:</span>
+                <span className="font-black text-white font-mono">{currentTier.drawdownBuffer}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-neutral-400">Daily Loss Limit:</span>
-                <span className="font-bold text-white font-mono">{currentTier.dailyLossLimit}</span>
+                <span className="text-neutral-300">Daily Loss Limit:</span>
+                <span className="font-black text-white font-mono">{currentTier.dailyLossLimit}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-neutral-400">Drawdown Nature:</span>
+                <span className="text-neutral-300">Drawdown Nature:</span>
                 <span className="font-bold text-emerald-400">Static (Never Trails)</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-[#12161f] border border-white/5 rounded-2xl p-5 flex flex-col justify-between">
+          <div className="bg-[#12161f] border border-white/5 rounded-2xl p-6 flex flex-col justify-between">
             <div>
-              <span className="text-[11px] uppercase font-bold text-neutral-400 tracking-wider">
+              <span className="text-xs uppercase font-bold text-neutral-300 tracking-wider">
                 TIER PRIVILEGES
               </span>
-              <ul className="space-y-1.5 mt-2">
+              <ul className="space-y-2 mt-2.5">
                 {currentTier.perks.map((perk, pi) => (
-                  <li key={pi} className="text-xs text-neutral-300 flex items-center gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#ccff00] shrink-0" />
+                  <li key={pi} className="text-sm text-neutral-200 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-[#ccff00] shrink-0" />
                     <span>{perk}</span>
                   </li>
                 ))}
@@ -314,10 +314,10 @@ export default function ScalingPlanInteractive() {
 
             <Link
               href="/challenges"
-              className="mt-4 w-full py-2.5 rounded-xl bg-[#ccff00] hover:bg-[#b8e600] text-black font-black text-xs uppercase tracking-wider text-center transition flex items-center justify-center gap-1.5"
+              className="mt-5 w-full py-3.5 rounded-xl bg-[#ccff00] hover:bg-[#b8e600] text-black font-black text-sm uppercase tracking-wider text-center transition flex items-center justify-center gap-2"
             >
               <span>Unlock This Scale Stage</span>
-              <ChevronRight className="w-3.5 h-3.5 stroke-[3]" />
+              <ChevronRight className="w-4 h-4 stroke-[3]" />
             </Link>
           </div>
         </div>

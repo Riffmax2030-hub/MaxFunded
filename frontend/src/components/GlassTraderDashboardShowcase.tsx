@@ -25,18 +25,18 @@ export default function GlassTraderDashboardShowcase() {
       <div className="relative rounded-2xl sm:rounded-3xl bg-[#0b0e14]/90 backdrop-blur-xl border border-white/[0.08] shadow-[0_20px_70px_rgba(0,0,0,0.85)] overflow-hidden">
         
         {/* Terminal Window Header Bar */}
-        <div className="px-4 sm:px-6 py-3.5 bg-[#07090d]/90 border-b border-white/[0.06] flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-rose-500/80" />
-            <div className="w-3 h-3 rounded-full bg-amber-500/80" />
-            <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
-            <span className="hidden sm:inline-block ml-3 font-mono text-xs text-neutral-400 font-semibold tracking-wide">
+        <div className="px-4 sm:px-6 py-4 bg-[#07090d]/90 border-b border-white/[0.06] flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-3.5 h-3.5 rounded-full bg-rose-500/80" />
+            <div className="w-3.5 h-3.5 rounded-full bg-amber-500/80" />
+            <div className="w-3.5 h-3.5 rounded-full bg-emerald-500/80" />
+            <span className="hidden sm:inline-block ml-3 font-mono text-xs sm:text-sm text-neutral-300 font-semibold tracking-wide">
               maxfunded-trader-terminal · v2.4 (MT5 Raw ECN Feed)
             </span>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/30 text-[#ccff00] font-mono text-[11px] font-bold">
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/30 text-[#ccff00] font-mono text-xs font-bold">
               <span className="w-2 h-2 rounded-full bg-[#ccff00] animate-pulse" />
               STATUS: FUNDED · ACTIVE
             </span>
@@ -44,63 +44,63 @@ export default function GlassTraderDashboardShowcase() {
         </div>
 
         {/* Dashboard Interior Layout (Bento Grid) */}
-        <div className="p-4 sm:p-7 space-y-5 text-left">
+        <div className="p-4 sm:p-7 space-y-6 text-left">
           
           {/* Top Row: Metric Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             
             {/* Metric 1: Account Equity */}
-            <div className="p-4 rounded-2xl bg-[#11141c]/90 border border-white/[0.06]">
-              <div className="flex items-center justify-between text-neutral-400 text-xs font-mono mb-1">
+            <div className="p-4 sm:p-5 rounded-2xl bg-[#11141c]/90 border border-white/[0.08]">
+              <div className="flex items-center justify-between text-neutral-300 text-xs sm:text-sm font-mono mb-1.5">
                 <span>ACCOUNT EQUITY</span>
-                <TrendingUp className="w-3.5 h-3.5 text-[#ccff00]" />
+                <TrendingUp className="w-4 h-4 text-[#ccff00]" />
               </div>
-              <div className="text-xl sm:text-2xl font-black text-white font-mono tracking-tight">
+              <div className="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight">
                 $218,450.00
               </div>
-              <div className="text-[11px] font-bold text-[#ccff00] mt-1 flex items-center gap-1">
-                <ArrowUpRight size={12} /> +$18,450.00 (+9.22%)
+              <div className="text-xs sm:text-sm font-bold text-[#ccff00] mt-1.5 flex items-center gap-1">
+                <ArrowUpRight size={14} /> +$18,450.00 (+9.22%)
               </div>
             </div>
 
             {/* Metric 2: Profit Split Target */}
-            <div className="p-4 rounded-2xl bg-[#11141c]/90 border border-white/[0.06]">
-              <div className="flex items-center justify-between text-neutral-400 text-xs font-mono mb-1">
+            <div className="p-4 sm:p-5 rounded-2xl bg-[#11141c]/90 border border-white/[0.08]">
+              <div className="flex items-center justify-between text-neutral-300 text-xs sm:text-sm font-mono mb-1.5">
                 <span>PROFIT SPLIT (90%)</span>
-                <Zap className="w-3.5 h-3.5 text-[#ccff00]" />
+                <Zap className="w-4 h-4 text-[#ccff00]" />
               </div>
-              <div className="text-xl sm:text-2xl font-black text-[#ccff00] font-mono tracking-tight">
+              <div className="text-2xl sm:text-3xl font-black text-[#ccff00] font-mono tracking-tight">
                 $16,605.00
               </div>
-              <div className="text-[11px] text-neutral-400 mt-1">
+              <div className="text-xs sm:text-sm text-neutral-300 mt-1.5">
                 Eligible for instant withdrawal
               </div>
             </div>
 
             {/* Metric 3: Max Drawdown Cushion */}
-            <div className="p-4 rounded-2xl bg-[#11141c]/90 border border-white/[0.06]">
-              <div className="flex items-center justify-between text-neutral-400 text-xs font-mono mb-1">
+            <div className="p-4 sm:p-5 rounded-2xl bg-[#11141c]/90 border border-white/[0.08]">
+              <div className="flex items-center justify-between text-neutral-300 text-xs sm:text-sm font-mono mb-1.5">
                 <span>DRAWDOWN CUSHION</span>
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
               </div>
-              <div className="text-xl sm:text-2xl font-black text-white font-mono tracking-tight">
+              <div className="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight">
                 9.4% Left
               </div>
-              <div className="text-[11px] text-emerald-400 mt-1 font-bold">
+              <div className="text-xs sm:text-sm text-emerald-400 mt-1.5 font-bold">
                 ✓ Static 10% model · Safe
               </div>
             </div>
 
             {/* Metric 4: Win Rate & Profit Factor */}
-            <div className="p-4 rounded-2xl bg-[#11141c]/90 border border-white/[0.06]">
-              <div className="flex items-center justify-between text-neutral-400 text-xs font-mono mb-1">
+            <div className="p-4 sm:p-5 rounded-2xl bg-[#11141c]/90 border border-white/[0.08]">
+              <div className="flex items-center justify-between text-neutral-300 text-xs sm:text-sm font-mono mb-1.5">
                 <span>WIN RATE / PF</span>
-                <Activity className="w-3.5 h-3.5 text-neutral-400" />
+                <Activity className="w-4 h-4 text-neutral-400" />
               </div>
-              <div className="text-xl sm:text-2xl font-black text-white font-mono tracking-tight">
-                73.8% <span className="text-xs text-neutral-400 font-normal">/ 2.45</span>
+              <div className="text-2xl sm:text-3xl font-black text-white font-mono tracking-tight">
+                73.8% <span className="text-sm text-neutral-400 font-normal">/ 2.45</span>
               </div>
-              <div className="text-[11px] text-neutral-400 mt-1">
+              <div className="text-xs sm:text-sm text-neutral-300 mt-1.5">
                 48 Closed Trades · 0 Breaches
               </div>
             </div>
@@ -108,30 +108,30 @@ export default function GlassTraderDashboardShowcase() {
           </div>
 
           {/* Middle Row: Glowing SVG Equity Curve + Real-Time Drawdown Ring */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
             
             {/* Left Chart Area (8 cols) */}
-            <div className="lg:col-span-8 p-5 rounded-2xl bg-[#0e121a]/95 border border-white/[0.06] flex flex-col justify-between">
+            <div className="lg:col-span-8 p-5 sm:p-6 rounded-2xl bg-[#0e121a]/95 border border-white/[0.08] flex flex-col justify-between">
               
               <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                 <div>
-                  <h4 className="text-xs uppercase font-mono font-bold text-neutral-400 tracking-wider">
+                  <h4 className="text-xs sm:text-sm uppercase font-mono font-bold text-neutral-400 tracking-wider">
                     Cumulative Equity Curve ($200K Account)
                   </h4>
-                  <div className="text-base sm:text-lg font-black text-white mt-0.5">
+                  <div className="text-lg sm:text-xl font-black text-white mt-1">
                     Consistent Compound Growth
                   </div>
                 </div>
 
                 {/* Timeframe Toggles */}
-                <div className="flex gap-1 p-1 rounded-xl bg-white/[0.04] border border-white/10 text-xs font-mono font-bold">
+                <div className="flex gap-1.5 p-1 rounded-xl bg-white/[0.04] border border-white/10 text-xs font-mono font-bold">
                   {(["1D", "1W", "1M", "ALL"] as const).map((tf) => (
                     <button
                       key={tf}
                       onClick={() => setSelectedTimeframe(tf)}
-                      className={`px-2.5 py-1 rounded-lg transition-all ${
+                      className={`px-3 py-1.5 rounded-lg transition-all ${
                         selectedTimeframe === tf
-                          ? "bg-[#ccff00] text-black shadow-sm"
+                          ? "bg-[#ccff00] text-black shadow-sm font-black"
                           : "text-neutral-400 hover:text-white"
                       }`}
                     >
@@ -182,17 +182,17 @@ export default function GlassTraderDashboardShowcase() {
               </div>
 
               {/* Chart Footer Sub-Metrics */}
-              <div className="pt-3 border-t border-white/[0.05] grid grid-cols-3 text-[11px] font-mono text-neutral-400">
+              <div className="pt-3.5 border-t border-white/[0.07] grid grid-cols-3 text-xs sm:text-sm font-mono text-neutral-300">
                 <div>
-                  <span className="block text-neutral-500">START CAPITAL</span>
+                  <span className="block text-neutral-400 text-xs font-semibold">START CAPITAL</span>
                   <span className="font-bold text-white">$200,000.00</span>
                 </div>
                 <div>
-                  <span className="block text-neutral-500">PEAK PROFIT</span>
+                  <span className="block text-neutral-400 text-xs font-semibold">PEAK PROFIT</span>
                   <span className="font-bold text-[#ccff00]">+$18,450.00</span>
                 </div>
                 <div>
-                  <span className="block text-neutral-500">NEXT PAYOUT</span>
+                  <span className="block text-neutral-400 text-xs font-semibold">NEXT PAYOUT</span>
                   <span className="font-bold text-white">48h (Auto Crypto)</span>
                 </div>
               </div>
@@ -200,19 +200,19 @@ export default function GlassTraderDashboardShowcase() {
             </div>
 
             {/* Right Gauge & Rule Integrity Card (4 cols) */}
-            <div className="lg:col-span-4 p-5 rounded-2xl bg-[#0e121a]/95 border border-white/[0.06] flex flex-col justify-between space-y-4">
+            <div className="lg:col-span-4 p-5 sm:p-6 rounded-2xl bg-[#0e121a]/95 border border-white/[0.08] flex flex-col justify-between space-y-4">
               <div>
                 <span className="text-xs font-mono font-bold text-neutral-400 uppercase tracking-wider block mb-1">
                   Active Risk Radar
                 </span>
-                <h4 className="text-sm font-extrabold text-white">
+                <h4 className="text-base font-extrabold text-white">
                   Drawdown Thresholds
                 </h4>
               </div>
 
               {/* Circular SVG Gauge */}
               <div className="flex flex-col items-center justify-center py-2">
-                <div className="relative w-32 h-32 flex items-center justify-center">
+                <div className="relative w-36 h-36 flex items-center justify-center">
                   <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
                     <circle
                       cx="60"
@@ -235,24 +235,24 @@ export default function GlassTraderDashboardShowcase() {
                     />
                   </svg>
                   <div className="absolute text-center">
-                    <span className="text-2xl font-black text-white font-mono block leading-none">94%</span>
-                    <span className="text-[10px] text-neutral-400 font-mono uppercase tracking-wider">Safe Margin</span>
+                    <span className="text-3xl font-black text-white font-mono block leading-none">94%</span>
+                    <span className="text-xs text-neutral-300 font-mono uppercase tracking-wider font-semibold">Safe Margin</span>
                   </div>
                 </div>
               </div>
 
               {/* Rule Checks Pill List */}
-              <div className="space-y-2 text-xs">
-                <div className="flex items-center justify-between p-2 rounded-xl bg-black/40 border border-white/5">
-                  <span className="text-neutral-400">Daily Loss (5% max)</span>
+              <div className="space-y-2 text-xs sm:text-sm">
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-black/40 border border-white/5">
+                  <span className="text-neutral-300">Daily Loss (5% max)</span>
                   <span className="text-emerald-400 font-mono font-bold">0.6% used</span>
                 </div>
-                <div className="flex items-center justify-between p-2 rounded-xl bg-black/40 border border-white/5">
-                  <span className="text-neutral-400">Total Drawdown (10%)</span>
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-black/40 border border-white/5">
+                  <span className="text-neutral-300">Total Drawdown (10%)</span>
                   <span className="text-emerald-400 font-mono font-bold">0.0% used</span>
                 </div>
-                <div className="flex items-center justify-between p-2 rounded-xl bg-black/40 border border-white/5">
-                  <span className="text-neutral-400">News Trading</span>
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-black/40 border border-white/5">
+                  <span className="text-neutral-300">News Trading</span>
                   <span className="text-[#ccff00] font-bold">✓ Allowed</span>
                 </div>
               </div>
@@ -262,23 +262,23 @@ export default function GlassTraderDashboardShowcase() {
           </div>
 
           {/* Bottom Row: Recent Live Payout Dispatched Receipt */}
-          <div className="p-3.5 sm:p-4 rounded-xl bg-[#07090e]/90 border border-[#ccff00]/25 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-[#ccff00]/15 flex items-center justify-center text-[#ccff00] shrink-0">
-                <CheckCircle2 size={16} />
+          <div className="p-4 sm:p-5 rounded-2xl bg-[#07090e]/90 border border-[#ccff00]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm">
+            <div className="flex items-center gap-3.5">
+              <div className="w-9 h-9 rounded-full bg-[#ccff00]/15 flex items-center justify-center text-[#ccff00] shrink-0">
+                <CheckCircle2 size={18} />
               </div>
               <div>
-                <span className="font-bold text-white block">
+                <span className="font-bold text-white block text-sm sm:text-base">
                   Last Payout Dispatched: <span className="text-[#ccff00] font-mono">$12,160.00 USDT (TRC20)</span>
                 </span>
-                <span className="text-[11px] text-neutral-400">
+                <span className="text-xs sm:text-sm text-neutral-300">
                   TX: 0x8a91...4e21 · Confirmed on-chain in 42 seconds
                 </span>
               </div>
             </div>
 
             <div className="shrink-0 flex items-center gap-2">
-              <span className="text-[10px] uppercase font-mono font-bold px-2 py-1 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+              <span className="text-xs uppercase font-mono font-bold px-3 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                 ✓ Payout Vault Verified
               </span>
             </div>

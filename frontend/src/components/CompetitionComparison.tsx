@@ -92,23 +92,23 @@ export default function CompetitionComparison() {
       {/* Comparison Table */}
       <div className="bg-[#0d0e10] border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full text-left text-base">
             <thead>
               <tr className="border-b border-white/10 bg-white/[0.02]">
-                <th className="py-5 px-6 font-bold text-neutral-400 text-xs uppercase tracking-wider">
+                <th className="py-5 px-6 font-bold text-neutral-300 text-sm uppercase tracking-wider">
                   Features &amp; Rules
                 </th>
                 {/* MaxFunded Column Highlight */}
-                <th className="py-5 px-6 font-black text-black bg-[#ccff00] text-center text-sm uppercase tracking-tight relative">
+                <th className="py-5 px-6 font-black text-black bg-[#ccff00] text-center text-base uppercase tracking-tight relative">
                   <div className="flex items-center justify-center gap-1.5">
-                    <Zap size={16} fill="black" />
+                    <Zap size={18} fill="black" />
                     <span>MaxFunded</span>
                   </div>
                 </th>
-                <th className="py-5 px-6 font-bold text-neutral-300 text-center text-xs uppercase tracking-wider">
+                <th className="py-5 px-6 font-bold text-neutral-300 text-center text-sm uppercase tracking-wider">
                   FTMO
                 </th>
-                <th className="py-5 px-6 font-bold text-neutral-300 text-center text-xs uppercase tracking-wider">
+                <th className="py-5 px-6 font-bold text-neutral-300 text-center text-sm uppercase tracking-wider">
                   FundedNext
                 </th>
               </tr>
@@ -117,20 +117,20 @@ export default function CompetitionComparison() {
               {COMPARISON_DATA.map((row, idx) => (
                 <tr
                   key={row.feature}
-                  className={`border-b border-white/[0.05] transition-colors hover:bg-white/[0.02] ${
+                  className={`border-b border-white/[0.06] transition-colors hover:bg-white/[0.02] ${
                     idx % 2 === 0 ? "bg-transparent" : "bg-white/[0.01]"
                   }`}
                 >
                   {/* Feature Name */}
-                  <td className="py-4 px-6 font-medium text-white text-xs sm:text-sm">
+                  <td className="py-4.5 px-6 font-semibold text-white text-sm sm:text-base">
                     {row.feature}
                   </td>
 
                   {/* MaxFunded (Elevated Column) */}
-                  <td className="py-4 px-6 text-center bg-[#ccff00]/[0.04] border-x border-[#ccff00]/20 font-bold text-xs sm:text-sm">
+                  <td className="py-4.5 px-6 text-center bg-[#ccff00]/[0.04] border-x border-[#ccff00]/20 font-black text-sm sm:text-base">
                     {typeof row.maxFunded === "boolean" ? (
-                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#ccff00]/20 text-[#ccff00]">
-                        <Check size={14} className="stroke-[3]" />
+                      <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#ccff00]/20 text-[#ccff00]">
+                        <Check size={16} className="stroke-[3]" />
                       </span>
                     ) : (
                       <span className="text-[#ccff00] font-black">{row.maxFunded}</span>
@@ -138,15 +138,15 @@ export default function CompetitionComparison() {
                   </td>
 
                   {/* FTMO */}
-                  <td className="py-4 px-6 text-center text-neutral-400 text-xs sm:text-sm">
+                  <td className="py-4.5 px-6 text-center text-neutral-300 text-sm sm:text-base">
                     {typeof row.ftmo === "boolean" ? (
                       row.ftmo ? (
-                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-400">
-                          <Check size={14} />
+                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-emerald-500/10 text-emerald-400">
+                          <Check size={16} />
                         </span>
                       ) : (
-                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-rose-500/10 text-rose-400">
-                          <X size={14} />
+                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-rose-500/10 text-rose-400">
+                          <X size={16} />
                         </span>
                       )
                     ) : (
@@ -155,15 +155,15 @@ export default function CompetitionComparison() {
                   </td>
 
                   {/* FundedNext */}
-                  <td className="py-4 px-6 text-center text-neutral-400 text-xs sm:text-sm">
+                  <td className="py-4.5 px-6 text-center text-neutral-300 text-sm sm:text-base">
                     {typeof row.fundedNext === "boolean" ? (
                       row.fundedNext ? (
-                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500/10 text-emerald-400">
-                          <Check size={14} />
+                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-emerald-500/10 text-emerald-400">
+                          <Check size={16} />
                         </span>
                       ) : (
-                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-rose-500/10 text-rose-400">
-                          <X size={14} />
+                        <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-rose-500/10 text-rose-400">
+                          <X size={16} />
                         </span>
                       )
                     ) : (

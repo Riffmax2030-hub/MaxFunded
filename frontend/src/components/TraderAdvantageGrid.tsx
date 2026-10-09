@@ -61,15 +61,15 @@ export default function TraderAdvantageGrid() {
   return (
     <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-white/[0.06]">
       <div className="text-center mb-16">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/20 text-[11px] font-bold text-[#ccff00] uppercase tracking-wider mb-3">
-          <Sparkles className="w-3.5 h-3.5" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/20 text-xs font-bold text-[#ccff00] uppercase tracking-wider mb-3">
+          <Sparkles className="w-4 h-4" />
           The MaxFunded Difference
         </div>
         <h2 className="text-3xl sm:text-5xl font-black text-white uppercase tracking-tight">
           Built By Real Traders. <br />
           <span className="text-[#ccff00]">Zero Unfair Rule Traps.</span>
         </h2>
-        <p className="mt-4 text-sm sm:text-base text-neutral-400 max-w-2xl mx-auto">
+        <p className="mt-4 text-base sm:text-lg text-neutral-300 max-w-2xl mx-auto font-normal">
           We eliminated the sneaky small-print rules that cause 90% of prop firm failures. Here is why the world&apos;s best traders migrate to MaxFunded.
         </p>
       </div>
@@ -80,27 +80,27 @@ export default function TraderAdvantageGrid() {
           return (
             <div
               key={idx}
-              className="bg-[#111418] border border-white/10 hover:border-[#ccff00]/50 rounded-3xl p-7 transition-all duration-300 group flex flex-col justify-between hover:shadow-[0_0_30px_rgba(204,255,0,0.06)]"
+              className="bg-[#111418] border border-white/10 hover:border-[#ccff00]/50 rounded-3xl p-7 sm:p-8 transition-all duration-300 group flex flex-col justify-between hover:shadow-[0_0_30px_rgba(204,255,0,0.06)]"
             >
               <div>
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-12 h-12 rounded-2xl bg-[#161a22] border border-white/5 flex items-center justify-center text-[#ccff00] group-hover:scale-110 transition duration-300">
-                    <Icon className="w-6 h-6 stroke-[2]" />
+                  <div className="w-13 h-13 rounded-2xl bg-[#161a22] border border-white/5 flex items-center justify-center text-[#ccff00] group-hover:scale-110 transition duration-300">
+                    <Icon className="w-7 h-7 stroke-[2]" />
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg border bg-[#ccff00]/10 text-[#ccff00] border-[#ccff00]/25">
+                  <span className="text-xs font-black uppercase tracking-wider px-3 py-1.5 rounded-lg border bg-[#ccff00]/10 text-[#ccff00] border-[#ccff00]/25">
                     {adv.badge}
                   </span>
                 </div>
 
-                <h3 className="text-lg font-black text-white group-hover:text-[#ccff00] transition mb-3">
+                <h3 className="text-xl sm:text-2xl font-black text-white group-hover:text-[#ccff00] transition mb-3">
                   {adv.title}
                 </h3>
-                <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+                <p className="text-sm sm:text-base text-neutral-300 leading-relaxed">
                   {adv.description}
                 </p>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-white/5 flex items-center gap-2 text-xs text-neutral-300 font-semibold">
+              <div className="mt-6 pt-4 border-t border-white/5 flex items-center gap-2 text-xs sm:text-sm text-neutral-200 font-semibold">
                 <CheckCircle2 className="w-4 h-4 text-[#ccff00]" />
                 <span>100% Verified Rule Guarantee</span>
               </div>
