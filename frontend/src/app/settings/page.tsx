@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSession } from '@/lib/auth';
+import { API_BASE } from '@/lib/api';
 import toast from 'react-hot-toast';
 import {
   User,
@@ -88,7 +89,7 @@ export default function SettingsPage() {
     setEmail(session.email || '');
 
     // Fetch user details
-    fetch('http://127.0.0.1:8000/api/v1/users/me', {
+    fetch(`${API_BASE}/users/me`, {
       headers: { Authorization: `Bearer ${session.token}` },
     })
       .then((res) => (res.ok ? res.json() : null))
@@ -135,7 +136,7 @@ export default function SettingsPage() {
     setLoading(true);
     const session = getSession();
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/v1/users/me', {
+      const res = await fetch(`${API_BASE}/users/me`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -175,7 +176,7 @@ export default function SettingsPage() {
     setLoading(true);
     const session = getSession();
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/v1/auth/change-password', {
+      const res = await fetch(`${API_BASE}/auth/change-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

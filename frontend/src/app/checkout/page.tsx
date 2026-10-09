@@ -46,11 +46,11 @@ import {
 const RULE_DEFINITIONS: Record<string, { title: string; desc: string }> = {
   min_days: {
     title: "Minimum Trading Days: 0 Days",
-    desc: "No minimum trading days required. If you hit your 8% profit target on day one while complying with daily loss rules, you pass immediately.",
+    desc: "No minimum trading days required. If you hit your 10% profit target on day one while complying with daily loss rules, you pass immediately.",
   },
   profit_target: {
-    title: "Profit Target: Phase 1 (8%) / Phase 2 (5%)",
-    desc: "Achieve an 8% gain in Phase 1 and 5% in Phase 2. Once reached, your account qualifies for your official funded live credentials.",
+    title: "Profit Target: 10% Target",
+    desc: "Achieve a 10% gain without violating daily loss rules. Once reached, your account qualifies for your official funded live credentials.",
   },
   daily_loss: {
     title: "Max Daily Loss: 5% Static",

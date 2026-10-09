@@ -35,7 +35,7 @@ const CALCULATOR_FAQS = [
   },
   {
     q: "What is the difference between 1-Step and 2-Step Evaluations?",
-    a: "A 1-Step Evaluation has a single phase with a 10% profit target and a 6% trailing drawdown limit for fast funding. A 2-Step Evaluation has Phase 1 (8% target) and Phase 2 (5% target) with a generous 10% static drawdown and 5% daily loss limit, giving conservative traders more breathing room.",
+    a: "A 1-Step Evaluation has a single phase with a 10% profit target and a 6% trailing drawdown limit for fast funding. A 2-Step Evaluation achieves the 10% total profit target across two phases (Phase 1 + Phase 2) with a 10% static drawdown and 5% static daily loss — zero trailing drawdown traps — giving conservative traders more breathing room.",
   },
   {
     q: "Is the evaluation fee really 100% refundable?",

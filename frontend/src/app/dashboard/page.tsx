@@ -9,6 +9,7 @@ import {
   fetchEquityCurve,
   DashboardSummaryData,
   EquityPoint,
+  API_BASE,
 } from "@/lib/api";
 import dynamic from "next/dynamic";
 import { useDashboardWebSocket } from "@/hooks/useDashboardWebSocket";
@@ -152,7 +153,7 @@ export default function TraderDashboard() {
   const handleQuickDemoLogin = async () => {
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:8000/api/v1/auth/login", {
+      const res = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: "sherif@maxfunded.com", password: "Password123!" }),

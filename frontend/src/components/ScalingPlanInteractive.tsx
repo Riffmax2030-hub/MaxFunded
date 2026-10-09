@@ -108,7 +108,7 @@ const TIERS: ScalingTier[] = [
 
 export default function ScalingPlanInteractive() {
   const [selectedIdx, setSelectedIdx] = useState<number>(3); // Default at $200K
-  const [targetGainPct, setTargetGainPct] = useState<number>(8); // 8% average gain
+  const [targetGainPct, setTargetGainPct] = useState<number>(10); // 10% profit target
 
   const currentTier = TIERS[selectedIdx];
   const monthlyProfitGross = (currentTier.capital * (targetGainPct / 100));
@@ -210,7 +210,7 @@ export default function ScalingPlanInteractive() {
               />
               <div className="flex justify-between text-xs text-neutral-400 font-mono mt-1">
                 <span>3% Conservative</span>
-                <span>8% Average</span>
+                <span>10% Target</span>
                 <span>15% Aggressive</span>
               </div>
             </div>

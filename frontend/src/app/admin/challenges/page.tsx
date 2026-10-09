@@ -2,11 +2,9 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { getSession } from "@/lib/auth";
-import { Challenge } from "@/lib/api";
+import { Challenge, API_BASE } from "@/lib/api";
 import { SkeletonTable, PageError } from "@/components/AdminSkeleton";
 import { Edit2, Check, X, Loader2, RefreshCw } from "lucide-react";
-
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
 export default function AdminChallengesPage() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
@@ -24,7 +22,7 @@ export default function AdminChallengesPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API}/admin/challenges`, {
+      const res = await fetch(`${API_BASE}/admin/challenges`, {
         headers: { Authorization: `Bearer ${session.token}` },
       });
       if (!res.ok) throw new Error(`API error ${res.status}`);
@@ -53,7 +51,7 @@ export default function AdminChallengesPage() {
     setSavingId(c.id);
     setSaveMsg(null);
     try {
-      const res = await fetch(`${API}/admin/challenges/${c.id}`, {
+      const res = await fetch(`${API_BASE}/admin/challenges/${c.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

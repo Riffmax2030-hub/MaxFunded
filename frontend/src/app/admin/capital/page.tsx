@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, RefreshCw } from "lucide-react";
+import { API_BASE } from "@/lib/api";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -62,10 +63,9 @@ interface OrderExecution {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 async function apiFetch<T>(path: string, token: string): Promise<T> {
-  const res = await fetch(`${API}/api/v1${path}`, {
+  const res = await fetch(`${API_BASE}${path}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) throw new Error(`API error ${res.status}`);
@@ -73,7 +73,7 @@ async function apiFetch<T>(path: string, token: string): Promise<T> {
 }
 
 async function apiPatch<T>(path: string, token: string, body: object): Promise<T> {
-  const res = await fetch(`${API}/api/v1${path}`, {
+  const res = await fetch(`${API_BASE}${path}`, {
     method: "PATCH",
     headers: {
       Authorization: `Bearer ${token}`,
