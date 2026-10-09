@@ -197,6 +197,83 @@ export default function TradingConditionsPage() {
           </div>
         </section>
 
+        {/* Institutional vs Retail Broker Contract Size Transparency Section */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Shield className="w-5 h-5 text-[#ccff00]" />
+            <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight">
+              Contract Size Transparency <span className="text-[#ccff00]">(Zero-Trap Policy)</span>
+            </h2>
+          </div>
+          <p className="text-neutral-400 text-sm leading-relaxed max-w-3xl">
+            A common mistake retail traders make when joining prop firms is assuming index CFDs (like US30 and NAS100) use the micro contract sizes of retail brokers like Exness. On institutional MT5, 1 standard lot represents standard institutional depth ($10/point). Always calculate position size by dollar risk.
+          </p>
+
+          <div className="bg-[#0e1117] border border-white/10 rounded-2xl overflow-hidden shadow-xl">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs sm:text-sm font-mono">
+                <thead className="bg-white/[0.03] border-b border-white/10 text-neutral-400 uppercase text-[11px]">
+                  <tr>
+                    <th className="py-3 px-4">Instrument</th>
+                    <th className="py-3 px-4">Standard Lot Size</th>
+                    <th className="py-3 px-4">Point / Pip Value (1.00 Lot)</th>
+                    <th className="py-3 px-4">Retail Broker (Exness)</th>
+                    <th className="py-3 px-4 text-[#ccff00]">MaxFunded (Institutional)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5 text-neutral-300">
+                  <tr className="hover:bg-white/[0.02]">
+                    <td className="py-3 px-4 font-bold text-white">US30 (Dow Jones)</td>
+                    <td className="py-3 px-4">10 Contracts</td>
+                    <td className="py-3 px-4 text-[#ccff00] font-bold">$10.00 / point</td>
+                    <td className="py-3 px-4 text-neutral-400">1 contract ($1.00 / pt)</td>
+                    <td className="py-3 px-4 text-[#ccff00] font-bold">10 contracts ($10.00 / pt)</td>
+                  </tr>
+                  <tr className="hover:bg-white/[0.02]">
+                    <td className="py-3 px-4 font-bold text-white">NAS100 (Nasdaq)</td>
+                    <td className="py-3 px-4">10 Contracts</td>
+                    <td className="py-3 px-4 text-[#ccff00] font-bold">$10.00 / point</td>
+                    <td className="py-3 px-4 text-neutral-400">1 contract ($1.00 / pt)</td>
+                    <td className="py-3 px-4 text-[#ccff00] font-bold">10 contracts ($10.00 / pt)</td>
+                  </tr>
+                  <tr className="hover:bg-white/[0.02]">
+                    <td className="py-3 px-4 font-bold text-white">SPX500 (S&amp;P 500)</td>
+                    <td className="py-3 px-4">10 Contracts</td>
+                    <td className="py-3 px-4 text-[#ccff00] font-bold">$10.00 / point</td>
+                    <td className="py-3 px-4 text-neutral-400">1 contract ($1.00 / pt)</td>
+                    <td className="py-3 px-4 text-[#ccff00] font-bold">10 contracts ($10.00 / pt)</td>
+                  </tr>
+                  <tr className="hover:bg-white/[0.02]">
+                    <td className="py-3 px-4 font-bold text-white">XAUUSD (Gold)</td>
+                    <td className="py-3 px-4">100 Ounces</td>
+                    <td className="py-3 px-4 text-[#ccff00] font-bold">$10.00 / pip ($0.10)</td>
+                    <td className="py-3 px-4 text-neutral-300">100 oz ($10.00 / pip)</td>
+                    <td className="py-3 px-4 text-[#ccff00] font-bold">100 oz ($10.00 / pip)</td>
+                  </tr>
+                  <tr className="hover:bg-white/[0.02]">
+                    <td className="py-3 px-4 font-bold text-white">EURUSD / Forex Majors</td>
+                    <td className="py-3 px-4">100,000 Units</td>
+                    <td className="py-3 px-4 text-[#ccff00] font-bold">$10.00 / pip</td>
+                    <td className="py-3 px-4 text-neutral-300">100k ($10.00 / pip)</td>
+                    <td className="py-3 px-4 text-[#ccff00] font-bold">100k ($10.00 / pip)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="p-4 bg-[#ccff00]/5 border-t border-[#ccff00]/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+              <span className="text-neutral-300 font-sans">
+                💡 <strong>Trader Protection Rule:</strong> Never place trades based on lot habits from retail brokers. Use the <strong className="text-white">Lot Size Calculator</strong> in your dashboard to calculate exact risk in dollars.
+              </span>
+              <Link
+                href="/dashboard"
+                className="px-4 py-1.5 rounded-lg bg-[#ccff00] text-black font-bold uppercase text-[11px] whitespace-nowrap hover:bg-[#b8e600] transition"
+              >
+                Launch Dashboard Calculator
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* Disclaimer / Notice */}
         <section className="bento-card bg-neutral-900/40 border border-white/10 rounded-2xl p-6 sm:p-8 relative overflow-hidden">
           <div className="flex items-start gap-3">

@@ -29,7 +29,8 @@ export default function AdminPayoutsPage() {
   const [actionLoading, setActionLoading] = useState(false);
 
   useEffect(() => {
-    const t = localStorage.getItem("access_token");
+    const session = getSession();
+    const t = session?.token || localStorage.getItem("maxfunded_auth_token") || localStorage.getItem("mxf_token") || localStorage.getItem("access_token");
     if (!t) {
       router.push("/login");
       return;

@@ -17,6 +17,7 @@ from app.schemas.payout import (
 )
 from app.services.kyc_service import kyc_service
 from app.services.email_service import email_service
+from app.services.discord_service import discord_service
 
 MIN_PAYOUT_AMOUNT = Decimal("50.00")
 
@@ -257,6 +258,13 @@ class PayoutProcessingService:
                         amount_usd=float(payout.trader_amount),
                         method=payout.method.value,
                         reference=payout.tx_hash_or_reference or str(payout.id)[:8],
+                    )
+                    await discord_service.notify_payout_approved(
+                        trader_handle=f"{trader_name[:3]}***{trader_name[-1:] if len(trader_name) > 3 else ''}",
+                        amount_usd=float(payout.trader_amount),
+                        payout_method=payout.method.value,
+                        country=getattr(payout.user, "country", "GLOBAL") or "GLOBAL",
+                        tx_reference=payout.tx_hash_or_reference or str(payout.id)[:8],
                     )
                 elif payload.status == PayoutStatus.REJECTED:
                     await email_service.send_payout_rejected_email(

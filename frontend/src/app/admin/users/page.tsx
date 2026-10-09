@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSession } from '@/lib/auth';
+import { API_BASE } from '@/lib/api';
 import toast from 'react-hot-toast';
 import {
   Users,
@@ -79,7 +80,7 @@ export default function AdminUsersPage() {
         page: String(pageNum),
         per_page: '20',
       });
-      const res = await fetch(`http://127.0.0.1:8000/api/v1/admin/users?${params.toString()}`, {
+      const res = await fetch(`${API_BASE}/admin/users?${params.toString()}`, {
         headers: { Authorization: `Bearer ${session.token}` },
       });
 
@@ -113,7 +114,7 @@ export default function AdminUsersPage() {
 
     setActionLoading(true);
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/v1/admin/users/${user.id}/${endpoint}`, {
+      const res = await fetch(`${API_BASE}/admin/users/${user.id}/${endpoint}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${session?.token}` },
       });
@@ -143,7 +144,7 @@ export default function AdminUsersPage() {
 
     setActionLoading(true);
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/v1/admin/users/${user.id}/make-admin`, {
+      const res = await fetch(`${API_BASE}/admin/users/${user.id}/make-admin`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${session?.token}` },
       });

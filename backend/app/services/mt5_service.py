@@ -27,6 +27,7 @@ from app.models.audit import AuditLog
 from app.services.risk_engine import risk_engine
 from app.services.copy_engine import copy_engine
 from app.services.email_service import email_service
+from app.services.discord_service import discord_service
 from app.schemas.trading import (
     MT5TradeEventSchema,
     MT5EquityTickSchema,
@@ -164,6 +165,25 @@ class MT5TradingService:
         )
         db.add(audit)
         await db.flush()
+
+        # Dispatch credentials email to the trader
+        try:
+            user_stmt = select(User).where(User.id == purchase.user_id)
+            user_res = await db.execute(user_stmt)
+            trader = user_res.scalar_one_or_none()
+            if trader and trader.email:
+                await email_service.send_credentials_email(
+                    to_email=trader.email,
+                    trader_name=trader.full_name or "Trader",
+                    challenge_name=challenge.name,
+                    starting_balance=float(starting_bal),
+                    mt5_login=purchase.mt5_login or "",
+                    mt5_password=purchase.mt5_password or "",
+                    mt5_investor_password=purchase.mt5_investor_password or "",
+                    mt5_server=purchase.mt5_server or "MaxFunded-Server1",
+                )
+        except Exception as exc:
+            logger.warning("Failed to dispatch MT5 credentials email: %s", exc)
 
         logger.info(
             "Provisioned MT5 account %s for user %s on %s",
@@ -475,6 +495,12 @@ class MT5TradingService:
                     threshold_value=float(eval_result.max_drawdown_remaining or 0),
                     details=eval_result.breach_message,
                 )
+                await discord_service.notify_risk_breach(
+                    mt5_login=purchase.mt5_login or "N/A",
+                    rule_name=eval_result.breach_rule or "RISK_LIMIT",
+                    breached_val=float(purchase.current_equity or 0),
+                    limit_val=float(eval_result.max_drawdown_remaining or 0),
+                )
             elif eval_result.is_passed:
                 cert_code = None
                 try:
@@ -491,6 +517,11 @@ class MT5TradingService:
                     challenge_name=challenge_name,
                     mt5_login=purchase.mt5_login,
                     certificate_code=cert_code,
+                )
+                await discord_service.notify_funded_trader(
+                    trader_handle=f"{(trader.full_name or 'Trader')[:3]}***",
+                    account_size_usd=float(purchase.current_balance or 100000),
+                    country=getattr(trader, "country", "GLOBAL") or "GLOBAL",
                 )
         except Exception as exc:
             logger.warning("Failed to dispatch trader status email: %s", exc)

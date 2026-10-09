@@ -134,7 +134,7 @@ class DashboardService:
         )
 
         # ---- Account phase -------------------------------------------
-        phase = self._derive_phase(purchase.status)
+        phase = self._derive_phase(purchase.status, challenge)
 
         return DashboardSummary(
             purchase_id=purchase.id,
@@ -372,7 +372,9 @@ class DashboardService:
 
         return items
 
-    def _derive_phase(self, status: str) -> str:
+    def _derive_phase(self, status: str, challenge: Optional[Challenge] = None) -> str:
+        if challenge and ("trial" in challenge.slug.lower() or "trial" in challenge.name.lower()):
+            return "TRIAL"
         funded_statuses = {"FUNDED", "PAYOUT_PENDING", "PAYOUT_APPROVED", "PAYOUT_PAID"}
         passed_statuses = {"PASSED", "UNDER_REVIEW"}
         if status in funded_statuses:

@@ -36,7 +36,7 @@ class ChallengeBase(BaseModel):
     name: str = Field(..., min_length=2, max_length=100)
     slug: str = Field(..., min_length=2, max_length=100)
     starting_balance: Decimal = Field(..., gt=0)
-    price: Decimal = Field(..., gt=0)
+    price: Decimal = Field(..., ge=0)
     currency: str = Field(default="USD", min_length=3, max_length=3)
     description: Optional[str] = None
     is_active: bool = True

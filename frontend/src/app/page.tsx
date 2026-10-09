@@ -262,11 +262,11 @@ export default function HomePage() {
               </Link>
 
               <Link
-                href="/challenges"
+                href="/challenges?tab=trial"
                 className="px-6 py-4 rounded-xl bg-[#111418] hover:bg-[#181c24] text-white hover:text-[#ccff00] font-black text-base uppercase tracking-tight border border-white/10 hover:border-[#ccff00]/40 transition flex items-center justify-center gap-2"
               >
-                <Zap className="w-4 h-4 text-[#ccff00]" />
-                <span>Instant Funded (Skip Evaluation)</span>
+                <Sparkles className="w-4 h-4 text-[#ccff00]" />
+                <span>Try Free 14-Day CFD Trial ($0)</span>
               </Link>
             </div>
 

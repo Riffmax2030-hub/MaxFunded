@@ -2,9 +2,81 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calculator, X, DollarSign, ArrowRight, Percent, RefreshCw } from "lucide-react";
+import { Calculator, X, DollarSign, ArrowRight, Percent, RefreshCw, AlertTriangle, Info } from "lucide-react";
 
 export type CalculatorTab = "margin" | "profit" | "lotsize" | "swap";
+
+export interface InstrumentSpec {
+  symbol: string;
+  name: string;
+  contractSize: number;
+  dollarPerPointPerLot: number;
+  unitLabel: string;
+  note: string;
+  isIndex?: boolean;
+}
+
+export const INSTRUMENT_SPECS: Record<string, InstrumentSpec> = {
+  US30: {
+    symbol: "US30",
+    name: "Dow Jones 30",
+    contractSize: 10,
+    dollarPerPointPerLot: 10.0,
+    unitLabel: "Points",
+    isIndex: true,
+    note: "Institutional Spec: 1 Lot = 10 Contracts ($10.00/point). 10x larger than retail broker accounts like Exness ($1/pt).",
+  },
+  NAS100: {
+    symbol: "NAS100",
+    name: "Nasdaq 100",
+    contractSize: 10,
+    dollarPerPointPerLot: 10.0,
+    unitLabel: "Points",
+    isIndex: true,
+    note: "Institutional Spec: 1 Lot = 10 Contracts ($10.00/point).",
+  },
+  SPX500: {
+    symbol: "SPX500",
+    name: "S&P 500",
+    contractSize: 10,
+    dollarPerPointPerLot: 10.0,
+    unitLabel: "Points",
+    isIndex: true,
+    note: "Institutional Spec: 1 Lot = 10 Contracts ($10.00/point).",
+  },
+  XAUUSD: {
+    symbol: "XAUUSD",
+    name: "Gold / USD",
+    contractSize: 100,
+    dollarPerPointPerLot: 10.0,
+    unitLabel: "Pips ($0.10)",
+    note: "1 Lot = 100 Troy Oz ($10.00 per pip / $100 per $1.00 move).",
+  },
+  EURUSD: {
+    symbol: "EURUSD",
+    name: "Euro / US Dollar",
+    contractSize: 100000,
+    dollarPerPointPerLot: 10.0,
+    unitLabel: "Pips",
+    note: "Standard Forex: 1 Lot = 100,000 Units ($10.00 per pip).",
+  },
+  GBPUSD: {
+    symbol: "GBPUSD",
+    name: "British Pound / USD",
+    contractSize: 100000,
+    dollarPerPointPerLot: 10.0,
+    unitLabel: "Pips",
+    note: "Standard Forex: 1 Lot = 100,000 Units ($10.00 per pip).",
+  },
+  BTCUSD: {
+    symbol: "BTCUSD",
+    name: "Bitcoin / USD",
+    contractSize: 1,
+    dollarPerPointPerLot: 1.0,
+    unitLabel: "Dollars ($)",
+    note: "Crypto: 1 Lot = 1 Bitcoin ($1.00 per $1.00 price move).",
+  },
+};
 
 interface Props {
   isOpen: boolean;
@@ -34,9 +106,12 @@ export default function TraderCalculatorModal({
   const [pnlClose, setPnlClose] = useState("1.0920");
 
   // Lot Size Calculator State
+  const [selectedInst, setSelectedInst] = useState("US30");
   const [riskBalance, setRiskBalance] = useState(String(accountSize));
   const [riskPct, setRiskPct] = useState("1.0"); // 1%
-  const [riskPips, setRiskPips] = useState("20");
+  const [riskPips, setRiskPips] = useState("50");
+
+  const currentSpec = INSTRUMENT_SPECS[selectedInst] || INSTRUMENT_SPECS["US30"];
 
   // Swap Calculator State
   const [swapLots, setSwapLots] = useState("1.0");
@@ -54,10 +129,10 @@ export default function TraderCalculatorModal({
   const calculatedPnL = parseFloat(pnlLots || "0") * 100000 * pnlDiff;
 
   const riskCash = (parseFloat(riskBalance || "0") * parseFloat(riskPct || "0")) / 100;
-  // Standard forex: 1 pip on 1 lot = $10
+  const stopPoints = parseFloat(riskPips || "0");
   const calculatedLots =
-    parseFloat(riskPips || "0") > 0
-      ? (riskCash / (parseFloat(riskPips || "0") * 10)).toFixed(2)
+    stopPoints > 0
+      ? (riskCash / (stopPoints * currentSpec.dollarPerPointPerLot)).toFixed(2)
       : "0.00";
 
   const calculatedSwap =
@@ -240,6 +315,48 @@ export default function TraderCalculatorModal({
           {/* TAB 3: LOT SIZE */}
           {tab === "lotsize" && (
             <div className="space-y-4 text-xs font-mono">
+              {/* Instrument Selector */}
+              <div>
+                <label className="text-neutral-400 block mb-1.5 font-bold flex items-center justify-between">
+                  <span>Select Instrument / Asset</span>
+                  <span className="text-[10px] text-[#ccff00] font-normal">
+                    {currentSpec.note}
+                  </span>
+                </label>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {Object.keys(INSTRUMENT_SPECS).map((sym) => {
+                    const isSelected = selectedInst === sym;
+                    return (
+                      <button
+                        key={sym}
+                        type="button"
+                        onClick={() => setSelectedInst(sym)}
+                        className={`py-1.5 px-2 rounded-xl text-center font-bold transition border ${
+                          isSelected
+                            ? "bg-[#ccff00] text-black border-[#ccff00] shadow-sm"
+                            : "bg-white/[0.03] text-neutral-400 border-white/5 hover:border-white/20 hover:text-white"
+                        }`}
+                      >
+                        {sym}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Retail vs Institutional Alert Box for US30/Indices */}
+              {currentSpec.isIndex && (
+                <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 space-y-1">
+                  <div className="flex items-center gap-1.5 font-bold text-[11px] text-amber-200">
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <span>Contract Size Alert (Exness vs MaxFunded / FundedNext)</span>
+                  </div>
+                  <p className="text-[10px] text-amber-300/80 leading-relaxed font-sans">
+                    On retail brokers like Exness, 1 lot = \$1/point. On institutional MT5, 1 lot = 10 contracts (\$10.00/point — 10x larger). Sizing by dollar risk protects your 5% daily limit.
+                  </p>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-neutral-400 block mb-1">Account Balance ($)</label>
@@ -254,7 +371,7 @@ export default function TraderCalculatorModal({
                   <label className="text-neutral-400 block mb-1">Risk Percentage (%)</label>
                   <input
                     type="number"
-                    step="0.5"
+                    step="0.25"
                     value={riskPct}
                     onChange={(e) => setRiskPct(e.target.value)}
                     className="w-full bg-[#14161f] border border-white/10 rounded-xl px-3 py-2 text-white outline-none"
@@ -263,7 +380,9 @@ export default function TraderCalculatorModal({
               </div>
 
               <div>
-                <label className="text-neutral-400 block mb-1">Stop Loss (Pips)</label>
+                <label className="text-neutral-400 block mb-1">
+                  Stop Loss Distance ({currentSpec.unitLabel})
+                </label>
                 <input
                   type="number"
                   value={riskPips}
@@ -272,16 +391,18 @@ export default function TraderCalculatorModal({
                 />
               </div>
 
-              <div className="p-4 rounded-2xl bg-[#ccff00]/10 border border-[#ccff00]/25 text-center mt-4">
-                <span className="text-[10px] uppercase tracking-widest text-neutral-400 block">
-                  Recommended Lot Size
+              <div className="p-4 rounded-2xl bg-[#ccff00]/10 border border-[#ccff00]/25 text-center mt-3">
+                <span className="text-[10px] uppercase tracking-widest text-neutral-400 block font-bold">
+                  Recommended Lot Size for {selectedInst}
                 </span>
-                <span className="text-3xl font-black text-[#ccff00]">
+                <span className="text-3xl font-black text-[#ccff00] my-0.5 block">
                   {calculatedLots} Lots
                 </span>
-                <p className="text-[10px] text-neutral-400 mt-1">
-                  Total capital risked: ${riskCash.toFixed(2)}
-                </p>
+                <div className="flex items-center justify-center gap-3 text-[11px] text-neutral-300 mt-1">
+                  <span>Target Risk: <strong className="text-white">${riskCash.toFixed(2)}</strong></span>
+                  <span>•</span>
+                  <span>Point Value: <strong className="text-white">${currentSpec.dollarPerPointPerLot.toFixed(2)}/pt per lot</strong></span>
+                </div>
               </div>
             </div>
           )}

@@ -537,15 +537,15 @@ export default function TraderDashboard() {
                 {/* Purple Challenge Badge Box */}
                 <div className="w-36 h-24 rounded-2xl bg-gradient-to-br from-[#3b1754] to-[#1c0d2b] border border-[#a855f7]/30 p-3.5 flex flex-col justify-between shadow-lg">
                   <div>
-                    <span className="text-[10px] font-bold text-purple-300 uppercase tracking-widest block">
-                      {summary?.phase === "FUNDED" ? "Funded Tier" : "Evaluation"}
+                    <span className="text-[10px] font-bold uppercase tracking-widest block text-purple-300">
+                      {summary?.phase === "FUNDED" ? "Funded Tier" : summary?.phase === "TRIAL" ? "CFD Free Trial" : "Evaluation"}
                     </span>
                     <span className="text-xl font-black text-white font-mono">
                       {summary ? `$${(accountSizeNum / 1000).toFixed(0)}K` : "$100K"}
                     </span>
                   </div>
                   <span className="text-[9px] font-black uppercase tracking-wider text-purple-400">
-                    CHALLENGE
+                    {summary?.phase === "TRIAL" ? "14-DAY CFD TRIAL" : "CHALLENGE"}
                   </span>
                 </div>
 

@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import ChallengeCard from "@/components/ChallengeCard";
-import { fetchChallenges, Challenge } from "@/lib/api";
-import { Loader2, Zap, ShieldCheck, Award, Star, CheckCircle2, ArrowRight } from "lucide-react";
+import { fetchChallenges, claimFreeTrial, Challenge } from "@/lib/api";
+import { Loader2, Zap, ShieldCheck, Award, Star, CheckCircle2, ArrowRight, Sparkles, Clock } from "lucide-react";
 
 const INSTANT_ACCOUNTS = [
   { size: 10_000, price: 299, label: "$10K" },
@@ -147,13 +147,154 @@ function InstantFundedSection() {
   );
 }
 
+function FreeTrialSection() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  const handleClaim = async () => {
+    setLoading(true);
+    setError(null);
+    const token = typeof window !== "undefined" ? localStorage.getItem("mxf_token") : null;
+    if (!token) {
+      window.location.href = "/register?trial=true";
+      return;
+    }
+    try {
+      await claimFreeTrial(token);
+      setSuccess(true);
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 1200);
+    } catch (err: any) {
+      setError(err.message || "Failed to activate trial");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-8">
+      <div className="text-center max-w-2xl mx-auto">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/30 text-[#ccff00] text-xs font-bold mb-4">
+          <Sparkles className="w-3.5 h-3.5" />
+          100% FREE • NO CREDIT CARD REQUIRED
+        </div>
+        <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-4">
+          14-Day Free CFD <span className="text-[#ccff00]">Trial</span>
+        </h2>
+        <p className="text-neutral-400 text-sm sm:text-base leading-relaxed">
+          Test our institutional MT5 server conditions, tight spreads, and execution speed with $100,000 simulated capital with zero financial risk.
+        </p>
+      </div>
+
+      <div className="bg-[#0c0e15] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div>
+            <div className="inline-block px-3 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 font-mono text-xs font-bold uppercase mb-3">
+              Standard CFD Specification
+            </div>
+            <h3 className="text-3xl font-black text-white font-mono">$100,000 Capital</h3>
+            <p className="text-xs sm:text-sm text-neutral-400 mt-2 leading-relaxed">
+              Experience the exact trading rules, server conditions, and dashboard risk telemetry that our funded traders use daily.
+            </p>
+
+            <div className="mt-6 space-y-2.5">
+              {[
+                { label: "Account Size", val: "$100,000 USD (Simulated)" },
+                { label: "Duration", val: "14 Days" },
+                { label: "Fee", val: "$0.00 Free" },
+                { label: "Profit Target", val: "10% ($10,000)" },
+                { label: "Daily Loss Limit", val: "5% ($5,000)" },
+                { label: "Max Drawdown", val: "10% Static ($10,000)" },
+                { label: "Platform", val: "MetaTrader 5 (CFDs)" },
+                { label: "Instruments", val: "Forex, Metals, Indices, Crypto" },
+              ].map((item) => (
+                <div key={item.label} className="flex justify-between items-center py-1.5 border-b border-white/5 text-xs sm:text-sm">
+                  <span className="text-neutral-400">{item.label}</span>
+                  <span className="font-bold text-white font-mono">{item.val}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-[#080a0f] border border-white/10 rounded-2xl p-6 flex flex-col justify-between h-full">
+            <div>
+              <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                <span className="text-xs uppercase font-mono text-neutral-400">Trial Tier</span>
+                <span className="text-xs font-bold font-mono text-[#ccff00] bg-[#ccff00]/10 px-2 py-0.5 rounded">INSTANT ACCESS</span>
+              </div>
+              <div className="my-6 text-center">
+                <span className="text-neutral-400 text-xs uppercase tracking-widest block font-bold">One-Time Fee</span>
+                <span className="text-5xl font-black text-white font-mono mt-1 block">$0.00</span>
+                <span className="text-xs text-emerald-400 font-bold block mt-1">Zero Financial Risk</span>
+              </div>
+              <ul className="space-y-2 text-xs text-neutral-300 mb-6">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[#ccff00] shrink-0" />
+                  <span>Instant MT5 Login &amp; Server IP</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[#ccff00] shrink-0" />
+                  <span>Full access to live trader dashboard</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[#ccff00] shrink-0" />
+                  <span>Practice rules with live MT5 telemetry</span>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              {error && (
+                <p className="text-xs text-rose-400 mb-3 text-center">{error}</p>
+              )}
+              {success ? (
+                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold text-center">
+                  ✅ Trial Account Activated! Redirecting to dashboard...
+                </div>
+              ) : (
+                <button
+                  onClick={handleClaim}
+                  disabled={loading}
+                  className="w-full py-4 rounded-xl bg-[#ccff00] hover:bg-[#b8e600] text-black font-black text-sm uppercase tracking-tight transition flex items-center justify-center gap-2 shadow-lg shadow-[#ccff00]/20 disabled:opacity-50"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Provisioning MT5 Trial...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-4 h-4" />
+                      <span>Start Free 14-Day CFD Trial</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ChallengesPage() {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<"evaluation" | "instant">("evaluation");
+  const [tab, setTab] = useState<"evaluation" | "trial" | "instant">("evaluation");
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlTab = params.get("tab");
+      if (urlTab === "trial") setTab("trial");
+      else if (urlTab === "instant") setTab("instant");
+    }
+
     fetchChallenges()
       .then((data) => { setChallenges(data); setLoading(false); })
       .catch((err) => { setError(err.message || "Failed to load challenges"); setLoading(false); });
@@ -169,11 +310,13 @@ export default function ChallengesPage() {
           </div>
 
           <h1 className="text-3xl sm:text-6xl font-black text-white tracking-tight uppercase mb-4">
-            {tab === "evaluation" ? "Select Your Account Balance" : "Instant Funded Accounts"}
+            {tab === "evaluation" ? "Select Your Account Balance" : tab === "trial" ? "Free CFD Trial Account" : "Instant Funded Accounts"}
           </h1>
           <p className="text-sm sm:text-base text-neutral-400 max-w-xl mx-auto">
             {tab === "evaluation"
               ? "Choose your starting virtual capital. Transparent rules, fair targets, and instant credential delivery."
+              : tab === "trial"
+              ? "Practice on our live institutional simulated MT5 server for 14 days with zero commitment."
               : "Skip the evaluation. Get funded immediately with a premium account."}
           </p>
 
@@ -187,10 +330,10 @@ export default function ChallengesPage() {
 
         {/* Tab switcher */}
         <div className="flex justify-center mb-10">
-          <div className="flex gap-1 bg-[#111418] border border-white/10 rounded-full p-1">
+          <div className="flex flex-wrap gap-1 bg-[#111418] border border-white/10 rounded-full p-1">
             <button
               onClick={() => setTab("evaluation")}
-              className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all ${
+              className={`px-5 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all ${
                 tab === "evaluation"
                   ? "bg-[#ccff00] text-black shadow"
                   : "text-neutral-400 hover:text-white"
@@ -199,8 +342,18 @@ export default function ChallengesPage() {
               Evaluation Challenges
             </button>
             <button
+              onClick={() => setTab("trial")}
+              className={`px-5 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 ${
+                tab === "trial"
+                  ? "bg-[#ccff00] text-black shadow"
+                  : "text-neutral-400 hover:text-white"
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-indigo-400" /> Free CFD Trial
+            </button>
+            <button
               onClick={() => setTab("instant")}
-              className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-5 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 ${
                 tab === "instant"
                   ? "bg-[#ccff00] text-black shadow"
                   : "text-neutral-400 hover:text-white"
@@ -229,6 +382,8 @@ export default function ChallengesPage() {
               ))}
             </div>
           )
+        ) : tab === "trial" ? (
+          <FreeTrialSection />
         ) : (
           <InstantFundedSection />
         )}

@@ -12,7 +12,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { EquityPoint } from "@/lib/api";
-import { TrendingUp, TrendingDown, Maximize2, Activity } from "lucide-react";
+import { TrendingUp, TrendingDown, Maximize2, Activity, BarChart2 } from "lucide-react";
 
 interface InteractiveEquityChartProps {
   points: EquityPoint[];
@@ -258,6 +258,26 @@ export default function InteractiveEquityChart({
             )}
           </AreaChart>
         </ResponsiveContainer>
+
+        {(!points || points.length === 0) && (
+          <div className="absolute inset-0 bg-[#0d0e10]/85 backdrop-blur-[2px] flex flex-col items-center justify-center p-6 text-center z-20">
+            <div className="w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-center mb-3.5 shadow-lg">
+              <BarChart2 className="w-7 h-7 text-[#ccff00]" />
+            </div>
+            <h4 className="text-base font-black text-white tracking-wide">
+              No Trading Data Recorded Yet
+            </h4>
+            <p className="text-xs sm:text-sm text-neutral-400 max-w-md mt-1.5 leading-relaxed">
+              You haven&apos;t opened any trades on MetaTrader 5 yet. Connect your MT5 terminal using the account credentials above to start recording live equity, closed balance, and drawdown milestones.
+            </p>
+            <div className="flex items-center gap-2 mt-4">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/25 text-[#ccff00] font-mono text-xs font-semibold">
+                <span className="w-2 h-2 rounded-full bg-[#ccff00] animate-ping" />
+                Awaiting First Position
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Footer legend */}

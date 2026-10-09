@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
 export interface ChallengeRule {
   profit_target_percentage: number;
@@ -74,6 +74,21 @@ export async function purchaseChallenge(challengeId: string, token: string): Pro
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: "Purchase failed" }));
     throw new Error(err.detail || "Failed to start challenge");
+  }
+  return res.json();
+}
+
+export async function claimFreeTrial(token: string): Promise<ChallengePurchase> {
+  const res = await fetch(`${API_BASE}/challenges/trial`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: "Trial activation failed" }));
+    throw new Error(err.detail || "Failed to activate free trial");
   }
   return res.json();
 }
