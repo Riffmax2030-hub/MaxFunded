@@ -27,7 +27,7 @@ DEFAULT_CHALLENGES = [
             "profit_target_percentage": Decimal("10.00"),
             "max_daily_loss_percentage": Decimal("5.00"),
             "max_drawdown_percentage": Decimal("10.00"),
-            "min_trading_days": 5,
+            "min_trading_days": 0,
             "leverage": 100,
             "profit_split_percentage": Decimal("80.00"),
         }
@@ -43,7 +43,7 @@ DEFAULT_CHALLENGES = [
             "profit_target_percentage": Decimal("10.00"),
             "max_daily_loss_percentage": Decimal("5.00"),
             "max_drawdown_percentage": Decimal("10.00"),
-            "min_trading_days": 5,
+            "min_trading_days": 0,
             "leverage": 100,
             "profit_split_percentage": Decimal("80.00"),
         }
@@ -59,7 +59,7 @@ DEFAULT_CHALLENGES = [
             "profit_target_percentage": Decimal("10.00"),
             "max_daily_loss_percentage": Decimal("5.00"),
             "max_drawdown_percentage": Decimal("10.00"),
-            "min_trading_days": 5,
+            "min_trading_days": 0,
             "leverage": 100,
             "profit_split_percentage": Decimal("80.00"),
         }
@@ -75,7 +75,7 @@ DEFAULT_CHALLENGES = [
             "profit_target_percentage": Decimal("10.00"),
             "max_daily_loss_percentage": Decimal("5.00"),
             "max_drawdown_percentage": Decimal("10.00"),
-            "min_trading_days": 5,
+            "min_trading_days": 0,
             "leverage": 100,
             "profit_split_percentage": Decimal("80.00"),
         }
@@ -91,7 +91,7 @@ DEFAULT_CHALLENGES = [
             "profit_target_percentage": Decimal("10.00"),
             "max_daily_loss_percentage": Decimal("5.00"),
             "max_drawdown_percentage": Decimal("10.00"),
-            "min_trading_days": 5,
+            "min_trading_days": 0,
             "leverage": 100,
             "profit_split_percentage": Decimal("80.00"),
         }

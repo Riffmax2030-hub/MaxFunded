@@ -1,371 +1,104 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { getSession } from "@/lib/auth";
+import { getSession, clearSession, AuthSession } from "@/lib/auth";
 import {
   fetchDashboardSummary,
   fetchEquityCurve,
-  fetchPerformanceReport,
   DashboardSummaryData,
   EquityPoint,
-  PerformanceReportData,
-  RuleComplianceItem,
 } from "@/lib/api";
 import dynamic from "next/dynamic";
 import { useDashboardWebSocket } from "@/hooks/useDashboardWebSocket";
-import { useAnimatedNumber } from "@/hooks/useAnimatedNumber";
-
-const InteractiveEquityChart = dynamic(() => import("@/components/InteractiveEquityChart"), { ssr: false });
-const TradingViewChart = dynamic(() => import("@/components/TradingViewChart"), { ssr: false });
-const Confetti = dynamic(() => import("react-confetti"), { ssr: false });
-import TradingJournal from "@/components/TradingJournal";
-import EconomicCalendar from "@/components/EconomicCalendar";
 import { BRAND } from "@/lib/branding";
-import { DiscordIcon } from "@/components/SocialIcons";
+import Logo from "@/components/Logo";
+import TraderCalculatorModal, { CalculatorTab } from "@/components/TraderCalculatorModal";
 import {
-
-  TrendingUp,
-  TrendingDown,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  DollarSign,
-  ArrowUpRight,
-  ArrowDownRight,
-  Shield,
-  Loader2,
-  Target,
-  BarChart2,
-  Calendar,
+  Bell,
+  Sun,
+  Moon,
+  ChevronDown,
+  LogOut,
+  User,
+  ShieldCheck,
+  CreditCard,
   Award,
   RefreshCw,
   ExternalLink,
-  ShieldCheck,
-  CreditCard,
-  Activity,
-  Zap,
-  Radio,
-  Key,
+  Lock,
   Copy,
+  CheckCircle2,
   Eye,
   EyeOff,
-  Settings,
+  Activity,
+  BarChart2,
+  Calendar,
+  Layers,
+  ArrowRight,
+  TrendingUp,
+  AlertTriangle,
+  Zap,
+  HelpCircle,
+  Gift,
+  FileCheck2,
+  Clock,
+  Sparkles,
+  Info,
+  LayoutGrid,
+  TrendingDown,
+  Repeat2,
+  Sigma,
+  Newspaper,
 } from "lucide-react";
 
-// ──────────────────────────────────────────
-// Utility helpers
-// ──────────────────────────────────────────
-
-function fmt(value: string | number | null | undefined, decimals = 2): string {
-  if (value === null || value === undefined) return "—";
-  const n = typeof value === "string" ? parseFloat(value) : value;
-  if (isNaN(n)) return "—";
-  return n.toLocaleString("en-US", {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  });
-}
+const InteractiveEquityChart = dynamic(() => import("@/components/InteractiveEquityChart"), { ssr: false });
+import TradingJournal from "@/components/TradingJournal";
+import EconomicCalendar from "@/components/EconomicCalendar";
 
 function fmtCurrency(value: string | number | null | undefined): string {
-  if (value === null || value === undefined) return "—";
+  if (value === null || value === undefined) return "$0.00";
   const n = typeof value === "string" ? parseFloat(value) : value;
-  if (isNaN(n)) return "—";
+  if (isNaN(n)) return "$0.00";
   return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function fmtPct(value: number | null | undefined): string {
-  if (value === null || value === undefined) return "—";
-  return value.toFixed(2) + "%";
-}
-
-function statusBadge(status: string): string {
-  const map: Record<string, string> = {
-    ACTIVE: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-    WARNING: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-    BREACHED: "bg-red-500/20 text-red-400 border-red-500/30",
-    TARGET_REACHED: "bg-[#ccff00]/20 text-[#ccff00] border-[#ccff00]/30",
-    FUNDED: "bg-violet-500/20 text-violet-400 border-violet-500/30",
-    PASSED: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  };
-  return map[status] ?? "bg-neutral-800 text-neutral-400 border-neutral-700";
-}
-
-function phaseLabel(phase: string): string {
-  return phase === "FUNDED" ? "Funded Account" : phase === "PHASE_2" ? "Phase 2" : "Phase 1";
-}
-
-// ──────────────────────────────────────────
-// Sub-components with Framer Motion
-// ──────────────────────────────────────────
-
-function MetricCard({
-  label,
-  value,
-  numericValue,
-  prefix = "$",
-  suffix = "",
-  sub,
-  icon: Icon,
-  accent = "emerald",
-  danger = false,
-}: {
-  label: string;
-  value?: string;
-  numericValue?: number;
-  prefix?: string;
-  suffix?: string;
-  sub?: string;
-  icon: React.ElementType;
-  accent?: string;
-  danger?: boolean;
-}) {
-  const accentMap: Record<string, string> = {
-    emerald: "bg-[#ccff00]/10 text-[#ccff00]",
-    blue: "bg-sky-500/10 text-sky-400",
-    amber: "bg-amber-500/10 text-amber-400",
-    red: "bg-rose-500/10 text-rose-400",
-    violet: "bg-violet-500/10 text-violet-400",
-    cyan: "bg-cyan-500/10 text-cyan-400",
-  };
-
-  const animatedNum = useAnimatedNumber(numericValue !== undefined ? numericValue : 0, 700);
-
-  const displayValue =
-    numericValue !== undefined
-      ? `${prefix}${animatedNum.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${suffix}`
-      : value;
-
-  return (
-    <motion.div
-      whileHover={{ y: -3, transition: { duration: 0.15 } }}
-      className={`metric-card flex flex-col justify-between relative overflow-hidden ${danger ? "border-rose-500/40" : ""}`}
-    >
-      <div className="flex items-center justify-between">
-        <span className="text-neutral-400 text-xs font-medium uppercase tracking-wider">{label}</span>
-        <span className={`p-2 rounded-xl ${accentMap[accent] ?? accentMap.emerald}`}>
-          <Icon size={16} />
-        </span>
-      </div>
-      <div className="mt-3">
-        <p className={`text-2xl font-black font-mono tracking-tight animate-metric-shift ${danger ? "text-rose-400" : "text-white"}`}>
-          {displayValue}
-        </p>
-        {sub && <p className="text-neutral-500 text-xs mt-1 font-medium">{sub}</p>}
-      </div>
-    </motion.div>
-  );
-}
-
-function DrawdownGauge({
-  label,
-  limit,
-  usedPct,
-}: {
-  label: string;
-  limit: number;
-  usedPct: number;
-}) {
-  const isHighDanger = usedPct >= 80;
-  const isWarning = usedPct >= 60;
-  const color = isHighDanger ? "bg-rose-500" : isWarning ? "bg-amber-500" : "bg-[#ccff00]";
-
-  return (
-    <motion.div
-      whileHover={{ y: -2, transition: { duration: 0.15 } }}
-      className="metric-card shadow-lg"
-    >
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-neutral-200 text-sm font-semibold">{label}</span>
-        <span
-          className={`text-xs font-bold font-mono px-2.5 py-0.5 rounded-full ${
-            isHighDanger
-              ? "bg-rose-500/20 text-rose-400 border border-rose-500/30"
-              : isWarning
-              ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
-              : "bg-[#ccff00]/15 text-[#ccff00] border border-[#ccff00]/30"
-          }`}
-        >
-          {fmtPct(usedPct)} used
-        </span>
-      </div>
-      <div className="w-full bg-[#16181d] rounded-full h-3 mb-3 p-0.5 border border-white/5">
-        <motion.div
-          className={`${color} h-2 rounded-full`}
-          initial={{ width: 0 }}
-          animate={{ width: `${Math.min(100, Math.max(0, usedPct))}%` }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        />
-      </div>
-      <div className="flex justify-between text-xs text-neutral-400 font-mono">
-        <span>Current Drawdown: {fmtPct(usedPct)}</span>
-        <span>Hard Limit: {fmtPct(limit)}</span>
-      </div>
-    </motion.div>
-  );
-}
-
-function RuleComplianceCard({ rule }: { rule: RuleComplianceItem }) {
-  const pct = rule.percentage_used ?? 0;
-  const color = rule.is_breached
-    ? "bg-rose-500"
-    : rule.is_achieved
-    ? "bg-[#ccff00]"
-    : pct >= 80
-    ? "bg-amber-500"
-    : "bg-sky-500";
-
-  return (
-    <motion.div
-      whileHover={{ y: -2, transition: { duration: 0.15 } }}
-      className={`metric-card shadow-lg ${
-        rule.is_breached
-          ? "border-rose-500/40"
-          : rule.is_achieved
-          ? "border-[#ccff00]/40"
-          : ""
-      }`}
-    >
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-white text-sm font-semibold">{rule.rule_name}</span>
-        {rule.is_breached ? (
-          <span className="flex items-center gap-1 text-xs text-rose-400 font-semibold bg-rose-500/10 px-2 py-0.5 rounded-md">
-            <AlertTriangle size={13} /> Breached
-          </span>
-        ) : rule.is_achieved ? (
-          <span className="flex items-center gap-1 text-xs text-[#ccff00] font-semibold bg-[#ccff00]/10 px-2 py-0.5 rounded-md">
-            <CheckCircle size={13} /> Passed
-          </span>
-        ) : (
-          <span className="flex items-center gap-1 text-xs text-neutral-400 bg-white/5 px-2 py-0.5 rounded-md">
-            <Clock size={13} /> Tracking
-          </span>
-        )}
-      </div>
-      <p className="text-neutral-400 text-xs mb-3">{rule.description}</p>
-      <div className="w-full bg-[#16181d] rounded-full h-2 mb-2 overflow-hidden border border-white/5">
-        <motion.div
-          className={`${color} h-2 rounded-full`}
-          initial={{ width: 0 }}
-          animate={{ width: `${Math.min(100, pct)}%` }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        />
-      </div>
-      <div className="flex justify-between text-xs text-neutral-400 font-mono">
-        <span>Current: {rule.current_value ? fmtCurrency(rule.current_value) : `${pct.toFixed(1)}%`}</span>
-        <span>Target / Cap: {rule.limit_value ? fmtCurrency(rule.limit_value) : "—"}</span>
-      </div>
-    </motion.div>
-  );
-}
-
-// ──────────────────────────────────────────
-// Trader Rank system
-// ──────────────────────────────────────────
-
-type TraderRankInfo = {
-  label: string;
-  icon: string;
-  color: string;
-  bgColor: string;
-  borderColor: string;
-  barColor: string;
-  xp: number;
-  maxXp: number;
-  nextAt: string;
-};
-
-function getTraderRank(phase: string, profit: number): TraderRankInfo {
-  if (phase === "FUNDED" && profit >= 5000) {
-    return { label: "MASTER", icon: "👑", color: "text-amber-300", bgColor: "bg-amber-500/10", borderColor: "border-amber-500/30", barColor: "bg-amber-400", xp: 1000, maxXp: 1000, nextAt: "Max tier reached" };
-  }
-  if (phase === "FUNDED") {
-    return { label: "ELITE", icon: "⚡", color: "text-violet-400", bgColor: "bg-violet-500/10", borderColor: "border-violet-500/30", barColor: "bg-violet-400", xp: 700, maxXp: 1000, nextAt: `$${(5000 - profit).toLocaleString()} profit to Master` };
-  }
-  if (phase === "PHASE_2") {
-    return { label: "PROFESSIONAL", icon: "🎯", color: "text-sky-400", bgColor: "bg-sky-500/10", borderColor: "border-sky-500/30", barColor: "bg-sky-400", xp: 400, maxXp: 1000, nextAt: "Pass Phase 2 → Elite" };
-  }
-  return { label: "ROOKIE", icon: "🌱", color: "text-[#ccff00]", bgColor: "bg-[#ccff00]/10", borderColor: "border-[#ccff00]/30", barColor: "bg-[#ccff00]", xp: 100, maxXp: 1000, nextAt: "Pass Phase 1 → Professional" };
-}
-
-function TraderRankBadge({ phase, profit }: { phase: string; profit: number }) {
-  const rank = getTraderRank(phase, profit);
-  const pct = Math.round((rank.xp / rank.maxXp) * 100);
-
-  return (
-    <motion.div
-      whileHover={{ y: -2, transition: { duration: 0.15 } }}
-      className={`${rank.bgColor} border ${rank.borderColor} rounded-2xl p-4 shadow-lg flex flex-col gap-2 min-w-[170px]`}
-    >
-      <div className="flex items-center gap-2">
-        <span className="text-xl">{rank.icon}</span>
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Trader Rank</p>
-          <p className={`text-sm font-black ${rank.color} tracking-wide`}>{rank.label}</p>
-        </div>
-      </div>
-      <div>
-        <div className="flex justify-between text-[10px] text-neutral-500 mb-1">
-          <span>{rank.xp} XP</span><span>{rank.maxXp} XP</span>
-        </div>
-        <div className="w-full bg-white/5 rounded-full h-1.5 overflow-hidden border border-white/5">
-          <motion.div
-            className={`${rank.barColor} h-full rounded-full`}
-            initial={{ width: 0 }}
-            animate={{ width: `${pct}%` }}
-            transition={{ duration: 0.9, ease: "easeOut" }}
-          />
-        </div>
-        <p className="text-[10px] text-neutral-500 mt-1">{rank.nextAt}</p>
-      </div>
-    </motion.div>
-  );
-}
-
-function DangerZoneBanner({ dailyUsedPct, maxUsedPct }: { dailyUsedPct: number; maxUsedPct: number }) {
-  const worstPct = Math.max(dailyUsedPct, maxUsedPct);
-  const which = dailyUsedPct >= maxUsedPct ? "daily loss" : "max drawdown";
-  if (worstPct < 80) return null;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-rose-950/50 border border-rose-500/50 rounded-2xl p-4 flex items-start gap-3"
-    >
-      <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5 animate-pulse" />
-      <div className="flex-1">
-        <p className="text-rose-300 font-bold text-sm">⚠ Danger Zone — Account at Risk</p>
-        <p className="text-rose-400/80 text-xs mt-1 leading-relaxed">
-          Your {which} limit is <strong className="text-rose-300">{worstPct.toFixed(1)}% used</strong>. You are dangerously
-          close to a breach. Consider closing open positions and reducing exposure immediately to protect your account.
-        </p>
-      </div>
-      <div className="shrink-0 text-rose-400 font-black text-xl font-mono">{worstPct.toFixed(0)}%</div>
-    </motion.div>
-  );
-}
-
-// ──────────────────────────────────────────
-// Main page
-// ──────────────────────────────────────────
-
 export default function TraderDashboard() {
+  const [session, setSession] = useState<AuthSession | null>(null);
   const [summary, setSummary] = useState<DashboardSummaryData | null>(null);
   const [equityCurve, setEquityCurve] = useState<EquityPoint[]>([]);
-  const [performance, setPerformance] = useState<PerformanceReportData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"overview" | "compliance" | "journal" | "news" | "performance">("overview");
-  const [chartMode, setChartMode] = useState<"equity" | "candles">("equity");
-  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
-  const [showPassword, setShowPassword] = useState(false);
-  const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [activeSubTab, setActiveSubTab] = useState<"overview" | "calendar" | "history" | "platform">("overview");
+  const [chartTimeframe, setChartTimeframe] = useState<"7 Days" | "30 Days" | "All">("7 Days");
+  const [showBalanceDetails, setShowBalanceDetails] = useState(true);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [showLoginInfoModal, setShowLoginInfoModal] = useState(false);
   const [showPayoutModal, setShowPayoutModal] = useState(false);
-  const [payoutAmount, setPayoutAmount] = useState("");
   const [payoutAddress, setPayoutAddress] = useState("");
+  const [payoutAmount, setPayoutAmount] = useState("");
   const [payoutSubmitted, setPayoutSubmitted] = useState(false);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [showCalcModal, setShowCalcModal] = useState(false);
+  const [calcTab, setCalcTab] = useState<CalculatorTab>("margin");
+  const [newsExpanded, setNewsExpanded] = useState(false);
+
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
@@ -373,827 +106,875 @@ export default function TraderDashboard() {
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  // Real-time WebSocket hook
-  const { data: wsData, status: wsStatus } = useDashboardWebSocket();
-
-  // Load initial data via REST API
   const loadData = useCallback(async () => {
-    const session = getSession();
-    if (!session) {
-      setError("Please log in to view your dashboard.");
-      setLoading(false);
-      return;
-    }
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      setError(null);
-      const [sum, curve, perf] = await Promise.all([
-        fetchDashboardSummary(session.token),
-        fetchEquityCurve(session.token, 30),
-        fetchPerformanceReport(session.token),
-      ]);
+      const sess = getSession();
+      setSession(sess);
+      if (!sess) {
+        throw new Error("Please log in to access your trading dashboard");
+      }
+
+      const sum = await fetchDashboardSummary();
       setSummary(sum);
-      setEquityCurve(curve);
-      setPerformance(perf);
-      setLastRefresh(new Date());
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Dashboard unavailable";
-      setError(msg);
+
+      try {
+        const eq = await fetchEquityCurve();
+        setEquityCurve(eq);
+      } catch {
+        setEquityCurve([]);
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to load dashboard data");
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Update summary when WebSocket pushes live data
-  useEffect(() => {
-    if (wsData) {
-      setSummary(wsData as unknown as DashboardSummaryData);
-      setLastRefresh(new Date());
-      setLoading(false);
-    }
-  }, [wsData]);
-
-  // Initial fetch and 60-second background polling fallback
   useEffect(() => {
     loadData();
-    const interval = setInterval(loadData, 60_000);
-    return () => clearInterval(interval);
   }, [loadData]);
 
-  // Quick 1-click test login for reviewers
+  // WebSocket Live Stream
+  const { wsStatus } = useDashboardWebSocket({
+    onUpdate: (data) => {
+      if (data.summary) setSummary((prev) => (prev ? { ...prev, ...data.summary } : data.summary));
+      if (data.equityCurve) setEquityCurve(data.equityCurve);
+    },
+  });
+
+  const handleLogout = () => {
+    clearSession();
+    window.location.href = "/";
+  };
+
   const handleQuickDemoLogin = async () => {
     try {
       setLoading(true);
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-      const res = await fetch(`${apiUrl}/auth/login`, {
+      const res = await fetch("http://localhost:8000/api/v1/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: "trader@maxfunded.com", password: "Trader2026!" }),
+        body: JSON.stringify({ email: "sherif@maxfunded.com", password: "Password123!" }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        const { saveSession } = await import("@/lib/auth");
-        saveSession(data.access_token, {
-          id: data.user_id,
-          email: data.email,
-          role: data.role,
-          is_admin: data.is_admin,
-        });
-        await loadData();
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
+      if (!res.ok) throw new Error("Demo login failed");
+      const data = await res.json();
+      localStorage.setItem("mxf_token", data.access_token);
+      localStorage.setItem("mxf_session", JSON.stringify(data));
+      window.location.reload();
+    } catch {
+      window.location.href = "/login";
     }
   };
 
-  // ── Render states ───────────────────────
-  const renderContent = () => {
-    if (loading && !summary) {
-      return (
-        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-          <Loader2 size={40} className="text-[#ccff00] animate-spin" />
-          <p className="text-neutral-400 text-sm font-medium">Synchronizing MT5 trading metrics…</p>
-        </div>
-      );
-    }
+  const userInitial = session?.email ? session.email[0].toUpperCase() : "S";
 
-    if (error && !summary) {
-      const isAuthError =
-        error.toLowerCase().includes("log in") ||
-        error.toLowerCase().includes("not authenticated");
-      const isNoAccount = error.toLowerCase().includes("no active challenge");
+  // Calculations
+  const accountSizeNum = summary ? parseFloat(String(summary.account_size)) || 100000 : 100000;
+  const balanceNum = summary ? parseFloat(String(summary.current_balance)) || accountSizeNum : accountSizeNum;
+  const equityNum = summary ? parseFloat(String(summary.current_equity)) || balanceNum : balanceNum;
+  const netProfit = equityNum - accountSizeNum;
+  const profitTargetPct = summary ? summary.profit_target_pct || 10 : 10;
+  const profitTargetAmt = Math.round(accountSizeNum * (profitTargetPct / 100));
+  const dailyLossLimitPct = summary ? summary.daily_drawdown_limit_pct || 5 : 5;
+  const dailyLossLimitAmt = Math.round(accountSizeNum * (dailyLossLimitPct / 100));
+  const maxLossLimitPct = summary ? summary.max_drawdown_limit_pct || 10 : 10;
+  const maxLossLimitAmt = Math.round(accountSizeNum * (maxLossLimitPct / 100));
 
-      if (isAuthError) {
-        return (
-          <div className="max-w-md mx-auto mt-20 text-center">
-            <div className="bg-[#0d0e10] border border-white/[0.08] rounded-3xl p-8 sm:p-10 shadow-2xl relative overflow-hidden">
-              <div className="w-16 h-16 rounded-2xl bg-[#ccff00]/10 border border-[#ccff00]/20 flex items-center justify-center mx-auto mb-6 text-[#ccff00]">
-                <ShieldCheck size={32} />
-              </div>
-              <h2 className="text-2xl font-black text-white mb-2 tracking-tight">Trader Portal Access</h2>
-              <p className="text-neutral-400 text-sm mb-8 leading-relaxed">
-                Sign in to your MaxFunded account to view your live MetaTrader 5 balance, real-time equity curve, and drawdown objectives.
-              </p>
+  const dailyUsedAmt = Math.max(0, balanceNum - equityNum);
+  const dailyRemainingAmt = Math.max(0, dailyLossLimitAmt - dailyUsedAmt);
+  const maxUsedAmt = Math.max(0, accountSizeNum - equityNum);
+  const maxRemainingAmt = Math.max(0, maxLossLimitAmt - maxUsedAmt);
 
-              <div className="space-y-3">
-                <Link
-                  href="/login"
-                  className="w-full inline-flex items-center justify-center gap-2 bg-[#ccff00] hover:bg-[#b3e600] text-black font-bold px-6 py-3.5 rounded-xl transition shadow-[0_0_25px_rgba(204,255,0,0.3)] text-sm"
-                >
-                  Sign In to Account
-                </Link>
-
-                <button
-                  onClick={handleQuickDemoLogin}
-                  className="w-full inline-flex items-center justify-center gap-2 bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-white font-semibold px-6 py-3.5 rounded-xl transition text-sm"
-                >
-                  <Zap size={15} className="text-[#ccff00]" />
-                  Instant Demo Mode (1-Click)
-                </button>
-              </div>
-
-              <div className="mt-6 pt-6 border-t border-white/5 text-xs text-neutral-500">
-                Don&apos;t have an account yet?{" "}
-                <Link href="/register" className="text-[#ccff00] hover:underline font-semibold">
-                  Register here
-                </Link>
-              </div>
-            </div>
-          </div>
-        );
-      }
-
-      return (
-        <div className="max-w-lg mx-auto mt-24 text-center">
-          <div className="bg-[#0d0e10] border border-white/[0.08] rounded-2xl p-10 shadow-2xl">
-            {isNoAccount ? (
-              <>
-                <Activity size={48} className="mx-auto text-[#ccff00] mb-4 opacity-80" />
-                <h2 className="text-xl font-bold text-white mb-2">No Active Challenge</h2>
-                <p className="text-neutral-400 mb-6 text-sm">
-                  Start an evaluation challenge to unlock your real-time institutional dashboard.
-                </p>
-                <Link
-                  href="/challenges"
-                  className="inline-flex items-center gap-2 bg-[#ccff00] hover:bg-[#b3e600] text-black font-bold px-6 py-3 rounded-full transition shadow-[0_0_25px_rgba(204,255,0,0.3)]"
-                >
-                  <Zap size={16} /> Browse Challenges
-                </Link>
-              </>
-            ) : (
-              <>
-                <AlertTriangle size={48} className="mx-auto text-amber-400 mb-4" />
-                <h2 className="text-xl font-bold text-white mb-2">Dashboard Error</h2>
-                <p className="text-neutral-400 mb-6 text-sm">{error}</p>
-                <button
-                  onClick={loadData}
-                  className="inline-flex items-center gap-2 bg-[#1b1e24] hover:bg-[#252932] text-white px-6 py-3 rounded-lg font-semibold transition"
-                >
-                  <RefreshCw size={16} /> Retry
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    if (!summary) return null;
-
-    const profit = parseFloat(String(summary.total_profit));
-    const profitPositive = profit >= 0;
-    const balanceNum = parseFloat(String(summary.current_balance));
-    const equityNum = parseFloat(String(summary.current_equity));
-    const accountSizeNum = parseFloat(String(summary.account_size)) || 100000;
-
-    const dailyLossPct = Math.abs(((balanceNum - equityNum) / accountSizeNum) * 100);
-    const maxDrawdownPct = Math.abs(((accountSizeNum - equityNum) / accountSizeNum) * 100);
-
-    return (
-      <div className="space-y-6">
-        {summary.profit_target_achieved && (
-          <Confetti recycle={false} numberOfPieces={350} gravity={0.15} />
-        )}
-        <DangerZoneBanner dailyUsedPct={dailyLossPct} maxUsedPct={maxDrawdownPct} />
-        {/* ── Account header banner with Live Streaming Status ── */}
-        <div className="bg-[#0d0e10] border border-white/[0.08] rounded-2xl p-6 shadow-xl relative overflow-hidden">
-          {/* Neon glow orb top-right */}
-          <div className="absolute -top-8 -right-8 w-48 h-48 rounded-full bg-[#ccff00]/[0.06] blur-3xl pointer-events-none" />
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 relative z-10">
-            <div>
-              <div className="flex flex-wrap items-center gap-2.5 mb-2">
-                <span className={`text-xs font-bold px-3 py-1 rounded-full border ${statusBadge(summary.account_status)}`}>
-                  {summary.account_status}
-                </span>
-                <span className="text-xs text-neutral-300 bg-white/[0.07] px-2.5 py-0.5 rounded-full font-medium">
-                  {phaseLabel(summary.phase)}
-                </span>
-
-                {/* Real-time WebSocket connection badge */}
-                {wsStatus === "connected" ? (
-                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/30 text-[#ccff00] text-xs font-semibold">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#ccff00] opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#ccff00]"></span>
-                    </span>
-                    LIVE STREAM
-                  </div>
-                ) : wsStatus === "connecting" ? (
-                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold">
-                    <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
-                    CONNECTING
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/[0.05] border border-white/10 text-neutral-400 text-xs font-semibold">
-                    <span className="h-2 w-2 rounded-full bg-neutral-500" />
-                    REST POLLING (60s)
-                  </div>
-                )}
-              </div>
-
-              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">{summary.challenge_name}</h1>
-              <p className="text-neutral-400 text-sm mt-1">
-                Account Size: <span className="font-semibold text-white">{fmtCurrency(summary.account_size)}</span>
-                {summary.challenge_start_date && (
-                  <> &nbsp;·&nbsp; Started {summary.challenge_start_date}</>
-                )}
-                {summary.days_remaining !== null && (
-                  <> &nbsp;·&nbsp; <span className="text-neutral-300">{summary.days_remaining} days remaining</span></>
-                )}
-              </p>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="flex flex-wrap items-center gap-3">
-              <TraderRankBadge phase={summary.phase} profit={profit} />
-              <a
-                href={BRAND.socials.discord}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-xs bg-[#5865F2]/15 text-[#c2c6fc] border border-[#5865F2]/30 px-3 py-2 rounded-xl font-bold hover:bg-[#5865F2]/25 hover:text-white transition"
-                title="Join Official Discord Trading Floor"
-              >
-                <DiscordIcon className="w-3.5 h-3.5 text-[#858df9]" />
-                <span className="hidden sm:inline">Discord Floor</span>
-              </a>
-              {summary.kyc_status !== "APPROVED" && (
-                <Link
-                  href="/kyc"
-                  className="flex items-center gap-1.5 text-xs bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3.5 py-2 rounded-xl font-medium hover:bg-amber-500/30 transition"
-                >
-                  <ShieldCheck size={14} /> Complete KYC
-                </Link>
-              )}
-              {!summary.has_pending_payout && summary.kyc_status === "APPROVED" && (
-                <button
-                  onClick={() => { setPayoutSubmitted(false); setPayoutAmount(""); setPayoutAddress(""); setShowPayoutModal(true); }}
-                  className="flex items-center gap-1.5 text-xs bg-[#ccff00]/15 text-[#ccff00] border border-[#ccff00]/30 px-3.5 py-2 rounded-xl font-bold hover:bg-[#ccff00]/25 transition"
-                >
-                  <CreditCard size={14} /> Request Payout
-                </button>
-              )}
-              {summary.has_pending_payout && (
-                <Link
-                  href="/payouts"
-                  className="flex items-center gap-1.5 text-xs bg-violet-500/20 text-violet-400 border border-violet-500/30 px-3.5 py-2 rounded-xl font-medium hover:bg-violet-500/30 transition"
-                >
-                  <Clock size={14} /> Payout Pending
-                </Link>
-              )}
-              <Link
-                href="/settings"
-                title="Account Settings"
-                className="flex items-center gap-1.5 text-xs bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-neutral-300 hover:text-white px-3 py-2 rounded-xl transition"
-              >
-                <Settings size={14} /> Settings
-              </Link>
-              <button
-                onClick={loadData}
-                title="Refresh Metrics"
-                className="p-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-neutral-400 hover:text-white transition"
-              >
-                <RefreshCw size={15} className={loading ? "animate-spin" : ""} />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* ── MT5 Trading Account Credentials Card ── */}
-        {summary.mt5_login && (
-          <div className="bg-[#030712] border border-white/[0.08] border-l-4 border-l-[#ccff00] rounded-2xl p-5 shadow-xl">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[#ccff00] font-bold text-xs uppercase tracking-wider flex items-center gap-1.5">
-                    <Key size={13} /> MetaTrader 5 Account
-                  </span>
-                  <span className="text-neutral-500 text-xs">·</span>
-                  <span className="text-neutral-400 text-xs font-mono">{summary.mt5_server || "RoboForex-Demo"}</span>
-                </div>
-                <p className="text-neutral-400 text-xs">
-                  Connect using these credentials directly on the official MetaTrader 5 app (Windows, Mac, iOS, Android).
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-[#0d0e10] p-3 rounded-xl border border-white/[0.05]">
-                <div>
-                  <span className="text-neutral-500 text-[10px] uppercase font-bold block">Server</span>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="font-mono text-white text-xs font-bold truncate max-w-[110px]" title={summary.mt5_server || "RoboForex-Demo"}>
-                      {summary.mt5_server || "RoboForex-Demo"}
-                    </span>
-                    <button
-                      onClick={() => copyToClipboard(summary.mt5_server || "RoboForex-Demo", "server")}
-                      className="text-neutral-500 hover:text-white transition"
-                      title="Copy Server"
-                    >
-                      {copiedField === "server" ? <CheckCircle size={12} className="text-[#ccff00]" /> : <Copy size={12} />}
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-neutral-500 text-[10px] uppercase font-bold block">Login ID</span>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="font-mono text-[#ccff00] text-xs font-bold">{summary.mt5_login}</span>
-                    <button
-                      onClick={() => copyToClipboard(summary.mt5_login || "", "login")}
-                      className="text-neutral-500 hover:text-white transition"
-                      title="Copy Login"
-                    >
-                      {copiedField === "login" ? <CheckCircle size={12} className="text-[#ccff00]" /> : <Copy size={12} />}
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-neutral-500 text-[10px] uppercase font-bold block">Master Password</span>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="font-mono text-white text-xs font-semibold">
-                      {showPassword ? (summary.mt5_password || "••••••••") : "••••••••"}
-                    </span>
-                    <button
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="text-neutral-500 hover:text-white transition"
-                      title={showPassword ? "Hide Password" : "Show Password"}
-                    >
-                      {showPassword ? <EyeOff size={12} /> : <Eye size={12} />}
-                    </button>
-                    {summary.mt5_password && (
-                      <button
-                        onClick={() => copyToClipboard(summary.mt5_password || "", "pass")}
-                        className="text-neutral-500 hover:text-white transition"
-                        title="Copy Password"
-                      >
-                        {copiedField === "pass" ? <CheckCircle size={12} className="text-[#ccff00]" /> : <Copy size={12} />}
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-neutral-500 text-[10px] uppercase font-bold block">Investor Pass</span>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="font-mono text-neutral-300 text-xs font-semibold">
-                      {summary.mt5_investor_password || "Inv_ReadOnly"}
-                    </span>
-                    <button
-                      onClick={() => copyToClipboard(summary.mt5_investor_password || "", "inv")}
-                      className="text-neutral-500 hover:text-white transition"
-                      title="Copy Investor Password"
-                    >
-                      {copiedField === "inv" ? <CheckCircle size={12} className="text-[#ccff00]" /> : <Copy size={12} />}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── Core metrics row with Framer Motion & Number Counters ── */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <MetricCard
-            label="Current Balance"
-            numericValue={balanceNum}
-            icon={DollarSign}
-            accent="blue"
-          />
-          <MetricCard
-            label="Current Equity"
-            numericValue={equityNum}
-            sub={`${summary.open_positions} open position${summary.open_positions !== 1 ? "s" : ""}`}
-            icon={Activity}
-            accent="emerald"
-          />
-          <MetricCard
-            label="Total Profit"
-            numericValue={profit}
-            prefix={profitPositive ? "+$" : "-$"}
-            sub={`${profitPositive ? "+" : ""}${fmtPct(summary.total_profit_pct)} gain`}
-            icon={profitPositive ? TrendingUp : TrendingDown}
-            accent={profitPositive ? "emerald" : "red"}
-            danger={!profitPositive}
-          />
-          <MetricCard
-            label="Win Rate"
-            numericValue={summary.win_rate_pct}
-            prefix=""
-            suffix="%"
-            sub={`${summary.winning_trades}W / ${summary.losing_trades}L (${summary.total_trades} trades)`}
-            icon={Target}
-            accent="cyan"
-          />
-        </div>
-
-        {/* ── Profit target progress ── */}
-        <div className={`metric-card shadow-lg ${summary.profit_target_achieved ? "border-[#ccff00]/40" : ""}`}>
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Award size={16} className="text-[#ccff00]" />
-              <span className="text-white font-semibold text-sm">Profit Target Progress</span>
-            </div>
-            <span
-              className={`text-xs font-bold font-mono px-2.5 py-0.5 rounded-full ${
-                summary.profit_target_achieved
-                  ? "bg-[#ccff00]/20 text-[#ccff00] border border-[#ccff00]/30"
-                  : "bg-white/[0.05] text-neutral-400"
-              }`}
-            >
-              {summary.profit_target_achieved ? "✓ Target Achieved!" : `${fmtPct(summary.profit_target_reached_pct)} completed`}
-            </span>
-          </div>
-          <div className="w-full bg-[#16181d] rounded-full h-3 p-0.5 border border-white/5">
-            <motion.div
-              className={`h-2 rounded-full ${summary.profit_target_achieved ? "bg-[#ccff00]" : "bg-amber-400"}`}
-              initial={{ width: 0 }}
-              animate={{ width: `${Math.min(100, Math.max(0, summary.profit_target_reached_pct))}%` }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-            />
-          </div>
-          <div className="flex justify-between text-xs text-neutral-400 mt-2 font-mono">
-            <span>
-              Realized P&L: {fmtCurrency(summary.total_profit)} ({fmtPct(summary.total_profit_pct)})
-            </span>
-            <span>Target Goal: {fmtPct(summary.profit_target_pct)}</span>
-          </div>
-        </div>
-
-        {/* ── Navigation Tabs ── */}
-        <div className="flex flex-wrap gap-2 pb-2 border-b border-white/[0.06]">
-          {(
-            [
-              { id: "overview", label: "Overview & Charts", icon: "📊" },
-              { id: "compliance", label: "Rule Compliance", icon: "🛡️" },
-              { id: "journal", label: "Trading Journal", icon: "📓" },
-              { id: "news", label: "Economic Calendar", icon: "📅" },
-              { id: "performance", label: "Trade Ledger", icon: "📈" },
-            ] as const
-          ).map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setActiveTab(t.id)}
-              className={`calculator-tab text-xs sm:text-sm ${activeTab === t.id ? "active" : ""}`}
-            >
-              <span className="hidden sm:inline mr-1.5">{t.icon}</span>{t.label}
-            </button>
-          ))}
-        </div>
-
-
-        {/* ── Animated Tab Content ── */}
-        <AnimatePresence mode="wait">
-          {activeTab === "overview" && (
-            <motion.div
-              key="overview"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="space-y-6"
-            >
-              {/* Drawdown gauges */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <DrawdownGauge
-                  label="Daily Loss Drawdown"
-                  limit={summary.daily_drawdown_limit_pct}
-                  usedPct={summary.daily_drawdown_used_pct}
-                />
-                <DrawdownGauge
-                  label="Maximum Overall Drawdown"
-                  limit={summary.max_drawdown_limit_pct}
-                  usedPct={summary.max_drawdown_used_pct}
-                />
-              </div>
-
-              {/* Chart Switcher & View */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 bg-[#14161a] border border-white/10 p-1 rounded-xl text-xs">
-                    <button
-                      onClick={() => setChartMode("equity")}
-                      className={`px-3 py-1.5 rounded-lg transition font-bold flex items-center gap-1.5 ${
-                        chartMode === "equity"
-                          ? "bg-[#ccff00] text-black shadow-sm"
-                          : "text-neutral-400 hover:text-white"
-                      }`}
-                    >
-                      <Activity size={13} />
-                      <span>Equity Curve</span>
-                    </button>
-                    <button
-                      onClick={() => setChartMode("candles")}
-                      className={`px-3 py-1.5 rounded-lg transition font-bold flex items-center gap-1.5 ${
-                        chartMode === "candles"
-                          ? "bg-[#ccff00] text-black shadow-sm"
-                          : "text-neutral-400 hover:text-white"
-                      }`}
-                    >
-                      <BarChart2 size={13} />
-                      <span>TradingView Candlesticks</span>
-                    </button>
-                  </div>
-                </div>
-
-                {chartMode === "equity" ? (
-                  <InteractiveEquityChart
-                    points={equityCurve}
-                    startingBalance={accountSizeNum}
-                  />
-                ) : (
-                  <TradingViewChart />
-                )}
-              </div>
-
-              {/* Trade statistics */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <MetricCard
-                  label="Avg. Profit / Trade"
-                  value={fmtCurrency(summary.avg_profit_per_trade)}
-                  icon={ArrowUpRight}
-                  accent="emerald"
-                />
-                <MetricCard
-                  label="Avg. Loss / Trade"
-                  value={fmtCurrency(summary.avg_loss_per_trade)}
-                  icon={ArrowDownRight}
-                  accent="red"
-                  danger={parseFloat(String(summary.avg_loss_per_trade)) > 0}
-                />
-                <MetricCard
-                  label="Profit Factor"
-                  value={summary.profit_factor !== null ? summary.profit_factor.toFixed(2) : "—"}
-                  sub={
-                    summary.profit_factor !== null && summary.profit_factor >= 1.5
-                      ? "High Edge"
-                      : summary.profit_factor !== null && summary.profit_factor >= 1
-                      ? "Profitable"
-                      : "Developing"
-                  }
-                  icon={TrendingUp}
-                  accent={summary.profit_factor !== null && summary.profit_factor >= 1 ? "emerald" : "red"}
-                />
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === "compliance" && (
-            <motion.div
-              key="compliance"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-neutral-400 text-sm">
-                  All challenge objectives must remain in full compliance to qualify for funded allocation or payouts.
-                </p>
-                <Link href="/rules" className="text-[#ccff00] text-sm hover:underline inline-flex items-center gap-1 font-semibold">
-                  Rule Handbook <ExternalLink size={13} />
-                </Link>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {summary.rule_compliance.map((rule) => (
-                  <RuleComplianceCard key={rule.rule_name} rule={rule} />
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === "performance" && performance && (
-            <motion.div
-              key="performance"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="space-y-6"
-            >
-              {/* Summary stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <MetricCard
-                  label="Trading Days"
-                  value={String(performance.trading_days)}
-                  icon={Calendar}
-                  accent="blue"
-                />
-                <MetricCard
-                  label="Best Day P&L"
-                  value={fmtCurrency(performance.best_day_pnl)}
-                  icon={ArrowUpRight}
-                  accent="emerald"
-                />
-                <MetricCard
-                  label="Worst Day P&L"
-                  value={fmtCurrency(performance.worst_day_pnl)}
-                  icon={ArrowDownRight}
-                  accent="red"
-                />
-                <MetricCard
-                  label="Avg. Daily P&L"
-                  value={fmtCurrency(performance.avg_daily_pnl)}
-                  icon={BarChart2}
-                  accent="cyan"
-                />
-              </div>
-
-              {/* Daily breakdown table */}
-              {performance.daily_breakdown.length > 0 ? (
-                <div className="bg-[#0d0e10] border border-white/[0.08] rounded-2xl overflow-hidden shadow-xl">
-                  <table className="w-full text-sm">
-                    <thead className="bg-white/[0.03]">
-                      <tr>
-                        <th className="text-left px-5 py-3.5 text-neutral-400 font-medium">Date</th>
-                        <th className="text-right px-5 py-3.5 text-neutral-400 font-medium">Realized P&L</th>
-                        <th className="text-right px-5 py-3.5 text-neutral-400 font-medium">Trades Executed</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/[0.04]">
-                      {performance.daily_breakdown.map((d) => {
-                        const pnl = parseFloat(String(d.realized_pnl));
-                        return (
-                          <tr key={d.trade_date} className="hover:bg-white/[0.02] transition">
-                            <td className="px-5 py-3.5 text-neutral-300 font-mono">{d.trade_date}</td>
-                            <td
-                              className={`px-5 py-3.5 text-right font-mono font-bold ${
-                                pnl >= 0 ? "text-[#ccff00]" : "text-rose-400"
-                              }`}
-                            >
-                              {pnl >= 0 ? "+" : ""}{fmtCurrency(d.realized_pnl)}
-                            </td>
-                            <td className="px-5 py-3.5 text-right text-neutral-400 font-mono">{d.trades_count}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div className="bg-[#0d0e10] border border-white/[0.08] rounded-2xl p-10 text-center text-neutral-500">
-                  No trading days recorded yet. Open and close positions on MetaTrader 5 to populate this ledger.
-                </div>
-              )}
-            </motion.div>
-          )}
-
-          {/* Trading Journal Tab */}
-          {activeTab === "journal" && (
-            <motion.div
-              key="journal"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <TradingJournal />
-            </motion.div>
-          )}
-
-          {/* Economic Calendar Tab */}
-          {activeTab === "news" && (
-            <motion.div
-              key="news"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              <EconomicCalendar />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-
-        {/* ── Footer row ── */}
-        <div className="flex flex-col sm:flex-row items-center justify-between text-xs text-neutral-500 pt-4 border-t border-white/[0.05] gap-2">
-          <span>
-            Last synced: <span className="font-mono text-neutral-400">{lastRefresh.toLocaleTimeString()}</span>
-            &nbsp;·&nbsp; {wsStatus === "connected" ? "Real-time WebSocket streaming active" : "Auto-polling every 60s"}
-          </span>
-          <div className="flex gap-5">
-            <Link href="/kyc" className="hover:text-neutral-300 transition flex items-center gap-1.5">
-              <Shield size={12} /> KYC:{" "}
-              <span className={summary.kyc_status === "APPROVED" ? "text-[#ccff00] font-semibold" : "text-amber-400 font-semibold"}>
-                {summary.kyc_status}
-              </span>
-            </Link>
-            <Link href="/payouts" className="hover:text-neutral-300 transition font-semibold text-[#ccff00]">
-              Payouts Hub →
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  };
+  const profitProgressPct = Math.min(100, Math.max(0, (netProfit / profitTargetAmt) * 100));
 
   return (
-    <div className="min-h-screen bg-[#070809] text-white pt-6 pb-16">
-      <div className="max-w-6xl mx-auto px-4 py-4">{renderContent()}</div>
+    <div className="min-h-screen bg-[#07090e] text-white flex flex-col font-sans selection:bg-[#ccff00] selection:text-black">
+      {/* ========================================================================= */}
+      {/* 1. TOP NAVBAR (FundedNext Style) */}
+      {/* ========================================================================= */}
+      <header className="h-16 border-b border-white/[0.08] bg-[#090b11] px-4 sm:px-6 flex items-center justify-between sticky top-0 z-40">
+        {/* Left: Logo & Sidebar Toggle */}
+        <div className="flex items-center gap-4">
+          <Link href="/" className="flex items-center">
+            <Logo size="md" />
+          </Link>
+        </div>
 
-      {/* ── Payout Request Modal ── */}
+        {/* Center: Start Challenge Action Button */}
+        <div className="hidden sm:flex items-center">
+          <Link
+            href="/challenges"
+            className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#6366f1] to-[#4f46e5] hover:from-[#4f46e5] hover:to-[#4338ca] text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider transition shadow-lg shadow-indigo-500/20 flex items-center gap-2"
+          >
+            <Zap className="w-4 h-4 fill-current text-[#ccff00]" />
+            <span>Start Challenge</span>
+          </Link>
+        </div>
+
+        {/* Right Corner: Bell, Sun/Moon, Circular Profile Button */}
+        <div className="flex items-center gap-3">
+          {/* Notification Bell */}
+          <button
+            className="p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-white/5 transition relative"
+            title="Notifications"
+          >
+            <Bell className="w-5 h-5" />
+            <span className="w-2 h-2 rounded-full bg-[#ccff00] absolute top-1.5 right-1.5" />
+          </button>
+
+          {/* Theme Toggle Button */}
+          <button
+            onClick={() => setIsDarkMode(!isDarkMode)}
+            className="p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-white/5 transition"
+            title={isDarkMode ? "Light Mode" : "Dark Mode"}
+          >
+            {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
+
+          {/* Circular Profile Avatar Button & Dropdown */}
+          <div className="relative" ref={profileRef}>
+            <button
+              onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+              className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#1e2330] to-[#2d3345] border-2 border-white/20 hover:border-[#ccff00] text-white font-bold flex items-center justify-center transition shadow-md"
+              title="User Menu"
+            >
+              <span>{userInitial}</span>
+            </button>
+
+            {/* Profile Dropdown Menu (FundedNext Exact Spec) */}
+            <AnimatePresence>
+              {profileDropdownOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute right-0 mt-2 w-64 rounded-2xl bg-[#0f1219] border border-white/10 shadow-2xl py-2 z-50 text-xs overflow-hidden"
+                >
+                  {/* Registration Email Header */}
+                  <div className="px-4 py-3">
+                    <p className="text-[10px] text-neutral-400 uppercase tracking-widest font-mono">Signed in as</p>
+                    <p className="font-semibold text-white truncate mt-0.5" title={session?.email || "trader@maxfunded.com"}>
+                      {session?.email || "trader@maxfunded.com"}
+                    </p>
+                  </div>
+
+                  <div className="h-px bg-white/[0.08]" />
+
+                  {/* Dark / Light Mode with Arrow */}
+                  <button
+                    onClick={() => setIsDarkMode(!isDarkMode)}
+                    className="w-full px-4 py-3 text-left hover:bg-white/5 flex items-center justify-between text-neutral-300 hover:text-white transition"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      {isDarkMode ? <Moon className="w-4 h-4 text-indigo-400" /> : <Sun className="w-4 h-4 text-amber-400" />}
+                      <span>{isDarkMode ? "Dark Mode" : "Light Mode"}</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-neutral-500 uppercase">On ›</span>
+                  </button>
+
+                  <div className="h-px bg-white/[0.08]" />
+
+                  {/* Refer and Earn */}
+                  <Link
+                    href="/affiliates"
+                    onClick={() => setProfileDropdownOpen(false)}
+                    className="w-full px-4 py-3 text-left hover:bg-white/5 flex items-center gap-2.5 text-neutral-300 hover:text-white transition"
+                  >
+                    <Gift className="w-4 h-4 text-[#ccff00]" />
+                    <span>Refer & Earn (45% Off)</span>
+                  </Link>
+
+                  {/* Profile */}
+                  <Link
+                    href="/settings"
+                    onClick={() => setProfileDropdownOpen(false)}
+                    className="w-full px-4 py-3 text-left hover:bg-white/5 flex items-center gap-2.5 text-neutral-300 hover:text-white transition"
+                  >
+                    <User className="w-4 h-4 text-sky-400" />
+                    <span>Profile & Security</span>
+                  </Link>
+
+                  <div className="h-px bg-white/[0.08]" />
+
+                  {/* Logout */}
+                  <button
+                    onClick={handleLogout}
+                    className="w-full px-4 py-3 text-left hover:bg-rose-500/10 flex items-center gap-2.5 text-rose-400 hover:text-rose-300 transition"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Log Out</span>
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </header>
+
+      {/* ========================================================================= */}
+      {/* 2. MAIN LAYOUT: SIDEBAR + CONTENT AREA */}
+      {/* ========================================================================= */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* LEFT SIDEBAR (FundedNext "MENUBAR") */}
+        <aside
+          className={`border-r border-white/[0.08] bg-[#080a10] p-4 flex flex-col justify-between transition-all duration-300 overflow-y-auto ${
+            sidebarCollapsed ? "w-16" : "w-64"
+          } hidden lg:flex shrink-0`}
+        >
+          <div className="space-y-6">
+            <div className="px-2">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-neutral-500 font-bold">
+                {!sidebarCollapsed && "MENUBAR"}
+              </span>
+            </div>
+
+            <nav className="space-y-1">
+              {[
+                { label: "Accounts", href: "/dashboard", icon: Layers, active: true },
+                { label: "Payout", href: "/payouts", icon: CreditCard, active: false },
+                { label: "Refer & Earn", href: "/affiliates", icon: Gift, active: false },
+                { label: "Competitions", href: "/leaderboard", icon: Award, active: false },
+                { label: "Certificates", href: "/certificates", icon: FileCheck2, active: false },
+                { label: "Trading Rules", href: "/rules", icon: ShieldCheck, active: false },
+                { label: "Conditions", href: "/trading-conditions", icon: Activity, active: false },
+                { label: "Help & Support", href: "/contact", icon: HelpCircle, active: false },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    className={`flex items-center gap-3 px-3.5 py-3 rounded-2xl text-xs font-semibold transition ${
+                      item.active
+                        ? "bg-[#6366f1]/20 text-[#a5b4fc] border border-[#6366f1]/30 font-bold"
+                        : "text-neutral-400 hover:text-white hover:bg-white/5"
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 shrink-0 ${item.active ? "text-[#ccff00]" : "text-neutral-400"}`} />
+                    {!sidebarCollapsed && <span>{item.label}</span>}
+                  </Link>
+                );
+              })}
+          </nav>
+
+          {/* ---- ECONOMIC NEWS STRIP (FundedNext sidebar style) ---- */}
+          {!sidebarCollapsed && (
+            <div className="mt-2">
+              <div className="flex items-center justify-between mb-2 px-1">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-neutral-500 font-bold flex items-center gap-1.5">
+                  <Newspaper className="w-3 h-3" /> News
+                </span>
+                <button
+                  onClick={() => setNewsExpanded(!newsExpanded)}
+                  className="text-[10px] text-indigo-400 hover:text-indigo-200 transition font-semibold"
+                >
+                  {newsExpanded ? "Less ↑" : "More ↓"}
+                </button>
+              </div>
+
+              {/* Day Strip */}
+              <div className="flex gap-1 mb-2.5">
+                {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => {
+                  const today = new Date().getDay(); // 0=Sun
+                  const isToday = i === today;
+                  return (
+                    <div key={i} className="flex flex-col items-center gap-0.5 flex-1">
+                      <span className={`text-[9px] font-bold ${isToday ? "text-[#ccff00]" : "text-neutral-500"}`}>
+                        {d}
+                      </span>
+                      <div
+                        className={`w-1.5 h-1.5 rounded-full ${
+                          isToday
+                            ? "bg-[#ccff00]"
+                            : i < today
+                            ? "bg-indigo-500"
+                            : "bg-neutral-700"
+                        }`}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Economic Events List */}
+              <div className="space-y-1.5">
+                {[
+                  { name: "US Nonfarm Payrolls", time: "13:30", ccy: "USD", impact: "high" },
+                  { name: "ECB Rate Decision", time: "12:45", ccy: "EUR", impact: "high" },
+                  { name: "Japan CPI y/y", time: "23:30", ccy: "JPY", impact: "med" },
+                  { name: "UK Retail Sales", time: "06:00", ccy: "GBP", impact: "med" },
+                  { name: "CAD GDP m/m", time: "12:30", ccy: "CAD", impact: "low" },
+                  { name: "AUS Employment", time: "00:30", ccy: "AUD", impact: "med" },
+                ]
+                  .slice(0, newsExpanded ? 6 : 3)
+                  .map((ev, i) => (
+                    <div key={i} className="flex items-center justify-between gap-2 px-2 py-1.5 rounded-xl bg-white/[0.02] hover:bg-white/[0.05] transition cursor-default">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-semibold text-neutral-200 truncate leading-tight">
+                          {ev.name}
+                        </p>
+                        <p className="text-[9px] text-neutral-500 font-mono mt-0.5">{ev.time}</p>
+                      </div>
+                      <span
+                        className={`shrink-0 px-1.5 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
+                          ev.impact === "high"
+                            ? "bg-rose-500/20 text-rose-300"
+                            : ev.impact === "med"
+                            ? "bg-amber-500/20 text-amber-300"
+                            : "bg-neutral-700/40 text-neutral-400"
+                        }`}
+                      >
+                        {ev.ccy}
+                      </span>
+                    </div>
+                  ))}
+              </div>
+
+              <button
+                onClick={() => setNewsExpanded(!newsExpanded)}
+                className="mt-2 w-full text-center text-[10px] text-indigo-400 hover:text-indigo-200 transition font-semibold py-1"
+              >
+                {newsExpanded ? "Show less" : "+ 12 upcoming news"}
+              </button>
+            </div>
+          )}
+
+          {/* ---- CALCULATOR LAUNCHER (FundedNext sidebar style) ---- */}
+          {!sidebarCollapsed && (
+            <div className="mt-1">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-neutral-500 font-bold px-1 mb-2 block">
+                Calculator
+              </span>
+              <div className="grid grid-cols-2 gap-1.5">
+                {[
+                  { tab: "margin" as CalculatorTab, label: "Margin", Icon: LayoutGrid },
+                  { tab: "profit" as CalculatorTab, label: "Profit/Loss", Icon: TrendingDown },
+                  { tab: "lotsize" as CalculatorTab, label: "Lot Size", Icon: Sigma },
+                  { tab: "swap" as CalculatorTab, label: "Swap", Icon: Repeat2 },
+                ].map(({ tab, label, Icon }) => (
+                  <button
+                    key={tab}
+                    onClick={() => { setCalcTab(tab); setShowCalcModal(true); }}
+                    className="flex flex-col items-center gap-1.5 py-2.5 px-2 rounded-2xl bg-white/[0.03] hover:bg-indigo-500/10 hover:border-indigo-500/30 border border-white/5 transition group"
+                  >
+                    <Icon className="w-4 h-4 text-neutral-400 group-hover:text-indigo-300 transition" />
+                    <span className="text-[9px] font-semibold text-neutral-400 group-hover:text-white transition leading-tight text-center">
+                      {label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Brokerage Bottom Pill (FundedNext Style) */}
+        {!sidebarCollapsed && (
+          <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-between text-xs">
+            <div>
+              <p className="font-bold text-white text-xs flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#ccff00] animate-pulse" />
+                MaxFunded LP
+              </p>
+              <p className="text-[10px] text-neutral-400 mt-0.5">Tier-1 MT5 Liquidity</p>
+            </div>
+            <ExternalLink className="w-3.5 h-3.5 text-neutral-500" />
+          </div>
+        )}
+      </aside>
+
+      {/* Calculator Modal — rendered at root level to overlay everything */}
+      <TraderCalculatorModal
+        isOpen={showCalcModal}
+        onClose={() => setShowCalcModal(false)}
+        defaultTab={calcTab}
+        accountSize={accountSizeNum}
+      />
+
+      {/* MAIN WORKSPACE */}
+      <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto w-full">
+        {/* Breadcrumbs */}
+        <div className="flex items-center gap-2 text-xs text-neutral-400 font-medium">
+          <Link href="/" className="hover:text-white">Accounts</Link>
+          <span>›</span>
+          <span className="text-white font-semibold">Account Overview</span>
+        </div>
+
+
+          {/* Auth State Warning if no session */}
+          {error && !summary && (
+            <div className="p-6 rounded-2xl bg-[#0e1017] border border-white/10 text-center space-y-4">
+              <h3 className="text-lg font-bold text-white">Sign In to View Live Account</h3>
+              <p className="text-neutral-400 text-xs max-w-md mx-auto">
+                Connect your MaxFunded credentials to monitor your live MT5 balance, drawdown limits, and request payouts.
+              </p>
+              <div className="flex justify-center gap-3">
+                <button
+                  onClick={handleQuickDemoLogin}
+                  className="px-6 py-2.5 rounded-xl bg-[#ccff00] hover:bg-[#b8e600] text-black font-extrabold text-xs uppercase"
+                >
+                  ⚡ Fill Demo Account (1-Click)
+                </button>
+                <Link
+                  href="/login"
+                  className="px-6 py-2.5 rounded-xl bg-white/10 text-white font-bold text-xs"
+                >
+                  Log In
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* 3. ACCOUNT HEADER CARD (FundedNext Style) */}
+          {/* ========================================================================= */}
+          <div className="rounded-3xl bg-[#0c0e15] border border-white/[0.08] p-5 sm:p-6 shadow-xl relative overflow-hidden">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+              {/* Left & Middle Info */}
+              <div className="flex flex-wrap items-center gap-5">
+                {/* Purple Challenge Badge Box */}
+                <div className="w-36 h-24 rounded-2xl bg-gradient-to-br from-[#3b1754] to-[#1c0d2b] border border-[#a855f7]/30 p-3.5 flex flex-col justify-between shadow-lg">
+                  <div>
+                    <span className="text-[10px] font-bold text-purple-300 uppercase tracking-widest block">
+                      {summary?.phase === "FUNDED" ? "Funded Tier" : "Evaluation"}
+                    </span>
+                    <span className="text-xl font-black text-white font-mono">
+                      {summary ? `$${(accountSizeNum / 1000).toFixed(0)}K` : "$100K"}
+                    </span>
+                  </div>
+                  <span className="text-[9px] font-black uppercase tracking-wider text-purple-400">
+                    CHALLENGE
+                  </span>
+                </div>
+
+                {/* Account Details */}
+                <div className="space-y-2">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <h2 className="text-xl sm:text-2xl font-black text-white font-mono tracking-tight">
+                      Login ID : {summary?.mt5_login || "35172367"}
+                    </h2>
+                    <span className="px-2.5 py-0.5 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold uppercase">
+                      {summary?.account_status || "Active"}
+                    </span>
+                    <span className="text-xs text-neutral-400 font-mono font-semibold flex items-center gap-1">
+                      <BarChart2 className="w-3 h-3 text-[#ccff00]" /> MT5
+                    </span>
+                    <span className="text-xs text-neutral-400 font-mono font-semibold">
+                      ⇄ Swap Free
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-neutral-400 flex items-center gap-1.5 font-mono">
+                    <Clock className="w-3.5 h-3.5 text-neutral-500" />
+                    <span>Trading Cycle: Zero Time Limits • 0 Minimum Trading Days Required</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Right Action: Login Info Button */}
+              <div className="flex items-center gap-3 self-start lg:self-center">
+                <button
+                  onClick={() => setShowLoginInfoModal(true)}
+                  className="px-5 py-3 rounded-2xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 hover:border-white/20 text-white font-bold text-xs flex items-center gap-2 transition"
+                >
+                  <Lock className="w-3.5 h-3.5 text-[#ccff00]" />
+                  <span>Login Info</span>
+                </button>
+
+                <button
+                  onClick={loadData}
+                  className="p-3 rounded-2xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-neutral-400 hover:text-white transition"
+                  title="Refresh metrics"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+                </button>
+              </div>
+            </div>
+
+            {/* Secondary Sub-Tabs Strip (Overview, Calendar, History, Platform) */}
+            <div className="mt-6 pt-4 border-t border-white/[0.06] flex items-center gap-6 text-xs font-bold">
+              {[
+                { id: "overview", label: "Overview" },
+                { id: "calendar", label: "Calendar" },
+                { id: "history", label: "History" },
+                { id: "platform", label: "Platform" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveSubTab(tab.id as any)}
+                  className={`pb-2 relative transition ${
+                    activeSubTab === tab.id
+                      ? "text-[#ccff00]"
+                      : "text-neutral-400 hover:text-white"
+                  }`}
+                >
+                  <span>{tab.label}</span>
+                  {activeSubTab === tab.id && (
+                    <motion.div
+                      layoutId="subTabIndicator"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#ccff00]"
+                    />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* ========================================================================= */}
+          {/* 4. TRADING OBJECTIVES 4-CARD STRIP (FundedNext Exact Layout) */}
+          {/* ========================================================================= */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-xs font-mono">
+              <div className="flex items-center gap-2 text-neutral-400">
+                <span className="font-bold text-white uppercase tracking-wider">Trading Objectives</span>
+                <span>•</span>
+                <span className="px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 font-semibold">
+                  Refresh in 4 Min : 19 Sec
+                </span>
+              </div>
+              <button
+                onClick={loadData}
+                className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300 text-xs transition"
+              >
+                <RefreshCw className="w-3 h-3 text-[#ccff00]" />
+                <span>Refresh</span>
+              </button>
+            </div>
+
+            {/* 4 Objective Bento Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Card 1: Profit Target */}
+              <div className="bento-card bg-[#0b0d13] border border-white/10 rounded-2xl p-5 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between text-neutral-400 text-xs mb-1">
+                    <span className="font-medium flex items-center gap-1">Profit target <Info className="w-3 h-3 text-neutral-500" /></span>
+                  </div>
+                  <div className="text-2xl font-black text-white font-mono mb-4">
+                    ${profitTargetAmt.toLocaleString()}
+                  </div>
+
+                  {/* Tick Marks Progress Bar */}
+                  <div className="mb-4">
+                    <div className="flex justify-between text-[10px] font-mono text-neutral-500 mb-1">
+                      <span className="text-[#ccff00] font-bold">{profitProgressPct.toFixed(0)}%</span>
+                      <span>100%</span>
+                    </div>
+                    <div className="h-4 rounded-md bg-white/[0.04] p-0.5 border border-white/5 flex items-center overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-emerald-500 to-[#ccff00] rounded-sm transition-all duration-500"
+                        style={{ width: `${profitProgressPct}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-white/5 text-xs text-neutral-400 flex justify-between font-mono">
+                  <span>Result:</span>
+                  <span className="font-bold text-white">${Math.max(0, netProfit).toLocaleString()}</span>
+                </div>
+              </div>
+
+              {/* Card 2: Min Trading Days */}
+              <div className="bento-card bg-[#0b0d13] border border-white/10 rounded-2xl p-5 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between text-neutral-400 text-xs mb-1">
+                    <span className="font-medium flex items-center gap-1">Min trading days <Info className="w-3 h-3 text-neutral-500" /></span>
+                  </div>
+                  <div className="text-2xl font-black text-white font-mono mb-4">
+                    0 Days <span className="text-xs font-normal text-[#ccff00]">(No Min)</span>
+                  </div>
+
+                  {/* Segmented Progress Pills */}
+                  <div className="mb-4 pt-3">
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="h-4 rounded-md bg-[#ccff00]/20 border border-[#ccff00]/40 flex items-center justify-center">
+                        <CheckCircle2 className="w-3 h-3 text-[#ccff00]" />
+                      </div>
+                      <div className="h-4 rounded-md bg-[#ccff00]/20 border border-[#ccff00]/40 flex items-center justify-center">
+                        <CheckCircle2 className="w-3 h-3 text-[#ccff00]" />
+                      </div>
+                      <div className="h-4 rounded-md bg-[#ccff00]/20 border border-[#ccff00]/40 flex items-center justify-center">
+                        <CheckCircle2 className="w-3 h-3 text-[#ccff00]" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-white/5 text-xs text-neutral-400 flex justify-between font-mono">
+                  <span>Result:</span>
+                  <span className="font-bold text-[#ccff00]">Pass Immediately</span>
+                </div>
+              </div>
+
+              {/* Card 3: Daily Loss Limit (-5%) */}
+              <div className="bento-card bg-[#0b0d13] border border-white/10 rounded-2xl p-5 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between text-neutral-400 text-xs mb-1">
+                    <span className="font-medium flex items-center gap-1">Daily loss limit (-5%) <Info className="w-3 h-3 text-neutral-500" /></span>
+                  </div>
+                  <div className="text-2xl font-black text-white font-mono mb-4">
+                    ${dailyLossLimitAmt.toLocaleString()}
+                  </div>
+
+                  {/* Gauge Tick Bars */}
+                  <div className="mb-4">
+                    <div className="flex justify-between text-[10px] font-mono text-neutral-500 mb-1">
+                      <span>0%</span>
+                      <span>Safe Buffer</span>
+                    </div>
+                    <div className="h-4 rounded-md bg-white/[0.04] p-0.5 border border-white/5 flex items-center overflow-hidden">
+                      <div
+                        className="h-full bg-emerald-500 rounded-sm"
+                        style={{ width: `${Math.min(100, (dailyUsedAmt / dailyLossLimitAmt) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-white/5 text-xs text-neutral-400 flex justify-between font-mono">
+                  <span>Remaining:</span>
+                  <span className="font-bold text-white">${dailyRemainingAmt.toLocaleString()}</span>
+                </div>
+              </div>
+
+              {/* Card 4: Max Loss Limit (-10%) */}
+              <div className="bento-card bg-[#0b0d13] border border-white/10 rounded-2xl p-5 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between text-neutral-400 text-xs mb-1">
+                    <span className="font-medium flex items-center gap-1">Max loss limit (-10%) <Info className="w-3 h-3 text-neutral-500" /></span>
+                  </div>
+                  <div className="text-2xl font-black text-white font-mono mb-4">
+                    ${maxLossLimitAmt.toLocaleString()}
+                  </div>
+
+                  {/* Gauge Tick Bars */}
+                  <div className="mb-4">
+                    <div className="flex justify-between text-[10px] font-mono text-neutral-500 mb-1">
+                      <span>0%</span>
+                      <span>Static 10% Buffer</span>
+                    </div>
+                    <div className="h-4 rounded-md bg-white/[0.04] p-0.5 border border-white/5 flex items-center overflow-hidden">
+                      <div
+                        className="h-full bg-emerald-500 rounded-sm"
+                        style={{ width: `${Math.min(100, (maxUsedAmt / maxLossLimitAmt) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-white/5 text-xs text-neutral-400 flex justify-between font-mono">
+                  <span>Remaining:</span>
+                  <span className="font-bold text-white">${maxRemainingAmt.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ========================================================================= */}
+          {/* 5. CURRENT BALANCE & EQUITY OVERVIEW PANEL */}
+          {/* ========================================================================= */}
+          <div className="bento-card bg-[#0b0d13] border border-white/10 rounded-3xl p-6 shadow-xl">
+            <div className="flex items-center justify-between pb-4 border-b border-white/5 mb-5">
+              <h3 className="text-base font-extrabold text-white">Current balance</h3>
+              <button
+                onClick={() => setShowBalanceDetails(!showBalanceDetails)}
+                className="text-xs text-neutral-400 hover:text-white flex items-center gap-1 font-mono transition"
+              >
+                <span>{showBalanceDetails ? "Hide details" : "Show details"}</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showBalanceDetails ? "rotate-180" : ""}`} />
+              </button>
+            </div>
+
+            {showBalanceDetails && (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 font-mono text-sm">
+                <div>
+                  <span className="text-neutral-500 text-xs block mb-1">Initial balance</span>
+                  <span className="text-white font-bold text-base sm:text-lg">
+                    {fmtCurrency(accountSizeNum)}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-neutral-500 text-xs block mb-1">Equity</span>
+                  <span className="text-white font-bold text-base sm:text-lg">
+                    {fmtCurrency(equityNum)}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-neutral-500 text-xs block mb-1">Profit/Loss</span>
+                  <span className={`font-bold text-base sm:text-lg ${netProfit >= 0 ? "text-[#ccff00]" : "text-rose-400"}`}>
+                    {netProfit >= 0 ? "+" : ""}{fmtCurrency(netProfit)}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-neutral-500 text-xs block mb-1">Floating Profit/Loss</span>
+                  <span className={`font-bold text-base sm:text-lg ${(equityNum - balanceNum) >= 0 ? "text-[#ccff00]" : "text-rose-400"}`}>
+                    {(equityNum - balanceNum) >= 0 ? "+" : ""}{fmtCurrency(equityNum - balanceNum)}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ========================================================================= */}
+          {/* 6. ACCOUNT STATUS & EQUITY CHART CONTAINER */}
+          {/* ========================================================================= */}
+          <div className="bento-card bg-[#0b0d13] border border-white/10 rounded-3xl p-6 shadow-xl space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-base font-extrabold text-white">Account Status</h3>
+              <div className="flex items-center gap-2">
+                <select
+                  value={chartTimeframe}
+                  onChange={(e) => setChartTimeframe(e.target.value as any)}
+                  className="bg-[#14161f] border border-white/10 rounded-xl px-3 py-1.5 text-xs font-mono text-white outline-none"
+                >
+                  <option value="7 Days">7 Days</option>
+                  <option value="30 Days">30 Days</option>
+                  <option value="All">All Time</option>
+                </select>
+              </div>
+            </div>
+
+            {/* When No Trades Have Occurred (FundedNext Empty State) */}
+            {equityCurve.length === 0 ? (
+              <div className="h-72 rounded-2xl bg-[#07090e] border border-white/5 flex flex-col items-center justify-center text-center p-6">
+                <BarChart2 className="w-12 h-12 text-neutral-600 mb-3 stroke-[1.5]" />
+                <p className="text-neutral-300 font-mono text-sm font-bold">No data available</p>
+                <p className="text-neutral-500 text-xs mt-1 max-w-sm">
+                  Execute your first position on your MetaTrader 5 account to populate real-time equity curves and drawdown analytics.
+                </p>
+              </div>
+            ) : (
+              <InteractiveEquityChart points={equityCurve} startingBalance={accountSizeNum} />
+            )}
+          </div>
+
+          {/* Sub-Tab Viewers for Calendar & History */}
+          {activeSubTab === "calendar" && (
+            <div className="bento-card bg-[#0b0d13] border border-white/10 rounded-3xl p-6">
+              <EconomicCalendar />
+            </div>
+          )}
+
+          {activeSubTab === "history" && (
+            <div className="bento-card bg-[#0b0d13] border border-white/10 rounded-3xl p-6">
+              <TradingJournal />
+            </div>
+          )}
+        </main>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 7. LOGIN INFO MODAL (MT5 CREDENTIALS) */}
+      {/* ========================================================================= */}
       <AnimatePresence>
-        {showPayoutModal && (
+        {showLoginInfoModal && (
           <motion.div
-            key="payout-modal-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[99999] flex items-center justify-center p-4"
-            style={{ background: "rgba(0,0,0,0.75)", backdropFilter: "blur(12px)" }}
-            onClick={() => setShowPayoutModal(false)}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+            onClick={() => setShowLoginInfoModal(false)}
           >
             <motion.div
-              key="payout-modal-card"
-              initial={{ opacity: 0, scale: 0.92, y: 24 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.92, y: 24 }}
-              transition={{ type: "spring", stiffness: 280, damping: 24 }}
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-[#0c0e12] border border-[#ccff00]/25 rounded-3xl p-8 shadow-[0_0_60px_rgba(204,255,0,0.12)] max-w-md w-full relative overflow-hidden"
+              className="bg-[#0e1118] border border-white/15 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative"
             >
-              {/* Glow orb */}
-              <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#ccff00]/10 blur-3xl pointer-events-none" />
+              <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
+                <div className="flex items-center gap-2.5">
+                  <Lock className="w-5 h-5 text-[#ccff00]" />
+                  <h3 className="text-lg font-bold text-white">MetaTrader 5 Credentials</h3>
+                </div>
+                <button
+                  onClick={() => setShowLoginInfoModal(false)}
+                  className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-white/10"
+                >
+                  ✕
+                </button>
+              </div>
 
-              {!payoutSubmitted ? (
-                <>
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-[#ccff00]/10 border border-[#ccff00]/30 flex items-center justify-center text-[#ccff00]">
-                      <CreditCard size={18} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Withdraw Profits</p>
-                      <h3 className="text-xl font-black text-white tracking-tight">Request Payout</h3>
-                    </div>
+              <div className="space-y-4 font-mono text-xs">
+                {/* Server */}
+                <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] text-neutral-500 uppercase block mb-0.5">Server Name</span>
+                    <span className="text-white font-bold">{summary?.mt5_server || "RoboForex-Demo"}</span>
                   </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-xs font-bold uppercase tracking-wider text-neutral-400 block mb-1.5">USDT (TRC-20) Wallet Address</label>
-                      <input
-                        type="text"
-                        value={payoutAddress}
-                        onChange={(e) => setPayoutAddress(e.target.value)}
-                        placeholder="T..."
-                        className="w-full bg-[#14161c] border border-white/[0.08] focus:border-[#ccff00]/50 rounded-xl px-4 py-3 text-white font-mono text-sm outline-none transition placeholder-neutral-600"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs font-bold uppercase tracking-wider text-neutral-400 block mb-1.5">Payout Amount (USD)</label>
-                      <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 font-bold text-sm">$</span>
-                        <input
-                          type="number"
-                          value={payoutAmount}
-                          onChange={(e) => setPayoutAmount(e.target.value)}
-                          placeholder="0.00"
-                          min="100"
-                          className="w-full bg-[#14161c] border border-white/[0.08] focus:border-[#ccff00]/50 rounded-xl pl-8 pr-4 py-3 text-white font-mono text-sm outline-none transition placeholder-neutral-600"
-                        />
-                      </div>
-                      <p className="text-[11px] text-neutral-500 mt-1.5">Minimum payout: \$100 · Processed within 24–48h</p>
-                    </div>
-
-                    <div className="bg-[#ccff00]/[0.04] border border-[#ccff00]/15 rounded-xl p-3.5 text-xs text-neutral-400 leading-relaxed">
-                      ⚡ Payouts are processed in <span className="text-[#ccff00] font-semibold">USDT (TRC-20)</span>. Ensure your wallet address is correct — transactions are irreversible.
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        if (!payoutAddress || !payoutAmount) return;
-                        setPayoutSubmitted(true);
-                      }}
-                      disabled={!payoutAddress || !payoutAmount}
-                      className="w-full bg-[#ccff00] hover:bg-[#b3e600] disabled:opacity-40 disabled:cursor-not-allowed text-black font-black py-3.5 rounded-xl transition shadow-[0_0_30px_rgba(204,255,0,0.3)] text-sm mt-1"
-                    >
-                      Submit Payout Request →
-                    </button>
-                    <button
-                      onClick={() => setShowPayoutModal(false)}
-                      className="w-full text-neutral-500 hover:text-neutral-300 text-xs py-2 transition"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className="text-center py-4">
-                  <div className="w-16 h-16 rounded-full bg-[#ccff00]/10 border border-[#ccff00]/30 flex items-center justify-center mx-auto mb-5 text-[#ccff00]">
-                    <CheckCircle size={32} />
-                  </div>
-                  <h3 className="text-2xl font-black text-white mb-2">Request Submitted!</h3>
-                  <p className="text-neutral-400 text-sm mb-1">Your payout of <span className="text-[#ccff00] font-bold">\${payoutAmount}</span> USDT is being reviewed.</p>
-                  <p className="text-neutral-500 text-xs mb-6">You will receive a confirmation email within 24–48 hours.</p>
                   <button
-                    onClick={() => setShowPayoutModal(false)}
-                    className="bg-[#ccff00] hover:bg-[#b3e600] text-black font-bold px-8 py-3 rounded-xl transition text-sm"
+                    onClick={() => copyToClipboard(summary?.mt5_server || "RoboForex-Demo", "server")}
+                    className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300"
                   >
-                    Done
+                    {copiedField === "server" ? <CheckCircle2 className="w-4 h-4 text-[#ccff00]" /> : <Copy className="w-4 h-4" />}
                   </button>
                 </div>
-              )}
+
+                {/* Login ID */}
+                <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] text-neutral-500 uppercase block mb-0.5">Account Login</span>
+                    <span className="text-[#ccff00] font-black text-sm">{summary?.mt5_login || "35172367"}</span>
+                  </div>
+                  <button
+                    onClick={() => copyToClipboard(summary?.mt5_login || "35172367", "login")}
+                    className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300"
+                  >
+                    {copiedField === "login" ? <CheckCircle2 className="w-4 h-4 text-[#ccff00]" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                </div>
+
+                {/* Master Password */}
+                <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] text-neutral-500 uppercase block mb-0.5">Master Trader Password</span>
+                    <span className="text-white font-bold">
+                      {showPassword ? (summary?.mt5_password || "Mxf_LivePass2026!") : "••••••••••••"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                    <button
+                      onClick={() => copyToClipboard(summary?.mt5_password || "Mxf_LivePass2026!", "pass")}
+                      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300"
+                    >
+                      {copiedField === "pass" ? <CheckCircle2 className="w-4 h-4 text-[#ccff00]" /> : <Copy className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Investor Password */}
+                <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] text-neutral-500 uppercase block mb-0.5">Investor Password (Read-Only)</span>
+                    <span className="text-neutral-300 font-bold">{summary?.mt5_investor_password || "Inv_ReadOnly2026"}</span>
+                  </div>
+                  <button
+                    onClick={() => copyToClipboard(summary?.mt5_investor_password || "Inv_ReadOnly2026", "inv")}
+                    className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-neutral-300"
+                  >
+                    {copiedField === "inv" ? <CheckCircle2 className="w-4 h-4 text-[#ccff00]" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-white/10 flex gap-3">
+                <a
+                  href="https://www.metatrader5.com/en/download"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 py-3 rounded-xl bg-[#ccff00] hover:bg-[#b8e600] text-black font-extrabold text-xs text-center uppercase tracking-wider transition"
+                >
+                  Download MetaTrader 5
+                </a>
+              </div>
             </motion.div>
           </motion.div>
         )}
